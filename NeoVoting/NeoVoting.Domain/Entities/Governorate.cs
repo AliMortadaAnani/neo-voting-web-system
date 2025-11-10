@@ -1,4 +1,6 @@
-﻿namespace NeoVoting.Domain.Entities
+﻿using NeoVoting.Domain.Enums;
+
+namespace NeoVoting.Domain.Entities
 {
     public class Governorate
     {
@@ -19,46 +21,29 @@
         private Governorate() { }
 
 
-        // --- Factory Methods ---
-
-        /// <summary>
-        /// Creates a new instance representing the Beirut governorate.
-        /// </summary>
         public static Governorate CreateBeirut()
         {
-            return new Governorate { Id = 1, Name = "Beirut" };
+            return new Governorate { Id = (int)GovernoratesEnum.Beirut, Name = GovernoratesEnum.Beirut.GetDescription() };
         }
 
-        /// <summary>
-        /// Creates a new instance representing the Mount Lebanon governorate.
-        /// </summary>
         public static Governorate CreateMountLebanon()
         {
-            return new Governorate { Id = 2, Name = "Mount Lebanon" };
+            return new Governorate { Id = (int)GovernoratesEnum.MountLebanon, Name = GovernoratesEnum.MountLebanon.GetDescription() };
         }
 
-        /// <summary>
-        /// Creates a new instance representing the South governorate.
-        /// </summary>
         public static Governorate CreateSouth()
         {
-            return new Governorate { Id = 3, Name = "South" };
+            return new Governorate { Id = (int)GovernoratesEnum.South, Name = GovernoratesEnum.South.GetDescription() };
         }
 
-        /// <summary>
-        /// Creates a new instance representing the East governorate.
-        /// </summary>
         public static Governorate CreateEast()
         {
-            return new Governorate { Id = 4, Name = "East" };
+            return new Governorate { Id = (int)GovernoratesEnum.East, Name = GovernoratesEnum.East.GetDescription() };
         }
 
-        /// <summary>
-        /// Creates a new instance representing the North governorate.
-        /// </summary>
         public static Governorate CreateNorth()
         {
-            return new Governorate { Id = 5, Name = "North" };
+            return new Governorate { Id = (int)GovernoratesEnum.North, Name = GovernoratesEnum.North.GetDescription() };
         }
     }
 }
