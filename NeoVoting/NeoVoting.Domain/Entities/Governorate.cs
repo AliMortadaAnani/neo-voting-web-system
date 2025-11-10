@@ -21,6 +21,10 @@ namespace NeoVoting.Domain.Entities
         /// </summary>
         private Governorate() { }
 
+        public override string ToString()
+        {
+            return $"{Name} (Id: {Id})";
+        }
 
         public static Governorate CreateBeirutGovernorate()
         {
