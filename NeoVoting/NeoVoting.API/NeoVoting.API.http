@@ -1,0 +1,6 @@
+@NeoVoting.API_HostAddress = http://localhost:5239
+
+GET {{NeoVoting.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
