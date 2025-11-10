@@ -1,0 +1,60 @@
+# Ignore Visual Studio temporary/workspace files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore build output
+[Bb]in/
+[Oo]bj/
+out/
+
+# Ignore NuGet packages
+*.nupkg
+*.snupkg
+**/packages/*
+**/packages/
+# (If you use packages folder, but usually with package references you can skip this)
+
+# Ignore generated files
+*.log
+*.tlog
+*.dll
+*.exe
+*.pdb
+*.cache
+*.dbmdl
+*.bak
+
+# Ignore secrets, credentials
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Ignore test results/build reports
+TestResults/
+*.coverage
+*.coveragexml
+*.trx
+
+# Ignore Rider/other IDE files
+.idea/
+*.resharper
+*.DotSettings.user
+
+# Ignore OS-level files
+*.DS_Store
+Thumbs.db
+
+# Ignore node/npm if using front-end
+node_modules/
+
+# Ignore Python/other if present
+*.pyc
+__pycache__/
+
+# Ignore yarn/pnpm
+yarn.lock
+pnpm-lock.yaml
