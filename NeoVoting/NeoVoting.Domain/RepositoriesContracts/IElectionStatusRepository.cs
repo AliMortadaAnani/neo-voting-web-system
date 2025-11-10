@@ -4,6 +4,6 @@ namespace NeoVoting.Domain.RepositoriesContracts
 {
     public interface IElectionStatusRepository
     {
-        Task<List<ElectionStatus>> GetAllElectionStatuses();
+        Task<IReadOnlyList<ElectionStatus>> GetAllElectionStatuses();
     }
 }

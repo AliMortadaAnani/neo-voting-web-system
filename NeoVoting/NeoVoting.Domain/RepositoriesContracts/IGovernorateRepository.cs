@@ -5,6 +5,6 @@ namespace NeoVoting.Domain.RepositoriesContracts
 {
     public interface IGovernorateRepository
     {
-        Task<List<Governorate>> GetAllGovernorates();
+        Task<IReadOnlyList<Governorate>> GetAllGovernorates();
     }
 }
