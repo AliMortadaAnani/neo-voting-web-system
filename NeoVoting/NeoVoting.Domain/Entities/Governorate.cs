@@ -4,8 +4,9 @@ namespace NeoVoting.Domain.Entities
 {
     public class Governorate
     {
+        // TODO: Consider caching these instances if they are frequently used.
         // The primary key of the table.
-        
+
         public int Id { get; set; }
 
         // The name of the governorate.
@@ -21,27 +22,27 @@ namespace NeoVoting.Domain.Entities
         private Governorate() { }
 
 
-        public static Governorate CreateBeirut()
+        public static Governorate CreateBeirutGovernorate()
         {
             return new Governorate { Id = (int)GovernoratesEnum.Beirut, Name = GovernoratesEnum.Beirut.GetDescription() };
         }
 
-        public static Governorate CreateMountLebanon()
+        public static Governorate CreateMountLebanonGovernorate()
         {
             return new Governorate { Id = (int)GovernoratesEnum.MountLebanon, Name = GovernoratesEnum.MountLebanon.GetDescription() };
         }
 
-        public static Governorate CreateSouth()
+        public static Governorate CreateSouthGovernorate()
         {
             return new Governorate { Id = (int)GovernoratesEnum.South, Name = GovernoratesEnum.South.GetDescription() };
         }
 
-        public static Governorate CreateEast()
+        public static Governorate CreateEastGovernorate()
         {
             return new Governorate { Id = (int)GovernoratesEnum.East, Name = GovernoratesEnum.East.GetDescription() };
         }
 
-        public static Governorate CreateNorth()
+        public static Governorate CreateNorthGovernorate()
         {
             return new Governorate { Id = (int)GovernoratesEnum.North, Name = GovernoratesEnum.North.GetDescription() };
         }

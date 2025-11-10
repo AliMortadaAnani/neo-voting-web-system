@@ -1,14 +1,13 @@
-﻿using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums; // Don't forget to import the enum's namespace
+﻿using NeoVoting.Domain.Enums; 
 
 namespace NeoVoting.Domain.Entities
 {
     public class ElectionStatus
-    {
+    {   // TODO: Consider caching these instances if they are frequently used.
         // --- Properties ---
 
         public int Id { get;  set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         // --- Constructor ---
 
@@ -35,7 +34,7 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Creates a new instance representing the Upcoming status.
         /// </summary>
-        public static ElectionStatus CreateUpcoming()
+        public static ElectionStatus CreateUpcomingStatus()
         {
             return new ElectionStatus
             {
@@ -47,7 +46,7 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Creates a new instance representing the Nomination status.
         /// </summary>
-        public static ElectionStatus CreateNomination()
+        public static ElectionStatus CreateNominationStatus()
         {
             return new ElectionStatus
             {
@@ -59,7 +58,7 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Creates a new instance representing the Voting status.
         /// </summary>
-        public static ElectionStatus CreateVoting()
+        public static ElectionStatus CreateVotingStatus()
         {
             return new ElectionStatus
             {
@@ -71,7 +70,7 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Creates a new instance representing the Completed status.
         /// </summary>
-        public static ElectionStatus CreateCompleted()
+        public static ElectionStatus CreateCompletedStatus()
         {
             return new ElectionStatus
             {
