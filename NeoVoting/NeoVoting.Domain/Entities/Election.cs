@@ -18,7 +18,7 @@ namespace NeoVoting.Domain.Entities
         // --- Foreign Key & Navigation Property ---
 
         public int ElectionStatusId { get; private set; } // to enforce controlled state transitions
-        public ElectionStatus? ElectionStatus { get; private set; }
+        public ElectionStatus ElectionStatus { get; private set; }
 
 
         // --- Constructor ---
@@ -27,7 +27,9 @@ namespace NeoVoting.Domain.Entities
         /// A private constructor to force all object creation to go through the
         /// controlled, static factory method. EF Core uses this for materializing.
         /// </summary>
-        private Election() { }
+        private Election() {
+        ElectionStatus = null!;
+        }
 
 
         // --- ToString() Override ---
