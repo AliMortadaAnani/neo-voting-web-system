@@ -6,8 +6,8 @@ namespace NeoVoting.Domain.Entities
     {   // TODO: Consider caching these instances if they are frequently used.
         // --- Properties ---
 
-        public int Id { get;  set; }
-        public required string Name { get; set; }
+        public int Id { get; private set; }
+        public required string Name { get; init; }
 
         // --- Constructor ---
 

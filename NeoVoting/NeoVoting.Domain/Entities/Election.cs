@@ -8,16 +8,17 @@ namespace NeoVoting.Domain.Entities
     {
         // --- Properties ---
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public DateTime NominationStartDate { get; set; }
-        public DateTime NominationEndDate { get; set; }
-        public DateTime VotingStartDate { get; set; }
-        public DateTime VotingEndDate { get; set; }
+        public Guid Id { get;private set; }
+        public required string Name { get; set; }
+        public DateTime NominationStartDate { get; private set; }
+        public DateTime NominationEndDate { get; private set; }
+        public DateTime VotingStartDate { get; private set; }
+        public DateTime VotingEndDate { get; private set; }
 
         // --- Foreign Key & Navigation Property ---
-        public int ElectionStatusId { get; set; }
-        public ElectionStatus? ElectionStatus { get; set; }
+
+        public int ElectionStatusId { get; private set; } // to enforce controlled state transitions
+        public ElectionStatus? ElectionStatus { get; private set; }
 
 
         // --- Constructor ---
@@ -81,6 +82,65 @@ namespace NeoVoting.Domain.Entities
 
             return election;
         }
+
+        public void Update(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
+        {
+            // --- Centralized Validation Logic ---
+            Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate);
+
+
+                this.Name = name;
+                this.NominationStartDate = nominationStartDate;
+                this.NominationEndDate = nominationEndDate;
+                this.VotingStartDate = votingStartDate;
+                this.VotingEndDate = votingEndDate;
+              
+
+            
+        }
+
+
+        /// <summary>
+        /// Moves the election to the Nomination phase.
+        /// Throws an exception if the election is not in the 'Upcoming' state.
+        /// </summary>
+        public void StartNomination()
+        {
+            if (ElectionStatusId != (int)ElectionStatusEnum.Upcoming)
+            {
+                throw new InvalidOperationException("Cannot start nomination unless the election is in the 'Upcoming' state.");
+            }
+            ElectionStatusId = (int)ElectionStatusEnum.Nomination;
+        }
+
+        /// <summary>
+        /// Moves the election to the Voting phase.
+        /// Throws an exception if the election is not in the 'Nomination' state.
+        /// </summary>
+        public void StartVoting()
+        {
+            if (ElectionStatusId != (int)ElectionStatusEnum.Nomination)
+            {
+                throw new InvalidOperationException("Cannot start voting unless the election is in the 'Nomination' state.");
+            }
+            ElectionStatusId = (int)ElectionStatusEnum.Voting;
+        }
+
+        /// <summary>
+        /// Moves the election to the Completed phase.
+        /// Throws an exception if the election is not in the 'Voting' state.
+        /// </summary>
+        public void CompleteElection()
+        {
+            if (ElectionStatusId != (int)ElectionStatusEnum.Voting)
+            {
+                throw new InvalidOperationException("Cannot complete the election unless it is in the 'Voting' state.");
+            }
+            ElectionStatusId = (int)ElectionStatusEnum.Completed;
+        }
+
+
+
 
         /// <summary>
         /// Private helper method to contain all validation rules for creating an election.

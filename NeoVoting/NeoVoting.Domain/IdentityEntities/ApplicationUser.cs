@@ -16,9 +16,9 @@ namespace NeoVoting.Domain.IdentityEntities
         public string? LastName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public char? Gender { get; set; }
-        public int? GovernorateID { get; set; }
+        public int? GovernorateID { get; private set; }
 
-        public  Governorate? Governorate { get; set; } // Navigation property
+        public  Governorate? Governorate { get; private set; } // Navigation property
 
 
         /// <summary>
@@ -54,7 +54,8 @@ namespace NeoVoting.Domain.IdentityEntities
 
             if (GovernorateID.HasValue)
             {
-                sb.Append($", GovID: {GovernorateID.Value}");
+                sb.Append($", GovID: ({GovernorateID.Value})" +
+                    $" {((GovernoratesEnum)GovernorateID).GetDescription()}");
             }
 
             // For the refresh token, just indicate its presence, not the token itself.

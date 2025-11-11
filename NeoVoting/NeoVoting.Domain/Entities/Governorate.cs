@@ -7,10 +7,12 @@ namespace NeoVoting.Domain.Entities
         // TODO: Consider caching these instances if they are frequently used.
         // The primary key of the table.
 
-        public int Id { get; set; }
+        public int Id { get; private set; }
 
         // The name of the governorate.
-        public required string Name { get; set; }
+        public required string Name { get; init; }
+        //we will use init to make it immutable after creation
+        /*private set; } */  /*= null!;*/
 
         // --- Constructor ---
 
