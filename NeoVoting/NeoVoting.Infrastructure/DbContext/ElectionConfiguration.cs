@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -13,21 +8,56 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<Election> builder)
         {
-            // Define the primary key
+            // Primary key
             builder.HasKey(e => e.Id);
-
-            // Configure properties
+            builder.Property(entity => entity.Id).ValueGeneratedNever();
+            // Name property
             builder.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(250);
+                .HasMaxLength(100); // adjust as needed
 
-            // Configure relationships
-            // An Election has one ElectionStatus.
-            // An ElectionStatus can be associated with many Elections.
-            builder.HasOne(e => e.ElectionStatus)
-                .WithMany() // We don't need a collection of Elections on the ElectionStatus class
-                .HasForeignKey(e => e.ElectionStatusId)
+            // Dates
+            builder.Property(e => e.NominationStartDate)
                 .IsRequired();
+
+            builder.Property(e => e.NominationEndDate)
+                .IsRequired();
+
+            builder.Property(e => e.VotingStartDate)
+                .IsRequired();
+
+            builder.Property(e => e.VotingEndDate)
+                .IsRequired();
+
+            // Foreign key relationship
+            builder.HasOne(e => e.ElectionStatus)
+                .WithMany() // no back navigation
+                .HasForeignKey(e => e.ElectionStatusId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Table name and constraints
+            builder.ToTable(tb =>
+            {
+                // Example: enforce that NominationEndDate > NominationStartDate
+                tb.HasCheckConstraint("CK_Election_NominationDates",
+                    "[NominationEndDate] > [NominationStartDate]");
+
+                // Example: enforce that VotingEndDate > VotingStartDate
+                tb.HasCheckConstraint("CK_Election_VotingDates",
+                    "[VotingEndDate] > [VotingStartDate]");
+
+                // Example: enforce that VotingStartDate >= NominationEndDate
+                tb.HasCheckConstraint("CK_Election_VotingAfterNomination",
+                    "[VotingStartDate] >= [NominationEndDate]");
+
+                tb.HasCheckConstraint("CK_Election_ElectionStatusID",
+                    "[ElectionStatusId] BETWEEN 1 and 4");
+
+                tb.HasCheckConstraint("CK_Election_Name", "LEN([Name]) > 0");
+
+            });
         }
     }
+
 }

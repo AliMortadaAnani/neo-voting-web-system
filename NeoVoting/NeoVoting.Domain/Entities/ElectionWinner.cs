@@ -67,7 +67,7 @@ namespace NeoVoting.Domain.Entities
             var winner = new ElectionWinner
             {
                 // The 'Id' is typically database-generated (identity column), so we don't set it here.
-                // TODO : check post incremental ids in db and Ef core configuration if needed. (AdminLog,PublicLog, ElectionWinner)
+                // done : check post incremental ids in db and Ef core configuration if needed. (AdminLog,PublicLog, ElectionWinner)
                 ElectionId = electionId,
                 CandidateProfileId = candidateProfileId,
                 VoteCount = voteCount

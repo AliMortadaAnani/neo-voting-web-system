@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.IdentityEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -35,7 +30,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .HasMaxLength(1);
 
             builder.ToTable(tb =>
-            tb.HasCheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F')"));
+            tb.HasCheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F') OR [Gender] IS NULL"));
 
 
             //we wont add check constraint for date of birth here because it may cause issues with users who are creating accounts on their birthday. (dynamic not static)
@@ -60,6 +55,13 @@ namespace NeoVoting.Infrastructure.DbContext
                 .HasForeignKey(u => u.GovernorateID)
                 .IsRequired(false) // This makes the foreign key optional (nullable), matching the int? property.
                 .OnDelete(DeleteBehavior.Restrict); // Important! Prevents deleting a governorate if users are assigned to it.
+
+            builder.ToTable(tb =>
+            tb.HasCheckConstraint(
+                "CK_User_GovernorateID",
+                "[GovernorateID] BETWEEN 1 AND 5 OR [GovernorateID] IS NULL"
+            ));
+
         }
     }
  }
