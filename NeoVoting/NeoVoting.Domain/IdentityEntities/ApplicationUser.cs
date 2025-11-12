@@ -120,6 +120,8 @@ namespace NeoVoting.Domain.IdentityEntities
             // --- Validation logic is centralized right here ---
             ValidateParticipantDetails(userName, firstName, lastName, dateOfBirth, gender, governorateId);
 
+            var genderUpper = char.ToUpper(gender);  
+
             var participantUser = new ApplicationUser
             {
                 // The Id is generated here, making the object complete.
@@ -128,7 +130,7 @@ namespace NeoVoting.Domain.IdentityEntities
                 FirstName = firstName,
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
-                Gender = gender,
+                Gender = genderUpper,
                 GovernorateID = governorateId
             };
 
