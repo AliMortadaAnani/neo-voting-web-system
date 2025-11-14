@@ -1,5 +1,4 @@
 ﻿using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
@@ -16,7 +15,7 @@ namespace NeoVoting.Domain.RepositoryContracts
 
 
         // Add these back. They are simple, synchronous persistence operations.
-        void Update(Election election); 
+        void Update(Election election);
 
 
         //Application logic moved to IElectionService

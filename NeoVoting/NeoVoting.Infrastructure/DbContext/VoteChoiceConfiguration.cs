@@ -4,7 +4,7 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-    
+
 
     public class VoteChoiceConfiguration : IEntityTypeConfiguration<VoteChoice>
     {
@@ -19,7 +19,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .HasForeignKey(vc => vc.VoteId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
 
             builder.HasOne(vc => vc.CandidateProfile)
                 .WithMany() // no back navigation from CandidateProfile
@@ -28,7 +28,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .OnDelete(DeleteBehavior.Restrict);
             // Prevent deleting a CandidateProfile if votes reference it
 
-            builder.HasIndex(vc => new { vc.VoteId, vc.CandidateProfileId})
+            builder.HasIndex(vc => new { vc.VoteId, vc.CandidateProfileId })
               .IsUnique();
         }
     }

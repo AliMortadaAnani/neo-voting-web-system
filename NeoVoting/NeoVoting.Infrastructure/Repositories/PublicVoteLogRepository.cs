@@ -37,6 +37,6 @@ namespace NeoVoting.Infrastructure.Repositories
             return log;
         }
 
-        
+
     }
 }

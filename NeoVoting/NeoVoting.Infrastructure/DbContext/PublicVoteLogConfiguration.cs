@@ -4,7 +4,7 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-    
+
     public class PublicVoteLogConfiguration : IEntityTypeConfiguration<PublicVoteLog>
     {
         public void Configure(EntityTypeBuilder<PublicVoteLog> builder)
@@ -37,12 +37,12 @@ namespace NeoVoting.Infrastructure.DbContext
 
             // Table name and constraints
             builder.ToTable(tb =>
-            { 
+            {
                 // GovernorateId must be between 1 and 5
                 tb.HasCheckConstraint("CK_YourEntity_GovernorateId", "[GovernorateId] BETWEEN 1 AND 5");
             });
 
-            builder.HasIndex(pv => new { pv.ElectionId , pv.VoteId}).IsUnique();
+            builder.HasIndex(pv => new { pv.ElectionId, pv.VoteId }).IsUnique();
 
         }
     }

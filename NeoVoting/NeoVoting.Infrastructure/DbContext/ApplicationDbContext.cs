@@ -37,4 +37,4 @@ namespace NeoVoting.Infrastructure.DbContext
 
     }
 
- }
+}

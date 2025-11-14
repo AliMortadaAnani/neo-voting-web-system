@@ -8,7 +8,7 @@ namespace NeoVoting.Domain.Entities
     {
         // --- Properties ---
 
-        public Guid Id { get;private set; }
+        public Guid Id { get; private set; }
         public required string Name { get; set; }
         public DateTime NominationStartDate { get; private set; }
         public DateTime NominationEndDate { get; private set; }
@@ -27,8 +27,9 @@ namespace NeoVoting.Domain.Entities
         /// A private constructor to force all object creation to go through the
         /// controlled, static factory method. EF Core uses this for materializing.
         /// </summary>
-        private Election() {
-        ElectionStatus = null!;
+        private Election()
+        {
+            ElectionStatus = null!;
         }
 
 
@@ -41,8 +42,8 @@ namespace NeoVoting.Domain.Entities
         /// <returns>A comprehensive string summary of the election.</returns>
         public override string ToString()
         {
-            
-           
+
+
             var sb = new StringBuilder();
             sb.AppendLine($"Election: '{Name}' (Id: {Id})");
             sb.AppendLine($"  Status: ({ElectionStatusId}) " +
@@ -91,14 +92,14 @@ namespace NeoVoting.Domain.Entities
             Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate);
 
 
-                this.Name = name;
-                this.NominationStartDate = nominationStartDate;
-                this.NominationEndDate = nominationEndDate;
-                this.VotingStartDate = votingStartDate;
-                this.VotingEndDate = votingEndDate;
-              
+            this.Name = name;
+            this.NominationStartDate = nominationStartDate;
+            this.NominationEndDate = nominationEndDate;
+            this.VotingStartDate = votingStartDate;
+            this.VotingEndDate = votingEndDate;
 
-            
+
+
         }
 
 

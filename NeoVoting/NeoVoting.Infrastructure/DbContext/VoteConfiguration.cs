@@ -4,8 +4,8 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-   
- 
+
+
     public class VoteConfiguration : IEntityTypeConfiguration<Vote>
     {
         public void Configure(EntityTypeBuilder<Vote> builder)
@@ -50,7 +50,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 tb.HasCheckConstraint("CK_Vote_VoterGender", "[VoterGender] IN ('M','F')");
             });
 
-            
+
 
         }
     }

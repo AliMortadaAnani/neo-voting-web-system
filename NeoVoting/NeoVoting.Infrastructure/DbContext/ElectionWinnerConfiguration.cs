@@ -4,7 +4,7 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-   
+
 
     public class ElectionWinnerConfiguration : IEntityTypeConfiguration<ElectionWinner>
     {
@@ -23,7 +23,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .HasForeignKey(ew => ew.ElectionId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
 
             builder.HasOne(ew => ew.CandidateProfile)
                 .WithMany() // no back navigation from CandidateProfile

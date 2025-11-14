@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
-using static System.Collections.Specialized.BitVector32;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
@@ -17,7 +16,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<CandidateProfile> AddCandidateProfileAsync(CandidateProfile candidateProfile, CancellationToken cancellationToken)
         {
             await _dbContext.CandidateProfiles.AddAsync(candidateProfile, cancellationToken);
-            return candidateProfile; 
+            return candidateProfile;
         }
 
         public async Task<List<CandidateProfile>> GetAllCandidatesProfilesAsync(CancellationToken cancellationToken)
@@ -40,6 +39,6 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             _dbContext.CandidateProfiles.Update(candidateProfile);
         }
-     
+
     }
 }

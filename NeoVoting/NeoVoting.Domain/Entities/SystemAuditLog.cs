@@ -35,7 +35,7 @@ namespace NeoVoting.Domain.Entities
         private SystemAuditLog() // CHANGED: Renamed from AdminAuditLog
         {
             // Initialize non-nullable properties to satisfy the C# compiler.
-            
+
             User = null!;
         }
 

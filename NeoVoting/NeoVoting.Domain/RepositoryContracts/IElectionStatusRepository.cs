@@ -1,5 +1,4 @@
 ﻿using NeoVoting.Domain.Entities;
-using System.Threading;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {

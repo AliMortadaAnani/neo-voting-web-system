@@ -18,7 +18,7 @@ namespace NeoVoting.Domain.IdentityEntities
         public char? Gender { get; set; }
         public int? GovernorateID { get; private set; }
 
-        public  Governorate? Governorate { get; private set; } // Navigation property
+        public Governorate? Governorate { get; private set; } // Navigation property
 
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace NeoVoting.Domain.IdentityEntities
 
             var adminUser = new ApplicationUser
             {
-                
+
                 // The Id is generated here, making the object complete.
                 Id = Guid.NewGuid(),
                 UserName = userName,
@@ -120,7 +120,7 @@ namespace NeoVoting.Domain.IdentityEntities
             // --- Validation logic is centralized right here ---
             ValidateParticipantDetails(userName, firstName, lastName, dateOfBirth, gender, governorateId);
 
-            var genderUpper = char.ToUpper(gender);  
+            var genderUpper = char.ToUpper(gender);
 
             var participantUser = new ApplicationUser
             {

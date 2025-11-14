@@ -5,7 +5,7 @@ namespace NeoVoting.Domain.Entities
 {
     /// <summary>
     /// Represents a single, immutable vote cast in an election.
-  
+
     /// </summary>
     public class Vote
     {
@@ -33,8 +33,8 @@ namespace NeoVoting.Domain.Entities
         /// </summary>
         private Vote()
         {
-          Election = null!;
-          Governorate = null!;
+            Election = null!;
+            Governorate = null!;
         }
 
 
@@ -57,7 +57,7 @@ namespace NeoVoting.Domain.Entities
 
         /// <summary>
         /// Creates a new, valid Vote instance.
-        
+
         /// </summary>
         /// <param name="electionId">The ID of the election this vote is for.</param>
         /// <param name="governorateId">The ID of the governorate where the vote was cast.</param>

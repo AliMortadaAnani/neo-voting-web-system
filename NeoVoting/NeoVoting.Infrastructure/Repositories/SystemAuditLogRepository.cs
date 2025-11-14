@@ -5,7 +5,7 @@ using NeoVoting.Infrastructure.DbContext;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class SystemAuditLogRepository : ISystemAuditLog
+    public class SystemAuditLogRepository : ISystemAuditLogRepository
     {
         private readonly ApplicationDbContext _dbContext;
         public SystemAuditLogRepository(ApplicationDbContext dbContext)
@@ -33,6 +33,6 @@ namespace NeoVoting.Infrastructure.Repositories
             return log;
         }
 
-     
+
     }
 }

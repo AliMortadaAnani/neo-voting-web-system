@@ -5,7 +5,7 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-    
+
     public class CandidateProfileConfiguration : IEntityTypeConfiguration<CandidateProfile>
     {
         public void Configure(EntityTypeBuilder<CandidateProfile> builder)

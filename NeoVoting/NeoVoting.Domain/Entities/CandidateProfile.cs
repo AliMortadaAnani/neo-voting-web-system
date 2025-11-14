@@ -29,8 +29,8 @@ namespace NeoVoting.Domain.Entities
         /// </summary>
         private CandidateProfile()
         {
-          User = null!;
-          Election = null!;
+            User = null!;
+            Election = null!;
         }
 
 
@@ -65,7 +65,7 @@ namespace NeoVoting.Domain.Entities
         /// <param name="nominationReasons">The reasons the candidate is running.</param>
         /// <returns>A new, valid CandidateProfile object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation of text inputs fails.</exception>
-        public static CandidateProfile Create(Guid userId, Guid electionId, string goals, string nominationReasons,string? profilePhotoUrl = null)
+        public static CandidateProfile Create(Guid userId, Guid electionId, string goals, string nominationReasons, string? profilePhotoUrl = null)
         {
             // --- Centralized Validation Logic ---
             Validate(goals, nominationReasons);

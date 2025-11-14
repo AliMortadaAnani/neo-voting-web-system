@@ -64,4 +64,4 @@ namespace NeoVoting.Infrastructure.DbContext
 
         }
     }
- }
+}

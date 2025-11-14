@@ -1,4 +1,4 @@
-﻿using NeoVoting.Domain.Enums; 
+﻿using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.Entities
 {

@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-    
+
 
     public class ElectionStatusConfiguration : IEntityTypeConfiguration<ElectionStatus>
     {
