@@ -1,10 +1,16 @@
-﻿using System.Threading;
+﻿using NeoVoting.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface IPublicVoteLogRepository
     {
-        // Example method with CancellationToken
-        // Task<IReadOnlyList<PublicVoteLog>> GetLogsAsync(CancellationToken cancellationToken);
+        Task<PublicVoteLog?> GetPublicVoteLogByIdAsync(long logId, CancellationToken cancellationToken);
+        Task<List<PublicVoteLog>> GetAllPublicVoteLogsAsync(CancellationToken cancellationToken);
+        Task<PublicVoteLog> AddPublicVoteLogAsync(PublicVoteLog log, CancellationToken cancellationToken);
+        void Update(PublicVoteLog log);
     }
 }

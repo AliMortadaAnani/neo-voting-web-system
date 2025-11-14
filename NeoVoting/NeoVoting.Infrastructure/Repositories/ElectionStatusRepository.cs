@@ -1,8 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
-using Microsoft.EntityFrameworkCore;
-using System.Threading;
 
 namespace NeoVoting.Infrastructure.Repositories
 {

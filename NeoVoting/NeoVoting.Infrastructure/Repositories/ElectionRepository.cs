@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
