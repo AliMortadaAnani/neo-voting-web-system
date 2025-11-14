@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.IdentityEntities;
-using NeoVoting.Domain.Enums;
 using System.Reflection;
 
 namespace NeoVoting.Infrastructure.DbContext

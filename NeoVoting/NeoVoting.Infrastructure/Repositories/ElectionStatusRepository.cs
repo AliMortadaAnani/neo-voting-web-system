@@ -1,14 +1,21 @@
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
+using NeoVoting.Infrastructure.DbContext;
+using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
     public class ElectionStatusRepository : IElectionStatusRepository
     {
-        // Implementation will be added later
-        public Task<IReadOnlyList<ElectionStatus>> GetAllElectionStatuses()
+        private readonly ApplicationDbContext _dbContext;
+        public ElectionStatusRepository(ApplicationDbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
+        }
+        public async Task<IReadOnlyList<ElectionStatus>> GetAllElectionStatusesAsync(CancellationToken cancellationToken)
+        {
+            return await _dbContext.ElectionStatuses.ToListAsync(cancellationToken);
         }
     }
 }

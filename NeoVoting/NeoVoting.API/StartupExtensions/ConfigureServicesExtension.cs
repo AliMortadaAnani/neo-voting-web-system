@@ -61,7 +61,7 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // --- REGISTER REPOSITORIES ---
-            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+            
             services.AddScoped<ICandidateProfileRepository, CandidateProfileRepository>();
             services.AddScoped<IElectionRepository, ElectionRepository>();
             services.AddScoped<IElectionStatusRepository, ElectionStatusRepository>();

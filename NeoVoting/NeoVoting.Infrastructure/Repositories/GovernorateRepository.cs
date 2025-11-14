@@ -1,14 +1,21 @@
+using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
+using NeoVoting.Infrastructure.DbContext;
+using System.Threading;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
     public class GovernorateRepository : IGovernorateRepository
     {
-        // Implementation will be added later
-        public Task<IReadOnlyList<Governorate>> GetAllGovernorates()
+        private readonly ApplicationDbContext _dbContext;
+        public GovernorateRepository(ApplicationDbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
+        }
+        public async Task<IReadOnlyList<Governorate>> GetAllGovernoratesAsync(CancellationToken cancellationToken)
+        {
+          return await _dbContext.Governorates.ToListAsync(cancellationToken);
         }
     }
 }

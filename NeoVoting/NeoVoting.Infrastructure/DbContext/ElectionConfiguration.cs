@@ -14,7 +14,10 @@ namespace NeoVoting.Infrastructure.DbContext
             // Name property
             builder.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(100); // adjust as needed
+                .HasMaxLength(100)
+                ; // adjust as needed
+            builder.HasIndex(e => e.Name)
+                .IsUnique();
 
             // Dates
             builder.Property(e => e.NominationStartDate)
