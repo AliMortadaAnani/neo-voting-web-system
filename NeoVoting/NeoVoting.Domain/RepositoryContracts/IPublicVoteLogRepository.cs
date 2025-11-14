@@ -11,6 +11,6 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<PublicVoteLog?> GetPublicVoteLogByIdAsync(long logId, CancellationToken cancellationToken);
         Task<List<PublicVoteLog>> GetAllPublicVoteLogsAsync(CancellationToken cancellationToken);
         Task<PublicVoteLog> AddPublicVoteLogAsync(PublicVoteLog log, CancellationToken cancellationToken);
-        void Update(PublicVoteLog log);
+        
     }
 }

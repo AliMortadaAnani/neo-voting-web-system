@@ -33,9 +33,6 @@ namespace NeoVoting.Infrastructure.Repositories
             return log;
         }
 
-        public void Update(SystemAuditLog log)
-        {
-            _dbContext.SystemAuditLogs.Update(log);
-        }
+     
     }
 }
