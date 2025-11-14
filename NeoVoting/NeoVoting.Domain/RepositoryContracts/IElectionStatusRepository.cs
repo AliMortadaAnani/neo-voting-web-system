@@ -1,6 +1,6 @@
 ﻿using NeoVoting.Domain.Entities;
 
-namespace NeoVoting.Domain.RepositoriesContracts
+namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface IElectionStatusRepository
     {

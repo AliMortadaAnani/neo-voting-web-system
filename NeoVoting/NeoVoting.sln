@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoVoting.Domain", "NeoVoti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoVoting.Infrastructure", "NeoVoting.Infrastructure\NeoVoting.Infrastructure.csproj", "{D86D5629-FD96-4389-B854-95004E5DC8B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoVoting.Application", "NeoVoting.Application\NeoVoting.Application.csproj", "{C1A43A97-A1CD-46B7-9157-45408F069A25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D86D5629-FD96-4389-B854-95004E5DC8B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D86D5629-FD96-4389-B854-95004E5DC8B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D86D5629-FD96-4389-B854-95004E5DC8B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1A43A97-A1CD-46B7-9157-45408F069A25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1A43A97-A1CD-46B7-9157-45408F069A25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1A43A97-A1CD-46B7-9157-45408F069A25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1A43A97-A1CD-46B7-9157-45408F069A25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

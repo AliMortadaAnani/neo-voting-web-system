@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NeoVoting.Domain.Contracts;
 using NeoVoting.Domain.IdentityEntities;
+using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
-using static System.Collections.Specialized.BitVector32;
+using NeoVoting.Infrastructure.Repositories;
 
 namespace NeoVoting.API.StartupExtensions
 {
@@ -54,7 +55,22 @@ namespace NeoVoting.API.StartupExtensions
             });
 
 
+            // --- REGISTER THE UNIT OF WORK ---
+            // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
+            // (and therefore ApplicationDbContext) is created for each HTTP request. This is the standard.
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            // --- REGISTER REPOSITORIES ---
+            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+            services.AddScoped<ICandidateProfileRepository, CandidateProfileRepository>();
+            services.AddScoped<IElectionRepository, ElectionRepository>();
+            services.AddScoped<IElectionStatusRepository, ElectionStatusRepository>();
+            services.AddScoped<IElectionWinnerRepository, ElectionWinnerRepository>();
+            services.AddScoped<IGovernorateRepository, GovernorateRepository>();
+            services.AddScoped<IPublicVoteLogRepository, PublicVoteLogRepository>();
+            services.AddScoped<ISystemAuditLog, SystemAuditLogRepository>();
+            services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
+            services.AddScoped<IVoteRepository, VoteRepository>();
 
 
 
