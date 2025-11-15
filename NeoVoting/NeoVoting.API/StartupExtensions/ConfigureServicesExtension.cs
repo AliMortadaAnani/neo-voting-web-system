@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Contracts;
 using NeoVoting.Domain.IdentityEntities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 using NeoVoting.Infrastructure.Repositories;
+using System.Reflection;
 
 namespace NeoVoting.API.StartupExtensions
 {
@@ -72,6 +74,7 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
 
+            services.AddValidatorsFromAssembly(Assembly.Load("NeoVoting.Application.Validators"));
 
 
             return services;
