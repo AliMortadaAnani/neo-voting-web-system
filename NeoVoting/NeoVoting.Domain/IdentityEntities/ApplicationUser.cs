@@ -31,7 +31,7 @@ namespace NeoVoting.Domain.IdentityEntities
         {
             // StringBuilder is efficient for building strings from multiple parts.
             var sb = new StringBuilder();
-
+            
             // Start with the most important, non-nullable identifiers.
             sb.Append($"User: {UserName} (Id: {Id})");
 

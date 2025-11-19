@@ -7,7 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NeoVoting.Domain\NeoVoting.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ResponseDTOs\" />
   </ItemGroup>
 
 </Project>
