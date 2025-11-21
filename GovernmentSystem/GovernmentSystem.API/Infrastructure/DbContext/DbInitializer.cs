@@ -17,7 +17,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
             // We look for a variable named "GOV_ADMIN_USERNAME"
             string adminUsername = configuration["Admin:Username"] ?? "none";
 
-            if (string.IsNullOrEmpty(adminUsername)||adminUsername == "none")
+            if (string.IsNullOrEmpty(adminUsername) || adminUsername == "none")
             {
                 Console.WriteLine("Error: Environment variable 'Admin:Username' is not set.");
                 return;
@@ -27,7 +27,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 
             // 2. Create Role
             string adminRoleName = "Admin";
-            
+
 
             if (await roleManager.FindByNameAsync("Admin") is null)
             {
@@ -39,7 +39,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 
             }
 
-           
+
             // 3. Create User
             var adminUser = await userManager.FindByNameAsync(adminUsername);
 
@@ -48,7 +48,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 adminUser = new ApplicationUser
                 {
                     UserName = adminUsername,
-                   
+
                 };
 
                 // Use the password passed from the CLI argument

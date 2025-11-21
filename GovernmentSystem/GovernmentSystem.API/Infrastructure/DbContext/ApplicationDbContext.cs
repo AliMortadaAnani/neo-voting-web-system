@@ -1,7 +1,6 @@
 ﻿using GovernmentSystem.API.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 namespace GovernmentSystem.API.Infrastructure.DbContext
 {

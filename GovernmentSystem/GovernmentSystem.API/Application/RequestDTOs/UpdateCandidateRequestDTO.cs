@@ -3,7 +3,7 @@ using GovernmentSystem.API.Domain.Shared;
 namespace GovernmentSystem.Application.RequestDTOs
 {
     public class UpdateCandidateRequestDTO
-    {   
+    {
         public Guid nationalId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;

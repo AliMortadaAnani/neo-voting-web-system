@@ -1,11 +1,10 @@
 ﻿using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovernmentSystem.API.Controllers
+namespace GovernmentSystem.API.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -30,7 +29,7 @@ namespace GovernmentSystem.API.Controllers
             var result = await _signInManager.PasswordSignInAsync(
                 user,
                 request.Password,
-                isPersistent:false,
+                isPersistent: false,
                 lockoutOnFailure: false);
 
             if (result.Succeeded)
@@ -53,7 +52,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpGet("check-status")]
         [Authorize] // <--- If Cookie is missing, this returns 401
         public IActionResult CheckStatus()
-        {   
+        {
             var name = User.Identity?.Name ?? "Unknown";
             return Ok($"You are logged in as {name}");
         }

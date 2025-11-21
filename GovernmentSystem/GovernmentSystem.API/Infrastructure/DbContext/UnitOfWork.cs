@@ -31,6 +31,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
             _context.Dispose();
         }
 
-        
+
     }
 }

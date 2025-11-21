@@ -54,7 +54,7 @@ namespace GovernmentSystem.API.Domain.Entities
 
         // 4. Update Method (All fields except Id and NominationToken)
         public void UpdateDetails(
-            
+
             GovernorateId governorateId,
             string firstName,
             string lastName,

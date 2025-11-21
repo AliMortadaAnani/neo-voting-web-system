@@ -1,14 +1,13 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using GovernmentSystem.API.Application.Services;
+using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Contracts;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
-using System.Reflection;
-using GovernmentSystem.API.Application.ServicesContracts;
-using GovernmentSystem.API.Application.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace GovernmentSystem.API.StartupExtensions

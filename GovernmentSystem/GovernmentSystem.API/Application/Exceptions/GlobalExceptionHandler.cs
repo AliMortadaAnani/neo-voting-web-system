@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovernmentSystem.API.Exceptions
+namespace GovernmentSystem.API.Application.Exceptions
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {

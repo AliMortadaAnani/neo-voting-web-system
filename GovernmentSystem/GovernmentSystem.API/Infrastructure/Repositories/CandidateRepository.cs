@@ -21,7 +21,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
 
         public void Delete(Candidate candidate)
         {
-             _dbContext.Candidates.Remove(candidate);
+            _dbContext.Candidates.Remove(candidate);
         }
 
         public async Task<List<Candidate>> GetAllCandidates()

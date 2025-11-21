@@ -1,4 +1,3 @@
-using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +14,7 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.ConfigureServices(builder.Configuration, builder.Host);
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
