@@ -54,6 +54,9 @@ if (args.Length > 0 && args[0].ToLower() == "seed")
 // =================================================================
 */
 
+
+app.UseExceptionHandler();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

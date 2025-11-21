@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace GovernmentSystem.API.Domain.Enums
+namespace GovernmentSystem.API.Domain.Shared
 {
     public enum GovernorateId
     {

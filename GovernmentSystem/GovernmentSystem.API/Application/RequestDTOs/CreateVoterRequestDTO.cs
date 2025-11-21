@@ -1,5 +1,5 @@
 using GovernmentSystem.API.Domain.Entities;
-using GovernmentSystem.API.Domain.Enums;
+using GovernmentSystem.API.Domain.Shared;
 
 namespace GovernmentSystem.Application.RequestDTOs
 {

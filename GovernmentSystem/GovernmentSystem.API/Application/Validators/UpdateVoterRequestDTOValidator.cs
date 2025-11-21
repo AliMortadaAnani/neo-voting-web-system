@@ -1,5 +1,5 @@
 using FluentValidation;
-using GovernmentSystem.API.Domain.Enums;
+using GovernmentSystem.API.Domain.Shared;
 using GovernmentSystem.Application.RequestDTOs;
 
 namespace GovernmentSystem.Application.Validators
