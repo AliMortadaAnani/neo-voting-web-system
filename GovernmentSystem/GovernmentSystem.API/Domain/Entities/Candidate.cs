@@ -66,8 +66,8 @@ namespace GovernmentSystem.API.Domain.Entities
         {
             ValidateGender(gender);
             ValidateGovernorate(governorateId);
+            ValidateAge(dateOfBirth);
 
-            
             GovernorateId = governorateId;
             FirstName = firstName;
             LastName = lastName;
@@ -84,7 +84,10 @@ namespace GovernmentSystem.API.Domain.Entities
             NominationToken = Guid.NewGuid();
             ValidToken = true;
         }
-
+        public void MarkCandidateAsRegistered()
+        {
+            IsRegistered = true;
+        }
         // 6. ToString Method
         public override string ToString()
         {
@@ -116,5 +119,22 @@ namespace GovernmentSystem.API.Domain.Entities
             if (!Enum.IsDefined(typeof(GovernorateId), id))
                 throw new ArgumentException("Invalid Governorate ID. Must be 1-5.");
         }
+        private static void ValidateAge(DateOnly dateOfBirth)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var age = today.Year - dateOfBirth.Year;
+
+            // Adjust age if the birthday hasn't occurred yet this year
+            if (dateOfBirth > today.AddYears(-age))
+            {
+                age--;
+            }
+
+            if (age < 18) // Lebanese voting age
+            {
+                throw new ArgumentException("Person must be at least 18 years old.");
+            }
+        }
+
     }
 }

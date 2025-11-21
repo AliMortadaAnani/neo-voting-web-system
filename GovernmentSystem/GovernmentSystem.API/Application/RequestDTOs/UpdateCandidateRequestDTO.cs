@@ -1,0 +1,17 @@
+using GovernmentSystem.API.Domain.Enums;
+
+namespace GovernmentSystem.Application.RequestDTOs
+{
+    public class UpdateCandidateRequestDTO
+    {   
+        public Guid nationalId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public GovernorateId GovernorateId { get; set; }
+        public DateOnly DateOfBirth { get; set; }
+        public char Gender { get; set; }
+        public bool EligibleForElection { get; set; }
+        public bool ValidToken { get; set; }
+        public bool IsRegistered { get; set; }
+    }
+}

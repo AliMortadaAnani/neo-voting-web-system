@@ -6,6 +6,9 @@ using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
+using System.Reflection;
+using GovernmentSystem.API.Application.ServicesContracts;
+using GovernmentSystem.API.Application.Services;
 
 
 namespace GovernmentSystem.API.StartupExtensions
@@ -66,9 +69,56 @@ namespace GovernmentSystem.API.StartupExtensions
 
             services.AddScoped<ICandidateRepository, CandidateRepository>();
             services.AddScoped<IVoterRepository, VoterRepository>();
-           
+            services.AddScoped<IAdminServices, AdminServices>();
+            services.AddScoped<IVoterServices, VoterServices>();
+            services.AddScoped<ICandidateServices, CandidateServices>();
 
-            //services.AddValidatorsFromAssembly(Assembly.Load("GovernmentSystem.API.Application"));
+            // Register all validators in GovernmentSystem.Application.Validators
+            services.AddValidatorsFromAssembly(typeof(GovernmentSystem.Application.Validators.CreateVoterRequestDTOValidator).Assembly);
+
+            // 2. Configure the "Most Secure" Cookie Settings
+            // ---------------------------------------------------------
+            services.ConfigureApplicationCookie(options =>
+            {
+                // SECURITY 1: HttpOnly
+                // Prevents JavaScript (XSS attacks) from reading the cookie.
+                options.Cookie.HttpOnly = true;
+
+                // SECURITY 2: Secure Policy
+                // Always requires HTTPS. (Browsers reject "Secure" cookies on HTTP).
+                // Use 'Always' in Prod. For Localhost, 'SameAsRequest' is easier if you aren't using https locally.
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+                // SECURITY 3: SameSite
+                // 'Strict': Cookie is only sent if the URL matches exactly. Best for Swagger/API on same domain.
+                // 'None': Required later for React (port 3000) talking to API (port 5000).
+                // For now (Swagger), we use Strict. When you add React, change to None.
+                options.Cookie.SameSite = SameSiteMode.Strict;
+
+                // SECURITY 4: Name Obfuscation
+                // Don't call it "IdentityCookie". Hide the tech stack.
+                options.Cookie.Name = "__Host-Gov-Auth";
+
+                // API BEHAVIOR:
+                // Identity normally redirects to a Login HTML page on failure. 
+                // We are an API, so we force it to return 401/403 codes instead.
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                };
+
+                // TIMEOUT
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true; // Extend time if user is active
+            });
+
+
 
 
             return services;

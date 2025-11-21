@@ -1,6 +1,10 @@
+using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 
@@ -13,6 +17,42 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 
 var app = builder.Build();
+
+/*// =================================================================
+// CLI SEEDING LOGIC
+// =================================================================
+if (args.Length > 0 && args[0].ToLower() == "seed")
+{
+    // Check if Password argument is provided
+    if (args.Length < 2)
+    {
+        Console.WriteLine("Error: Password argument missing.");
+        Console.WriteLine("Usage: dotnet run seed \"YourStrongPassword!\"");
+        return; // Exit
+    }
+
+    string passwordFromCli = args[1];
+
+    Console.WriteLine("Starting Admin Seeding Process...");
+
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            // Pass the password to the method
+            await DbInitializer.SeedAdminUser(scope.ServiceProvider, passwordFromCli);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Critical Error: {ex.Message}");
+        }
+    }
+
+    Console.WriteLine("Process complete. Exiting.");
+    return; // Stop app, do not start web server
+}
+// =================================================================
+*/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
