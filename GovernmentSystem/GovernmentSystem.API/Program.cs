@@ -1,3 +1,4 @@
+using GovernmentSystem.API.API.Middlewares;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,7 @@ builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
-
+app.UseMiddleware<IpWhitelistMiddleware>();
 /*// =================================================================
 // CLI SEEDING LOGIC
 // =================================================================
