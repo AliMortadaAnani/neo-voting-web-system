@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Net;
 
 
 namespace GovernmentSystem.API.API.Middlewares
@@ -8,25 +9,65 @@ namespace GovernmentSystem.API.API.Middlewares
     public class IpWhitelistMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly HashSet<string> _whitelist;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<IpWhitelistMiddleware> _logger;
 
-        public IpWhitelistMiddleware(RequestDelegate next, IConfiguration configuration)
+        public IpWhitelistMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<IpWhitelistMiddleware> logger)
         {
             _next = next;
-            // Read allowed IPs from configuration, e.g. ["127.0.0.1"]
-            _whitelist = configuration.GetSection("IpWhitelist").Get<HashSet<string>>() ?? new HashSet<string> { "" };
+            _configuration = configuration;
+            _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task Invoke(HttpContext context)
         {
-            var remoteIp = context.Connection.RemoteIpAddress?.ToString() ?? "";
-            if (!_whitelist.Contains(remoteIp))
+            string path = context.Request.Path;
+
+            // Only filter API endpoints. Allow Swagger UI or static files to pass through.
+            if (!path.StartsWith("/api", StringComparison.OrdinalIgnoreCase))
             {
-                context.Response.StatusCode = 403;
-                await context.Response.WriteAsync("Forbidden: Your IP is not allowed.");
+                await _next(context);
                 return;
             }
-            await _next(context);
+
+            var remoteIp = context.Connection.RemoteIpAddress;
+            string incomingIp = remoteIp?.ToString() ?? "";
+
+            // 1. Load IP Lists
+            var adminIps = _configuration.GetSection("SecuritySettings:AdminWhitelist").Get<string[]>() ?? Array.Empty<string>();
+            var externalIps = _configuration.GetSection("SecuritySettings:ExternalSystemWhitelist").Get<string[]>() ?? Array.Empty<string>();
+
+            // 2. Check if Admin (Super User)
+            // Admins can access EVERYTHING (/api/admin and /api/external)
+            if (adminIps.Contains(incomingIp))
+            {
+                await _next(context);
+                return;
+            }
+
+            // 3. Check if External System (Restricted User)
+            if (externalIps.Contains(incomingIp))
+            {
+                // They are only allowed to touch /api/external
+                if (path.StartsWith("/api/external", StringComparison.OrdinalIgnoreCase))
+                {
+                    await _next(context);
+                    return;
+                }
+                else
+                {
+                    // External IP tried to access /api/admin or other protected routes
+                    _logger.LogWarning($"Security Alert: External System IP {incomingIp} tried to access restricted path {path}");
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    await context.Response.WriteAsync("Access Denied: Your IP is authorized only for External APIs.");
+                    return;
+                }
+            }
+
+            // 4. Unknown IP
+            _logger.LogWarning($"Security Alert: Unauthorized access attempt from IP {incomingIp} to {path}");
+            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            await context.Response.WriteAsync("Access Denied: IP not whitelisted.");
         }
     }
 }
