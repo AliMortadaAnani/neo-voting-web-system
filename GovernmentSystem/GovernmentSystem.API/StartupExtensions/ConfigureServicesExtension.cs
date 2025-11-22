@@ -8,6 +8,7 @@ using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 
 namespace GovernmentSystem.API.StartupExtensions
@@ -17,6 +18,7 @@ namespace GovernmentSystem.API.StartupExtensions
         public static IServiceCollection ConfigureServices(this IServiceCollection services,
             IConfiguration configuration, ConfigureHostBuilder configureHostBuilder)
         {
+
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -118,7 +120,43 @@ namespace GovernmentSystem.API.StartupExtensions
             });
 
 
+            services.AddSwaggerGen(c =>
+            {
+                // Standard Swagger metadata
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Government System API", Version = "v1" });
 
+                // 1. DEFINITION: "Here is a security scheme that exists"
+                // This tells Swagger: "I support a security mode called 'ApiKey'. 
+                // It works by sending a value in the Header named 'X-Gov-Api-Key'."
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Description = "Enter your API Key below.",
+                    Name = "X-Gov-Api-Key",       // The actual HTTP Header name to send
+                    In = ParameterLocation.Header,// Where to put the key (Header, Query, Cookie)
+                    Type = SecuritySchemeType.ApiKey, // The type of auth
+                    Scheme = "ApiKeyScheme"
+                });
+
+                // 2. REQUIREMENT: "Apply this scheme to the endpoints"
+                // This tells Swagger: "By default, assume every endpoint might need this lock."
+                // When you click 'Authorize' and enter the key, Swagger will send that key
+                // with EVERY request you make in the browser.
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "ApiKey" // Must match the name defined in AddSecurityDefinition
+                            },
+                            In = ParameterLocation.Header
+                        },
+                        new List<string>() // Scopes (used for OAuth, empty for ApiKey)
+                    }
+                });
+                        });
 
             return services;
         }

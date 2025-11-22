@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Net;
+﻿using System.Net;
 
 
 namespace GovernmentSystem.API.API.Middlewares
 {
-    
+
 
     public class IpWhitelistMiddleware
     {

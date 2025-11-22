@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using GovernmentSystem.API.Application.AdminDTOs;
+﻿using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Shared;
 

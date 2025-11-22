@@ -11,7 +11,7 @@ namespace GovernmentSystem.API.Application.ServicesContracts
         Task<Result<List<CandidateResponseDTO>>> GetAllCandidatesAsync();
         Task<Result<CandidateResponseDTO>> AddCandidateAsync
             (CreateCandidateRequestDTO request);
-        Task<Result<CandidateResponseDTO>> UpdateByNationalIdAsync 
+        Task<Result<CandidateResponseDTO>> UpdateByNationalIdAsync
             (UpdateCandidateRequestDTO request);
         Task<Result<CandidateResponseDTO>> DeleteByNationalIdAsync
             (DeleteCandidateRequestDTO request);

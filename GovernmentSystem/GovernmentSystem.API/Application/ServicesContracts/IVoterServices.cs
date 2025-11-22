@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using GovernmentSystem.API.Domain.Shared;
+﻿using GovernmentSystem.API.Domain.Shared;
 using GovernmentSystem.Application.RequestDTOs;
 using GovernmentSystem.Application.ResponseDTOs;
 

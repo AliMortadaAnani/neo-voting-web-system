@@ -1,4 +1,5 @@
-﻿using GovernmentSystem.API.Application.AdminDTOs;
+﻿using GovernmentSystem.API.API.Filters;
+using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -55,6 +56,13 @@ namespace GovernmentSystem.API.API.Controllers
         {
             var name = User.Identity?.Name ?? "Unknown";
             return Ok($"You are logged in as {name}");
+        }
+
+        [HttpGet("test-api-key")]
+        [ApiKeyAuth]
+        public IActionResult testApiKe()
+        {
+            return Ok("API Key is valid.");
         }
     }
 }
