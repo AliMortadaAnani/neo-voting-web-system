@@ -62,7 +62,7 @@ namespace GovernmentSystem.API.API.Controllers
         [ApiKeyAuth]
         public IActionResult testApiKe()
         {
-            return Ok("API Key is valid.");
+            return Ok("Hello Caller!");
         }
     }
 }
