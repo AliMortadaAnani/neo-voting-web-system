@@ -4,11 +4,11 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 {
     public interface ICandidateRepository
     {
-        Task<List<Candidate>> GetAllCandidates();
+        Task<List<Candidate>> GetAllCandidatesAsync();
 
-        Task<Candidate?> GetCandidateById(Guid id);
+        Task<Candidate?> GetCandidateByIdAsync(Guid id);
 
-        Task<Candidate> AddCandidate(Candidate candidate);
+        Task<Candidate> AddCandidateAsync(Candidate candidate);
 
 
         // Add these back. They are simple, synchronous persistence operations.

@@ -1,7 +1,7 @@
 using FluentValidation;
-using GovernmentSystem.Application.RequestDTOs;
+using GovernmentSystem.API.Application.RequestDTOs;
 
-namespace GovernmentSystem.Application.Validators
+namespace GovernmentSystem.API.Application.Validators
 {
     public class NeoVoting_VoterHasVotedRequestDTOValidator : AbstractValidator<NeoVoting_VoterHasVotedRequestDTO>
     {

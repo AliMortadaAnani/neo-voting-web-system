@@ -13,7 +13,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Voter> AddVoter(Voter voter)
+        public async Task<Voter> AddVoterAsync(Voter voter)
         {
             await _dbContext.Voters.AddAsync(voter);
             return voter;
@@ -24,12 +24,12 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext.Voters.Remove(voter);
         }
 
-        public async Task<List<Voter>> GetAllVoters()
+        public async Task<List<Voter>> GetAllVotersAsync()
         {
             return await _dbContext.Voters.ToListAsync();
         }
 
-        public async Task<Voter?> GetVoterById(Guid id)
+        public async Task<Voter?> GetVoterByIdAsync(Guid id)
         {
             return await _dbContext.Voters.FindAsync(id);
         }

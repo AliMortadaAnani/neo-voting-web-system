@@ -1,19 +1,43 @@
-﻿using GovernmentSystem.API.Application.ServicesContracts;
+﻿using GovernmentSystem.API.Application.RequestDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs;
+using GovernmentSystem.API.Application.ServicesContracts;
+using GovernmentSystem.API.Domain.Contracts;
+using GovernmentSystem.API.Domain.Entities;
+using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Domain.Shared;
-using GovernmentSystem.Application.RequestDTOs;
-using GovernmentSystem.Application.ResponseDTOs;
+
 
 namespace GovernmentSystem.API.Application.Services
 {
     public class VoterServices : IVoterServices
     {
-        public VoterServices()
+        private readonly IVoterRepository _voterRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        public VoterServices(IVoterRepository voterRepository, IUnitOfWork unitOfWork)
         {
+            _voterRepository = voterRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<Result<VoterResponseDTO>> AddVoterAsync(CreateVoterRequestDTO request)
+        public async Task<Result<VoterResponseDTO>> AddVoterAsync(CreateVoterRequestDTO request)
         {
-            throw new NotImplementedException();
+            Voter voter = request.ToVoter();
+            Voter createdVoter = await _voterRepository.AddVoterAsync(voter);
+
+            if (createdVoter == null)
+            {
+                return Result<VoterResponseDTO>.Failure(
+                    Error.NullValue);
+            }
+
+            if (createdVoter.Voted == false)
+            {
+                return Result<VoterResponseDTO>.Failure(Error.NullValue);
+            }
+            await _unitOfWork.SaveChangesAsync();
+
+            var response = createdVoter.ToVoterResponse();
+            return Result<VoterResponseDTO>.Success(response);
         }
 
         public Task<Result<bool>> DeleteByNationalIdAsync(DeleteVoterRequestDTO request)

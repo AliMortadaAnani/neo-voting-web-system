@@ -1,8 +1,8 @@
 using FluentValidation;
+using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Domain.Shared;
-using GovernmentSystem.Application.RequestDTOs;
 
-namespace GovernmentSystem.Application.Validators
+namespace GovernmentSystem.API.Application.Validators
 {
     public class UpdateCandidateRequestDTOValidator : AbstractValidator<UpdateCandidateRequestDTO>
     {
@@ -12,15 +12,18 @@ namespace GovernmentSystem.Application.Validators
             RuleFor(x => x.LastName).NotEmpty();
 
             RuleFor(x => x.GovernorateId)
-                .Must(id => Enum.IsDefined(typeof(GovernorateId), id))
+                .NotNull()
+                .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateId), id.Value))
                 .WithMessage("A valid governorate must be selected.");
 
             RuleFor(x => x.DateOfBirth)
-                .Must(BeAtLeast18YearsOld)
+                .NotNull()
+                .Must(d => d.HasValue && BeAtLeast18YearsOld(d.Value))
                 .WithMessage("The candidate must be at least 18 years old.");
 
             RuleFor(x => x.Gender)
-                .Must(g => g == 'M' || g == 'F')
+                .NotNull()
+                .Must(g => g.HasValue && (char.ToUpperInvariant(g.Value) == 'M' || char.ToUpperInvariant(g.Value) == 'F'))
                 .WithMessage("Gender must be either 'M' or 'F'.");
         }
 

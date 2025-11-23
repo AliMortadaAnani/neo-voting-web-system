@@ -1,13 +1,13 @@
 using FluentValidation;
-using GovernmentSystem.Application.RequestDTOs;
+using GovernmentSystem.API.Application.RequestDTOs;
 
-namespace GovernmentSystem.Application.Validators
+namespace GovernmentSystem.API.Application.Validators
 {
     public class GenerateNewTokenVoterRequestDTOValidator : AbstractValidator<GenerateNewTokenVoterRequestDTO>
     {
         public GenerateNewTokenVoterRequestDTOValidator()
         {
-            RuleFor(x => x.NationalId).NotEmpty();
+            RuleFor(x => x.NationalId).NotNull().NotEmpty();
         }
     }
 }

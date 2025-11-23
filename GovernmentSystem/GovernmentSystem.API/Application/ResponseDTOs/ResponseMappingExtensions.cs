@@ -1,5 +1,4 @@
 ﻿using GovernmentSystem.API.Domain.Entities;
-using GovernmentSystem.Application.ResponseDTOs;
 
 namespace GovernmentSystem.API.Application.ResponseDTOs
 {

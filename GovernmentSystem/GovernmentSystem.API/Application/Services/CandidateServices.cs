@@ -1,7 +1,7 @@
-﻿using GovernmentSystem.API.Application.ServicesContracts;
+﻿using GovernmentSystem.API.Application.RequestDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs;
+using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Shared;
-using GovernmentSystem.Application.RequestDTOs;
-using GovernmentSystem.Application.ResponseDTOs;
 
 namespace GovernmentSystem.API.Application.Services
 {
@@ -16,7 +16,7 @@ namespace GovernmentSystem.API.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result<CandidateResponseDTO>> DeleteByNationalIdAsync(DeleteCandidateRequestDTO request)
+        public Task<Result<bool>> DeleteByNationalIdAsync(DeleteCandidateRequestDTO request)
         {
             throw new NotImplementedException();
         }

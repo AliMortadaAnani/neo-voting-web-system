@@ -1,30 +1,39 @@
 using FluentValidation;
+using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Domain.Shared;
-using GovernmentSystem.Application.RequestDTOs;
 
-namespace GovernmentSystem.Application.Validators
+namespace GovernmentSystem.API.Application.Validators
 {
     public class CreateVoterRequestDTOValidator : AbstractValidator<CreateVoterRequestDTO>
     {
         public CreateVoterRequestDTOValidator()
         {
+            // ADD THIS TEMPORARILY
+            Console.WriteLine("--> VALIDATOR LOADED: AddVoterValidator");
+
             RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50);
             RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);
 
             // 1. Governorate Validation
             RuleFor(x => x.GovernorateId)
-                .Must(id => Enum.IsDefined(typeof(GovernorateId), id))
+                .NotNull()
+                .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateId), id.Value))
                 .WithMessage("A valid governorate must be selected (1-5).");
 
             // 2. Age Validation (>= 18)
             RuleFor(x => x.DateOfBirth)
-                .Must(BeAtLeast18YearsOld)
+                .NotNull()
+                .Must(d => d.HasValue && BeAtLeast18YearsOld(d.Value))
                 .WithMessage("The voter must be at least 18 years old to vote.");
 
             // 3. Gender Validation
             RuleFor(x => x.Gender)
-                .Must(g => g == 'M' || g == 'F')
-                .WithMessage("Voter gender must be either 'M' or 'F'.");
+                .NotNull()
+                .Must(g => g.HasValue && (char.ToUpperInvariant(g.Value) == 'M' || char.ToUpperInvariant(g.Value) == 'F'))
+                .WithMessage("Gender must be either 'M' or 'F'.");
+
+            RuleFor(x => x.EligibleForElection)
+                .NotNull();
         }
 
         // Helper for DateOnly Age Calculation

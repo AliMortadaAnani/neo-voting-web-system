@@ -1,27 +1,27 @@
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.Shared;
 
-namespace GovernmentSystem.Application.RequestDTOs
+namespace GovernmentSystem.API.Application.RequestDTOs
 {
     public class CreateVoterRequestDTO
     {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public GovernorateId GovernorateId { get; set; }
-        public DateOnly DateOfBirth { get; set; }
-        public char Gender { get; set; }
-        public bool EligibleForElection { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public GovernorateId? GovernorateId { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        public char? Gender { get; set; }
+        public bool? EligibleForElection { get; set; }
 
         // Mapping Method
         public Voter ToVoter()
         {
             return Voter.Create(
-                GovernorateId,
-                FirstName,
-                LastName,
-                DateOfBirth,
-                Gender,
-                EligibleForElection
+                (GovernorateId)GovernorateId!.Value,
+                FirstName!,
+                LastName!,
+                DateOfBirth!.Value,
+                Gender!.Value,
+                EligibleForElection!.Value
             );
         }
     }

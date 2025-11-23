@@ -33,7 +33,7 @@ namespace GovernmentSystem.API.Domain.Entities
         {
             ValidateGender(gender);
             ValidateGovernorate(governorateId);
-
+            ValidateAge(dateOfBirth);
             return new Voter
             {
                 Id = Guid.NewGuid(),

@@ -1,6 +1,6 @@
 using GovernmentSystem.API.Domain.Shared;
 
-namespace GovernmentSystem.Application.ResponseDTOs
+namespace GovernmentSystem.API.Application.ResponseDTOs
 {
     public class VoterResponseDTO
     {

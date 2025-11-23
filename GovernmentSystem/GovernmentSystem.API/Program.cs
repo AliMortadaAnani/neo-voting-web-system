@@ -2,23 +2,11 @@ using GovernmentSystem.API.API.Middlewares;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
+builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 builder.Configuration.AddEnvironmentVariables();
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-
-builder.Services.ConfigureServices(builder.Configuration, builder.Host);
-builder.Services.AddProblemDetails();
-
 var app = builder.Build();
-app.UseMiddleware<IpWhitelistMiddleware>();
+
 /*// =================================================================
 // CLI SEEDING LOGIC
 // =================================================================
@@ -56,19 +44,23 @@ if (args.Length > 0 && args[0].ToLower() == "seed")
 */
 
 
+
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+/*if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}*/
 
 app.UseHsts();
 app.UseHttpsRedirection();
 
+app.UseMiddleware<IpWhitelistMiddleware>();
 
 //app.UseStaticFiles();
 app.UseRouting();

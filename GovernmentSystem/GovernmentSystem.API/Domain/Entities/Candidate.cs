@@ -35,7 +35,7 @@ namespace GovernmentSystem.API.Domain.Entities
         {
             ValidateGender(gender);
             ValidateGovernorate(governorateId);
-
+            ValidateAge(dateOfBirth);
             return new Candidate
             {
                 Id = Guid.NewGuid(),

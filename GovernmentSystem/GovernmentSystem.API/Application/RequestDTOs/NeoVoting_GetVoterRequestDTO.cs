@@ -1,8 +1,8 @@
-namespace GovernmentSystem.Application.RequestDTOs
+namespace GovernmentSystem.API.Application.RequestDTOs
 {
     public class NeoVoting_GetVoterRequestDTO
     {
-        public Guid NationalId { get; set; }
-        public Guid VotingToken { get; set; }
+        public Guid? NationalId { get; set; }
+        public Guid? VotingToken { get; set; }
     }
 }

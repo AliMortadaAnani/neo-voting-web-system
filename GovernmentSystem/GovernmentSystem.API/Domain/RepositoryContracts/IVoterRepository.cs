@@ -4,11 +4,11 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 {
     public interface IVoterRepository
     {
-        Task<List<Voter>> GetAllVoters();
+        Task<List<Voter>> GetAllVotersAsync();
 
-        Task<Voter?> GetVoterById(Guid id);
+        Task<Voter?> GetVoterByIdAsync(Guid id);
 
-        Task<Voter> AddVoter(Voter voter);
+        Task<Voter> AddVoterAsync(Voter voter);
 
 
         // Add these back. They are simple, synchronous persistence operations.

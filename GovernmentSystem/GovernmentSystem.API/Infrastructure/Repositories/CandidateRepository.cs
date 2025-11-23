@@ -13,7 +13,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Candidate> AddCandidate(Candidate candidate)
+        public async Task<Candidate> AddCandidateAsync(Candidate candidate)
         {
             await _dbContext.Candidates.AddAsync(candidate);
             return candidate;
@@ -24,12 +24,12 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext.Candidates.Remove(candidate);
         }
 
-        public async Task<List<Candidate>> GetAllCandidates()
+        public async Task<List<Candidate>> GetAllCandidatesAsync()
         {
             return await _dbContext.Candidates.ToListAsync();
         }
 
-        public async Task<Candidate?> GetCandidateById(Guid id)
+        public async Task<Candidate?> GetCandidateByIdAsync(Guid id)
         {
             return await _dbContext.Candidates.FindAsync(id);
         }

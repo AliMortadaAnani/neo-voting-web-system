@@ -1,14 +1,14 @@
 using FluentValidation;
-using GovernmentSystem.Application.RequestDTOs;
+using GovernmentSystem.API.Application.RequestDTOs;
 
-namespace GovernmentSystem.Application.Validators
+namespace GovernmentSystem.API.Application.Validators
 {
     public class NeoVoting_GetVoterRequestDTOValidator : AbstractValidator<NeoVoting_GetVoterRequestDTO>
     {
         public NeoVoting_GetVoterRequestDTOValidator()
         {
-            RuleFor(x => x.NationalId).NotEmpty();
-            RuleFor(x => x.VotingToken).NotEmpty();
+            RuleFor(x => x.NationalId).NotNull().NotEmpty();
+            RuleFor(x => x.VotingToken).NotNull().NotEmpty();
         }
     }
 }

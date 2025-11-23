@@ -1,6 +1,6 @@
-﻿using GovernmentSystem.API.Domain.Shared;
-using GovernmentSystem.Application.RequestDTOs;
-using GovernmentSystem.Application.ResponseDTOs;
+﻿using GovernmentSystem.API.Application.RequestDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs;
+using GovernmentSystem.API.Domain.Shared;
 
 namespace GovernmentSystem.API.Application.ServicesContracts
 {
@@ -13,7 +13,7 @@ namespace GovernmentSystem.API.Application.ServicesContracts
             (CreateCandidateRequestDTO request);
         Task<Result<CandidateResponseDTO>> UpdateByNationalIdAsync
             (UpdateCandidateRequestDTO request);
-        Task<Result<CandidateResponseDTO>> DeleteByNationalIdAsync
+        Task<Result<bool>> DeleteByNationalIdAsync
             (DeleteCandidateRequestDTO request);
         Task<Result<CandidateResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenCandidateRequestDTO request);
 

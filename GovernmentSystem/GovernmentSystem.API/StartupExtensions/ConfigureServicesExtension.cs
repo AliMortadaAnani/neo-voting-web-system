@@ -1,14 +1,21 @@
 ﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using GovernmentSystem.API.Application.AdminDTOs;
+using GovernmentSystem.API.Application.Exceptions;
+using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
+using GovernmentSystem.API.Application.Validators;
 using GovernmentSystem.API.Domain.Contracts;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System;
 
 
 namespace GovernmentSystem.API.StartupExtensions
@@ -18,6 +25,16 @@ namespace GovernmentSystem.API.StartupExtensions
         public static IServiceCollection ConfigureServices(this IServiceCollection services,
             IConfiguration configuration, ConfigureHostBuilder configureHostBuilder)
         {
+            // Get the connection string from appsettings.json
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException
+                ("Connection string 'DefaultConnection' not found.");
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+            });
+
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -48,34 +65,6 @@ namespace GovernmentSystem.API.StartupExtensions
                ;
             */
 
-
-
-            // Get the connection string from appsettings.json
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException
-                ("Connection string 'DefaultConnection' not found.");
-
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(connectionString);
-            });
-
-
-            // --- REGISTER THE UNIT OF WORK ---
-            // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
-            // (and therefore ApplicationDbContext) is created for each HTTP request. This is the standard.
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            // --- REGISTER REPOSITORIES ---
-
-            services.AddScoped<ICandidateRepository, CandidateRepository>();
-            services.AddScoped<IVoterRepository, VoterRepository>();
-            services.AddScoped<IAdminServices, AdminServices>();
-            services.AddScoped<IVoterServices, VoterServices>();
-            services.AddScoped<ICandidateServices, CandidateServices>();
-
-            // Register all validators in GovernmentSystem.Application.Validators
-            services.AddValidatorsFromAssembly(typeof(GovernmentSystem.Application.Validators.CreateVoterRequestDTOValidator).Assembly);
 
             // 2. Configure the "Most Secure" Cookie Settings
             // ---------------------------------------------------------
@@ -120,6 +109,26 @@ namespace GovernmentSystem.API.StartupExtensions
             });
 
 
+
+
+            // Add services to the container.
+
+            services.AddControllers();
+
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            services.AddEndpointsApiExplorer();
+           
+
+
+
+
+            // Register your Custom Handler
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails(); // Required for .NET 8 Exception Handler to work
+
+
+
+
             services.AddSwaggerGen(c =>
             {
                 // Standard Swagger metadata
@@ -156,7 +165,27 @@ namespace GovernmentSystem.API.StartupExtensions
                         new List<string>() // Scopes (used for OAuth, empty for ApiKey)
                     }
                 });
-                        });
+            });
+
+
+
+            // --- REGISTER THE UNIT OF WORK ---
+            // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
+            // (and therefore ApplicationDbContext) is created for each HTTP request. This is the standard.
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // --- REGISTER REPOSITORIES ---
+
+            services.AddScoped<ICandidateRepository, CandidateRepository>();
+            services.AddScoped<IVoterRepository, VoterRepository>();
+            services.AddScoped<IAdminServices, AdminServices>();
+            services.AddScoped<IVoterServices, VoterServices>();
+            services.AddScoped<ICandidateServices, CandidateServices>();
+
+
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<LoginDTOValidator>();
+            services.AddFluentValidationRulesToSwagger();
 
             return services;
         }

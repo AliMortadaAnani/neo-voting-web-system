@@ -1,9 +1,11 @@
-﻿using GovernmentSystem.API.API.Filters;
+﻿using FluentValidation;
+using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace GovernmentSystem.API.API.Controllers
 {
@@ -13,23 +15,26 @@ namespace GovernmentSystem.API.API.Controllers
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-
+       
         public AuthController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
-            _userManager = userManager;
+            _userManager = userManager;  
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO request)
         {
-            var user = await _userManager.FindByNameAsync(request.Username);
+            
+
+
+            var user = await _userManager.FindByNameAsync(request.Username!);
             if (user == null) return Unauthorized("Invalid Credentials");
 
             // This method creates the Set-Cookie header
             var result = await _signInManager.PasswordSignInAsync(
                 user,
-                request.Password,
+                request.Password!,
                 isPersistent: false,
                 lockoutOnFailure: false);
 

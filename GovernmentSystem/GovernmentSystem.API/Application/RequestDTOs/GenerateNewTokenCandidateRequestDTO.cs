@@ -1,7 +1,7 @@
-namespace GovernmentSystem.Application.RequestDTOs
+namespace GovernmentSystem.API.Application.RequestDTOs
 {
     public class GenerateNewTokenCandidateRequestDTO
     {
-        public Guid NationalId { get; set; }
+        public Guid? NationalId { get; set; }
     }
 }
