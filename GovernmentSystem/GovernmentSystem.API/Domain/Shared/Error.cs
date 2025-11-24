@@ -174,7 +174,7 @@ namespace GovernmentSystem.API.Domain.Shared
         public static Error Failure(string code, string description) =>
             new(code, description, ErrorType.Failure);
         //return an instance of Error with Failure type(general errors)
-        public static Error UnAuthorized(string code, string description) =>
+        public static Error Unauthorized(string code, string description) =>
             new(code, description, ErrorType.Unauthorized);
         //return an instance of Error with UnAuthorized type
         public static Error Forbidden(string code, string description) =>

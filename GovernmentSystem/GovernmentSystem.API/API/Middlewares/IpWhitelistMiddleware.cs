@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 
 namespace GovernmentSystem.API.API.Middlewares
@@ -66,7 +65,7 @@ namespace GovernmentSystem.API.API.Middlewares
                         type: "https://httpstatuses.com/403");
 
                     return;
-                   
+
                 }
             }
 

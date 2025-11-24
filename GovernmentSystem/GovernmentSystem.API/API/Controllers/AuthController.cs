@@ -1,81 +1,66 @@
-﻿using FluentValidation;
-using GovernmentSystem.API.API.Filters;
+﻿using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.AdminDTOs;
+using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    
+    public class AuthController : ApiController
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
-       
-        public AuthController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        
+        private readonly IAdminServices _adminServices;
+
+        public AuthController(IAdminServices adminServices)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;  
+            _adminServices = adminServices;
         }
 
+
         [HttpPost("login")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)] 
         public async Task<IActionResult> Login([FromBody] LoginDTO request)
         {
-            
-
-
-            var user = await _userManager.FindByNameAsync(request.Username!);
-            if (user == null) return Unauthorized("Invalid Credentials");
-
-            // This method creates the Set-Cookie header
-            var result = await _signInManager.PasswordSignInAsync(
-                user,
-                request.Password!,
-                isPersistent: false,
-                lockoutOnFailure: false);
-
-            if (result.Succeeded)
-            {
-                return Ok(new { Message = "Login Successful. Cookie Set." });
-            }
-
-            return Unauthorized("Invalid Credentials");
+            var result = await _adminServices.LoginAsync(request);
+            return HandleResult(result);
         }
 
         [HttpPost("logout")]
+        [ProducesResponseType(typeof(string),StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {
-            // This tells the browser to delete the cookie
-            await _signInManager.SignOutAsync();
-            return Ok(new { Message = "Logged out" });
+            var result = await _adminServices.LogoutAsync();
+            return HandleResult(result);
         }
 
         // Test Endpoint
-        [HttpGet("check-status")]
+        /*[HttpGet("check-status")]
         [Authorize] // <--- If Cookie is missing, this returns 401
         public IActionResult CheckStatus()
         {
             var name = User.Identity?.Name ?? "Unknown";
             return Ok($"You are logged in as {name}");
-        }
+        }*/
 
-        [HttpGet("test-api-key")]
+        // Test Endpoint
+        /*[HttpGet("test-api-key")]
         [ApiKeyAuth]
         public IActionResult testApiKe()
         {
             return Ok("Hello Caller!");
-        }
+        }*/
 
-        
-        [HttpGet("test-ips")]
-        
+
+        // Test Endpoint
+        /*[HttpGet("test-ips")]
         public IActionResult testIps()
         {
             return Ok("Hello external IP!");
-        }
+        }*/
     }
 }

@@ -41,5 +41,19 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
         {
             _dbContext.Voters.Remove(voter);
         }
+
+        public async Task ResetAllVotedFieldToFalse()
+        {
+            // This runs ONE SQL command: UPDATE Voters SET Voted = 0, ValidToken = 0
+            await _dbContext.Voters
+                .ExecuteUpdateAsync(setters => setters
+                    // Set 'Voted' to false
+                    .SetProperty(v => v.Voted, false)
+                // Optional: If you want to make a nullable field NULL
+                // .SetProperty(v => v.SomeNullableField, (string?)null) 
+                );
+
+            
+        }
     }
 }

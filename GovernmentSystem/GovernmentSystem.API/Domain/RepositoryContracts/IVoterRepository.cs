@@ -10,7 +10,7 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 
         Task<Voter> AddVoterAsync(Voter voter);
 
-
+        Task ResetAllVotedFieldToFalse();
         // Add these back. They are simple, synchronous persistence operations.
         void Update(Voter voter);
         void Delete(Voter voter);

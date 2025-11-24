@@ -1,9 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
-using GovernmentSystem.API.API.Filters;
-using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Application.Exceptions;
-using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Application.Validators;
@@ -17,7 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System;
 
 
 namespace GovernmentSystem.API.StartupExtensions
@@ -181,7 +177,7 @@ namespace GovernmentSystem.API.StartupExtensions
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
-           
+
 
 
 
@@ -230,7 +226,7 @@ namespace GovernmentSystem.API.StartupExtensions
                     }
                 });
 
-               // c.OperationFilter<GlobalResponseFilter>();
+                // c.OperationFilter<GlobalResponseFilter>();
 
 
             });
