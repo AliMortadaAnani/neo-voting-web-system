@@ -6,7 +6,7 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
     {
         Task<List<Voter>> GetAllVotersAsync();
 
-        Task<Voter?> GetVoterByIdAsync(Guid id);
+        Task<Voter?> GetVoterByNationalIdAsync(Guid id);
 
         Task<Voter> AddVoterAsync(Voter voter);
 

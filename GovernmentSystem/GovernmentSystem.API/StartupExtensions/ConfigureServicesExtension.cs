@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
+using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Application.Exceptions;
 using GovernmentSystem.API.Application.RequestDTOs;
@@ -13,6 +14,7 @@ using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System;
@@ -66,7 +68,7 @@ namespace GovernmentSystem.API.StartupExtensions
             */
 
 
-            // 2. Configure the "Most Secure" Cookie Settings
+            /*// 2. Configure the "Most Secure" Cookie Settings
             // ---------------------------------------------------------
             services.ConfigureApplicationCookie(options =>
             {
@@ -107,8 +109,70 @@ namespace GovernmentSystem.API.StartupExtensions
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
                 options.SlidingExpiration = true; // Extend time if user is active
             });
+*/
 
+            // Cookie configuration with ProblemDetails for 401/403
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.Name = "__Host-Gov-Auth";
 
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    if (IsApiRequest(context.Request))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/problem+json";
+
+                        var problem = new ProblemDetails
+                        {
+                            Status = StatusCodes.Status401Unauthorized,
+                            Title = "Unauthorized",
+                            Detail = "Authentication is required to access this resource.",
+                            Type = "https://httpstatuses.com/401"
+                        };
+
+                        return context.Response.WriteAsJsonAsync(problem);
+                    }
+
+                    // Non-API (if you ever have MVC pages)
+                    context.Response.Redirect(context.RedirectUri);
+                    return Task.CompletedTask;
+                };
+
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    if (IsApiRequest(context.Request))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/problem+json";
+
+                        var problem = new ProblemDetails
+                        {
+                            Status = StatusCodes.Status403Forbidden,
+                            Title = "Forbidden",
+                            Detail = "You do not have permission to access this resource.",
+                            Type = "https://httpstatuses.com/403"
+                        };
+
+                        return context.Response.WriteAsJsonAsync(problem);
+                    }
+
+                    context.Response.Redirect(context.RedirectUri);
+                    return Task.CompletedTask;
+                };
+
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true;
+            });
+
+            static bool IsApiRequest(HttpRequest request)
+            {
+                // simple heuristic: all your APIs are under /api
+                return request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase);
+            }
 
 
             // Add services to the container.
@@ -165,6 +229,10 @@ namespace GovernmentSystem.API.StartupExtensions
                         new List<string>() // Scopes (used for OAuth, empty for ApiKey)
                     }
                 });
+
+               // c.OperationFilter<GlobalResponseFilter>();
+
+
             });
 
 

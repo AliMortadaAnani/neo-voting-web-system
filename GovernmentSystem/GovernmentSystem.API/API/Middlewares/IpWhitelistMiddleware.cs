@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 
 namespace GovernmentSystem.API.API.Middlewares
@@ -57,16 +58,47 @@ namespace GovernmentSystem.API.API.Middlewares
                 {
                     // External IP tried to access /api/admin or other protected routes
                     _logger.LogWarning($"Security Alert: External System IP {incomingIp} tried to access restricted path {path}");
-                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                    await context.Response.WriteAsync("Access Denied: Your IP is authorized only for External APIs.");
+                    await WriteProblemDetailsAsync(
+                        context,
+                        statusCode: StatusCodes.Status403Forbidden,
+                        title: "Access denied",
+                        detail: "Your IP is authorized only for External APIs.",
+                        type: "https://httpstatuses.com/403");
+
                     return;
+                   
                 }
             }
 
             // 4. Unknown IP
             _logger.LogWarning($"Security Alert: Unauthorized access attempt from IP {incomingIp} to {path}");
-            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            await context.Response.WriteAsync("Access Denied: IP not whitelisted.");
+            await WriteProblemDetailsAsync(
+                context,
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "Access denied",
+                detail: "IP not whitelisted.",
+                type: "https://httpstatuses.com/403");
+        }
+
+        private static async Task WriteProblemDetailsAsync(
+           HttpContext context,
+           int statusCode,
+           string title,
+           string detail,
+           string? type = null)
+        {
+            context.Response.StatusCode = statusCode;
+            context.Response.ContentType = "application/problem+json";
+
+            var problem = new ProblemDetails
+            {
+                Status = statusCode,
+                Title = title,
+                Detail = detail,
+                Type = type
+            };
+
+            await context.Response.WriteAsJsonAsync(problem);
         }
     }
 }

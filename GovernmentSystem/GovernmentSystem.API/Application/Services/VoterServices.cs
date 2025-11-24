@@ -26,23 +26,49 @@ namespace GovernmentSystem.API.Application.Services
 
             if (createdVoter == null)
             {
-                return Result<VoterResponseDTO>.Failure(
-                    Error.NullValue);
+                return Result<VoterResponseDTO>.Failure(Error.Failure("Voter.AdditionFailed","Voter could not be added"));
             }
+            
 
-            if (createdVoter.Voted == false)
+            int rowsAdded = await _unitOfWork.SaveChangesAsync();
+
+            bool isAdded = rowsAdded > 0;
+
+            if (isAdded == false)
             {
-                return Result<VoterResponseDTO>.Failure(Error.NullValue);
+                return Result<VoterResponseDTO>.Failure(Error.Failure("Voter.AdditionFailed", "Voter could not be added."));
             }
-            await _unitOfWork.SaveChangesAsync();
-
             var response = createdVoter.ToVoterResponse();
             return Result<VoterResponseDTO>.Success(response);
         }
 
-        public Task<Result<bool>> DeleteByNationalIdAsync(DeleteVoterRequestDTO request)
+        public async Task<Result<bool>> DeleteByNationalIdAsync(DeleteVoterRequestDTO request)
         {
-            throw new NotImplementedException();
+
+            // 1. CHECK: Does it exist?
+            // We use the Repo to find it first.
+            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
+
+            if (voter == null)
+            {
+                // 2. FAILURE: Return 404 Not Found
+                // This answers your question: "How can we check for success?"
+                return Result<bool>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+            }
+
+            // 3. ACTION: Tell Repo to delete this specific object
+            _voterRepository.Delete(voter);
+
+            // 4. COMMIT: Unit of Work saves changes to DB
+            int rowsDeleted = await _unitOfWork.SaveChangesAsync();
+
+            bool isDeleted = rowsDeleted > 0;   
+            // 5. SUCCESS: Return True
+            if(isDeleted == false)
+            {
+                return Result<bool>.Failure(Error.Failure("Voter.DeletionFailed", "Voter could not be deleted."));
+            }
+            return Result<bool>.Success(isDeleted);
         }
 
         public Task<Result<VoterResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenVoterRequestDTO request)
@@ -70,9 +96,44 @@ namespace GovernmentSystem.API.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result<VoterResponseDTO>> UpdateByNationalIdAsync(UpdateVoterRequestDTO request)
+        public async Task<Result<VoterResponseDTO>> UpdateByNationalIdAsync(UpdateVoterRequestDTO request)
         {
-            throw new NotImplementedException();
+            
+            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
+
+            if (voter == null)
+            {
+               
+                return Result<VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+            }
+
+            voter.UpdateDetails(
+               request.GovernorateId!.Value,
+               request.FirstName!,
+               request.LastName!,
+               request.DateOfBirth!.Value,
+               request.Gender!.Value,
+               request.EligibleForElection!.Value,
+               request.ValidToken!.Value,
+               request.IsRegistered!.Value,
+               request.Voted!.Value
+               );
+
+            _voterRepository.Update(voter);
+
+            
+            int rowsUpdated = await _unitOfWork.SaveChangesAsync();
+
+            bool isUpdated = rowsUpdated > 0;
+            
+            if (isUpdated == false)
+            {
+                return Result<VoterResponseDTO>.Failure(Error.Failure("Voter.UpdateFailed", "Voter could not be updated."));
+            }
+           
+
+            var response = voter.ToVoterResponse();
+            return Result<VoterResponseDTO>.Success(response);
         }
 
         public Task<Result<bool>> UpdateVoterIsRegisteredFieldAsync(NeoVoting_VoterIsRegisteredRequestDTO request)

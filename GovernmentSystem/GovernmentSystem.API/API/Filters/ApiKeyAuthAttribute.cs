@@ -11,49 +11,76 @@ namespace GovernmentSystem.API.API.Filters
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ApiKeyAuthAttribute>>();
+            var logger = context.HttpContext.RequestServices
+                .GetRequiredService<ILogger<ApiKeyAuthAttribute>>();
 
-            logger.LogTrace("ApiKeyAuth.OnAuthorizationAsync started for {Path} at {Time}", context.HttpContext.Request.Path, DateTime.UtcNow);
+            logger.LogTrace("ApiKeyAuth.OnAuthorizationAsync started for {Path} at {Time}",
+                context.HttpContext.Request.Path, DateTime.UtcNow);
 
-            // Log all incoming headers for debugging
             foreach (var h in context.HttpContext.Request.Headers)
                 logger.LogTrace("Header received: {Key}: {Value}", h.Key, h.Value);
 
             if (!context.HttpContext.Request.Headers.TryGetValue(HeaderName, out var extractedApiKey))
             {
                 logger.LogTrace("Header {HeaderName} not found. Rejecting request.", HeaderName);
-                context.Result = new ContentResult()
+
+                context.Result = new ObjectResult(new ProblemDetails
                 {
-                    StatusCode = StatusCodes.Status401Unauthorized,
-                    Content = "API Key is missing."
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = "API Key is missing.",
+                    Type = "https://httpstatuses.com/401"
+                })
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized
                 };
+
                 return;
             }
 
             var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
             var apiKey = configuration.GetValue<string>(ConfigKey);
 
-            logger.LogTrace("Extracted API Key from header: {Extracted}. Configured API Key: {Configured}", extractedApiKey, string.IsNullOrEmpty(apiKey) ? "<null or empty>" : "<hidden>");
+            logger.LogTrace(
+                "Extracted API Key from header: {Extracted}. Configured API Key: {Configured}",
+                extractedApiKey,
+                string.IsNullOrEmpty(apiKey) ? "<null or empty>" : "<hidden>");
 
             if (string.IsNullOrEmpty(apiKey))
             {
                 logger.LogTrace("API key is empty or missing in server config.");
-                context.Result = new ContentResult()
+
+                context.Result = new ObjectResult(new ProblemDetails
                 {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Content = "Server security configuration is invalid (API Key not set)."
+                    Status = StatusCodes.Status500InternalServerError,
+                    Title = "Server configuration error",
+                    Detail = "Server security configuration is invalid (API Key not set).",
+                    Type = "about:blank"
+                })
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
                 };
+
                 return;
             }
 
             if (!apiKey.Equals(extractedApiKey))
             {
-                logger.LogTrace("API key mismatch. Provided: {Provided}, Expected: {Expected}.", extractedApiKey, "<hidden>");
-                context.Result = new ContentResult()
+                logger.LogTrace(
+                    "API key mismatch. Provided: {Provided}, Expected: {Expected}.",
+                    extractedApiKey, "<hidden>");
+
+                context.Result = new ObjectResult(new ProblemDetails
                 {
-                    StatusCode = StatusCodes.Status401Unauthorized,
-                    Content = "Invalid API Key."
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = "Invalid API Key.",
+                    Type = "https://httpstatuses.com/401"
+                })
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized
                 };
+
                 return;
             }
 

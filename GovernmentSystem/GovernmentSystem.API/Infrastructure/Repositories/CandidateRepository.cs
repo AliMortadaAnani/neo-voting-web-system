@@ -19,19 +19,22 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             return candidate;
         }
 
-        public void Delete(Candidate candidate)
-        {
-            _dbContext.Candidates.Remove(candidate);
-        }
 
         public async Task<List<Candidate>> GetAllCandidatesAsync()
         {
             return await _dbContext.Candidates.ToListAsync();
         }
 
-        public async Task<Candidate?> GetCandidateByIdAsync(Guid id)
+        public async Task<Candidate?> GetCandidateByNationalIdAsync(Guid id)
         {
-            return await _dbContext.Candidates.FindAsync(id);
+            // FindAsync only works for Primary Keys. For other columns, use FirstOrDefault.
+            return await _dbContext.Candidates
+                .FirstOrDefaultAsync(v => v.NationalId == id);
+        }
+
+        public void Delete(Candidate candidate)
+        {
+            _dbContext.Candidates.Remove(candidate);
         }
 
         public void Update(Candidate candidate)

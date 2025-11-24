@@ -17,6 +17,7 @@ public async Task<IActionResult> VerifyVoter(VerifyRequest request)
      */
     [ApiController]
     [Route("api/[controller]")]
+    
     public abstract class ApiController : ControllerBase
     {
         protected IActionResult HandleResult<T>(Result<T> result)

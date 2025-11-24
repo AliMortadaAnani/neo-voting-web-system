@@ -69,5 +69,13 @@ namespace GovernmentSystem.API.API.Controllers
         {
             return Ok("Hello Caller!");
         }
+
+        
+        [HttpGet("test-ips")]
+        
+        public IActionResult testIps()
+        {
+            return Ok("Hello external IP!");
+        }
     }
 }

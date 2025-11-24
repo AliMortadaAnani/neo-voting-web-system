@@ -19,24 +19,27 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             return voter;
         }
 
-        public void Delete(Voter voter)
-        {
-            _dbContext.Voters.Remove(voter);
-        }
 
         public async Task<List<Voter>> GetAllVotersAsync()
         {
             return await _dbContext.Voters.ToListAsync();
         }
 
-        public async Task<Voter?> GetVoterByIdAsync(Guid id)
+        public async Task<Voter?> GetVoterByNationalIdAsync(Guid id)
         {
-            return await _dbContext.Voters.FindAsync(id);
+            // FindAsync only works for Primary Keys. For other columns, use FirstOrDefault.
+            return await _dbContext.Voters
+                .FirstOrDefaultAsync(v => v.NationalId == id);
         }
 
         public void Update(Voter voter)
         {
             _dbContext.Voters.Update(voter);
+        }
+
+        public void Delete(Voter voter)
+        {
+            _dbContext.Voters.Remove(voter);
         }
     }
 }
