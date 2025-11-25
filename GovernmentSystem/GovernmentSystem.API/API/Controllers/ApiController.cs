@@ -26,7 +26,7 @@ public async Task<IActionResult> VerifyVoter(VerifyRequest request)
             {
                 return Ok(result.Value);
             }
-
+            
             // Convert our "Error" object into standard "ProblemDetails"
             var problemDetails = new ProblemDetails
             {

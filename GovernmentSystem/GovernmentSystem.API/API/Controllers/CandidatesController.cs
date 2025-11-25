@@ -41,6 +41,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpPost("add")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Add([FromBody] CreateCandidateRequestDTO request)
         {
             var result = await _candidateServices.AddCandidateAsync(request);
@@ -62,6 +63,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete([FromBody] DeleteCandidateRequestDTO request)
         {
             var result = await _candidateServices.DeleteByNationalIdAsync(request);

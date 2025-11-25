@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.Controllers
 {
-
+    [Route("api/voters")]
     [Authorize(Roles = "Admin")]
     public class VotersController : ApiController
     {
@@ -45,6 +45,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpPost("add")]
         [ProducesResponseType(typeof(VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Add([FromBody] CreateVoterRequestDTO request)
         {
             var result = await _voterServices.AddVoterAsync(request);
@@ -69,6 +70,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete([FromBody] DeleteVoterRequestDTO request)
         {
             var result = await _voterServices.DeleteByNationalIdAsync(request);

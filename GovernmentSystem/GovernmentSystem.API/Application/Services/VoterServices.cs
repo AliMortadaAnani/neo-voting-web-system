@@ -24,7 +24,12 @@ namespace GovernmentSystem.API.Application.Services
             Voter voter = request.ToVoter();
 
             // Note: AddAsync inside repo usually just tracks the entity.
-            await _voterRepository.AddVoterAsync(voter);
+            var voterAdded = await _voterRepository.AddVoterAsync(voter);
+
+            if(voterAdded == null)
+            {
+                return Result<VoterResponseDTO>.Failure(Error.Failure("Voter.AdditionFailed", "Voter could not be added."));
+            }
 
             int rowsAdded = await _unitOfWork.SaveChangesAsync();
 
@@ -124,58 +129,6 @@ namespace GovernmentSystem.API.Application.Services
             return Result<VoterResponseDTO>.Success(voter.ToVoterResponse());
         }
 
-        public async Task<Result<bool>> UpdateVoterIsRegisteredToTrueAsync(NeoVoting_VoterIsRegisteredRequestDTO request)
-        {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
-
-            if (voter == null)
-            {
-                return Result<bool>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
-            }
-            if (voter.VotingToken != request.VotingToken!.Value
-              || !voter.ValidToken || !voter.EligibleForElection
-                )
-            {
-                return Result<bool>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
-            }
-            // Idempotency check (Optional optimization)
-            if (voter.IsRegistered)
-            {
-                // Already done, just return success
-                return Result<bool>.Success(true);
-            }
-
-            voter.MarkVoterAsRegistered();
-            _voterRepository.Update(voter);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return Result<bool>.Success(true);
-        }
-
-        public async Task<Result<bool>> UpdateHasVotedToTrueAsync(NeoVoting_VoterHasVotedRequestDTO request)
-        {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
-
-            if (voter == null)
-            {
-                return Result<bool>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
-            }
-            if (voter.VotingToken != request.VotingToken!.Value
-              || !voter.IsRegistered || !voter.ValidToken || !voter.EligibleForElection
-                )
-            {
-                return Result<bool>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
-            }
-            if (voter.Voted) return Result<bool>.Success(true);
-
-            voter.MarkVoterAsVoted();
-            _voterRepository.Update(voter);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return Result<bool>.Success(true);
-        }
 
         public async Task<Result<VoterResponseDTO>> GetByNationalIdAsync(GetVoterRequestDTO request)
         {
@@ -187,6 +140,62 @@ namespace GovernmentSystem.API.Application.Services
             var response = voter.ToVoterResponse();
             return Result<VoterResponseDTO>.Success(response);
         }
+
+
+        public async Task<Result<NeoVoting_VoterResponseDTO>> UpdateVoterIsRegisteredToTrueAsync(NeoVoting_VoterIsRegisteredRequestDTO request)
+        {
+            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
+
+            if (voter == null)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+            }
+            if (voter.VotingToken != request.VotingToken!.Value
+              || !voter.ValidToken || !voter.EligibleForElection
+                )
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
+            }
+            // Idempotency check (Optional optimization)
+            if (voter.IsRegistered)
+            {
+                // Already done, just return success
+                return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+            }
+
+            voter.MarkVoterAsRegistered();
+            _voterRepository.Update(voter);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+        }
+
+        public async Task<Result<NeoVoting_VoterResponseDTO>> UpdateHasVotedToTrueAsync(NeoVoting_VoterHasVotedRequestDTO request)
+        {
+            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
+
+            if (voter == null)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+            }
+            if (voter.VotingToken != request.VotingToken!.Value
+              || !voter.IsRegistered || !voter.ValidToken || !voter.EligibleForElection
+                )
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
+            }
+            if (voter.Voted) return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+
+            voter.MarkVoterAsVoted();
+            _voterRepository.Update(voter);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+        }
+
+        
 
         public async Task<Result<NeoVoting_VoterResponseDTO>> GetVoterForNeoVotingAsync(NeoVoting_GetVoterRequestDTO request)
         {

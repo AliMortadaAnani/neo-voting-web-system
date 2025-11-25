@@ -1,4 +1,5 @@
-﻿using GovernmentSystem.API.Application.RequestDTOs;
+﻿using Azure;
+using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Contracts;
@@ -22,13 +23,24 @@ namespace GovernmentSystem.API.Application.Services
         public async Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request)
         {
             Candidate candidate = request.ToCandidate();
-            await _candidateRepository.AddCandidateAsync(candidate);
+
+            var candidateAdded = await _candidateRepository.AddCandidateAsync(candidate);
+            
+            if(candidateAdded == null)
+            {
+                return Result<CandidateResponseDTO>.Failure(Error.Failure("Candidate.AdditionFailed", "Candidate could not be added."));
+            }
+
             int rowsAdded = await _unitOfWork.SaveChangesAsync();
+            
             if (rowsAdded == 0)
             {
                 return Result<CandidateResponseDTO>.Failure(Error.Failure("Candidate.AdditionFailed", "Candidate could not be added."));
             }
-            return Result<CandidateResponseDTO>.Success(candidate.ToCandidateResponse());
+
+            var response = candidate.ToCandidateResponse();
+
+            return Result<CandidateResponseDTO>.Success(response);
         }
 
         public async Task<Result<bool>> DeleteByNationalIdAsync(DeleteCandidateRequestDTO request)
@@ -57,7 +69,9 @@ namespace GovernmentSystem.API.Application.Services
             candidate.GenerateNewNominationToken();
             _candidateRepository.Update(candidate);
             await _unitOfWork.SaveChangesAsync();
-            return Result<CandidateResponseDTO>.Success(candidate.ToCandidateResponse());
+
+            var response = candidate.ToCandidateResponse();
+            return Result<CandidateResponseDTO>.Success(response);
         }
 
         public async Task<Result<List<CandidateResponseDTO>>> GetAllCandidatesAsync()
@@ -78,7 +92,8 @@ namespace GovernmentSystem.API.Application.Services
             {
                 return Result<CandidateResponseDTO>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
             }
-            return Result<CandidateResponseDTO>.Success(candidate.ToCandidateResponse());
+            var response = candidate.ToCandidateResponse();
+            return Result<CandidateResponseDTO>.Success(response);
         }
 
         public async Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateForNeoVotingAsync(NeoVoting_GetCandidateRequestDTO request)
@@ -116,30 +131,33 @@ namespace GovernmentSystem.API.Application.Services
             );
             _candidateRepository.Update(candidate);
             await _unitOfWork.SaveChangesAsync();
-            return Result<CandidateResponseDTO>.Success(candidate.ToCandidateResponse());
+
+            var response = candidate.ToCandidateResponse();
+            return Result<CandidateResponseDTO>.Success(response);
         }
 
-        public async Task<Result<bool>> UpdateCandidateIsRegisteredToTrueAsync(NeoVoting_CandidateIsRegisteredRequestDTO request)
+        public async Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToTrueAsync(NeoVoting_CandidateIsRegisteredRequestDTO request)
         {
             var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
             if (candidate == null)
             {
-                return Result<bool>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
             }
             if (candidate.NominationToken != request.NominationToken!.Value
               || !candidate.ValidToken || !candidate.EligibleForElection
                 )
             {
-                return Result<bool>.Failure(Error.Unauthorized("Candidate.NotValid", "Invalid candidate credentials."));
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Invalid candidate credentials."));
             }
             if (candidate.IsRegistered)
-            {
-                return Result<bool>.Success(true);
+            {       
+                return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
             }
             candidate.MarkCandidateAsRegistered();
             _candidateRepository.Update(candidate);
             await _unitOfWork.SaveChangesAsync();
-            return Result<bool>.Success(true);
+            var response = candidate.ToNeoVoting_CandidateResponse();
+            return Result<NeoVoting_CandidateResponseDTO>.Success(response);
         }
     }
 }

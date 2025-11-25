@@ -1,11 +1,13 @@
 ﻿using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-
+    [Route("api/[controller]")]
+    [AllowAnonymous]
     public class AuthController : ApiController
     {
 
