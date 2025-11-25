@@ -1,17 +1,14 @@
 ﻿using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
-using GovernmentSystem.API.Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-    
+
     public class AuthController : ApiController
     {
-        
+
         private readonly IAdminServices _adminServices;
 
         public AuthController(IAdminServices adminServices)
@@ -23,7 +20,7 @@ namespace GovernmentSystem.API.API.Controllers
         [HttpPost("login")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)] 
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginDTO request)
         {
             var result = await _adminServices.LoginAsync(request);
@@ -31,7 +28,7 @@ namespace GovernmentSystem.API.API.Controllers
         }
 
         [HttpPost("logout")]
-        [ProducesResponseType(typeof(string),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {
             var result = await _adminServices.LogoutAsync();

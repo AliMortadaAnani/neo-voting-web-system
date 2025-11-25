@@ -25,11 +25,11 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             return await _dbContext.Voters.ToListAsync();
         }
 
-        public async Task<Voter?> GetVoterByNationalIdAsync(Guid id)
+        public async Task<Voter?> GetVoterByNationalIdAsync(Guid nationalId)
         {
             // FindAsync only works for Primary Keys. For other columns, use FirstOrDefault.
             return await _dbContext.Voters
-                .FirstOrDefaultAsync(v => v.NationalId == id);
+                .FirstOrDefaultAsync(v => v.NationalId == nationalId);
         }
 
         public void Update(Voter voter)
@@ -53,7 +53,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
                 // .SetProperty(v => v.SomeNullableField, (string?)null) 
                 );
 
-            
+
         }
     }
 }

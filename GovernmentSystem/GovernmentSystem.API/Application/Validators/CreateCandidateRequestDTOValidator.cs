@@ -25,6 +25,9 @@ namespace GovernmentSystem.API.Application.Validators
                 .NotNull()
                 .Must(g => g.HasValue && (char.ToUpperInvariant(g.Value) == 'M' || char.ToUpperInvariant(g.Value) == 'F'))
                 .WithMessage("Gender must be either 'M' or 'F'.");
+
+            RuleFor(x => x.EligibleForElection)
+                .NotNull();
         }
 
         private bool BeAtLeast18YearsOld(DateOnly dob)

@@ -14,7 +14,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
             // 1. Get Username from Environment Variable
-            // We look for a variable named "GOV_ADMIN_USERNAME"
+            // We look for a variable from environment configuration
             string adminUsername = configuration["Admin:Username"] ?? "none";
 
             if (string.IsNullOrEmpty(adminUsername) || adminUsername == "none")

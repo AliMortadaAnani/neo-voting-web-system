@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using GovernmentSystem.API.Application.AdminDTOs;
+﻿using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.Shared;

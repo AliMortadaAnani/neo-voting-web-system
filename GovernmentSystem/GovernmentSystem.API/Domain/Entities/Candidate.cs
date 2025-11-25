@@ -86,6 +86,12 @@ namespace GovernmentSystem.API.Domain.Entities
         }
         public void MarkCandidateAsRegistered()
         {
+            //Should not arrive here if well handled in the service layer
+            if (!ValidToken || !EligibleForElection)
+            {
+                throw new InvalidOperationException("Cannot register candidate with invalid token or ineligible for election.");
+            }
+
             IsRegistered = true;
         }
         // 6. ToString Method
@@ -130,7 +136,7 @@ namespace GovernmentSystem.API.Domain.Entities
                 age--;
             }
 
-            if (age < 18) // Lebanese voting age
+            if (age < 18) // Neo-Voting Lebanese nomination age
             {
                 throw new ArgumentException("Person must be at least 18 years old.");
             }

@@ -46,8 +46,8 @@ namespace GovernmentSystem.API.Domain.Entities
                 Gender = char.ToUpper(gender),
                 EligibleForElection = eligibleForElection,
                 ValidToken = true,             // Default to true on creation
-                IsRegistered = false,
-                Voted = false
+                IsRegistered = false,          // Default to false on creation
+                Voted = false                  // Default to false on creation 
             };
         }
 
@@ -87,10 +87,20 @@ namespace GovernmentSystem.API.Domain.Entities
         }
         public void MarkVoterAsRegistered()
         {
+            //Should not arrive here if well handled in the service layer
+            if (!ValidToken || !EligibleForElection)
+            {
+                throw new InvalidOperationException("Cannot register voter with invalid token or ineligible for election.");
+            }
             IsRegistered = true;
         }
         public void MarkVoterAsVoted()
         {
+            //Should not arrive here if well handled in the service layer
+            if (!IsRegistered || !ValidToken || !EligibleForElection)
+            {
+                throw new InvalidOperationException("Voter cannot vote with invalid token or ineligible for election or unregistered");
+            }
             Voted = true;
         }
         // 6. ToString Method
@@ -137,7 +147,7 @@ namespace GovernmentSystem.API.Domain.Entities
                 age--;
             }
 
-            if (age < 18) // Lebanese voting age
+            if (age < 18) // Neo-Voting Lebanese voting age
             {
                 throw new ArgumentException("Person must be at least 18 years old.");
             }

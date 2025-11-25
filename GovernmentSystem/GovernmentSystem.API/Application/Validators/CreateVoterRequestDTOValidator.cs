@@ -9,7 +9,7 @@ namespace GovernmentSystem.API.Application.Validators
         public CreateVoterRequestDTOValidator()
         {
             // ADD THIS TEMPORARILY
-            Console.WriteLine("--> VALIDATOR LOADED: AddVoterValidator");
+            Console.WriteLine("--> VALIDATORS LOADED: AddVoterValidator...");
 
             RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50);
             RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);

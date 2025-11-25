@@ -7,7 +7,9 @@ namespace GovernmentSystem.API.Application.Validators
     public class UpdateVoterRequestDTOValidator : AbstractValidator<UpdateVoterRequestDTO>
     {
         public UpdateVoterRequestDTOValidator()
-        {
+        {   
+            RuleFor(x => x.NationalId).NotNull().NotEmpty();
+
             RuleFor(x => x.FirstName).NotEmpty();
             RuleFor(x => x.LastName).NotEmpty();
 
@@ -25,6 +27,19 @@ namespace GovernmentSystem.API.Application.Validators
                 .NotNull()
                 .Must(g => g.HasValue && (char.ToUpperInvariant(g.Value) == 'M' || char.ToUpperInvariant(g.Value) == 'F'))
                 .WithMessage("Gender must be either 'M' or 'F'.");
+
+            RuleFor(x => x.EligibleForElection)
+                .NotNull();
+
+            RuleFor(x => x.ValidToken)
+                .NotNull();
+
+            RuleFor(x => x.IsRegistered)
+                .NotNull();
+
+            RuleFor(x => x.Voted)
+                .NotNull();
+
         }
 
         private bool BeAtLeast18YearsOld(DateOnly dob)

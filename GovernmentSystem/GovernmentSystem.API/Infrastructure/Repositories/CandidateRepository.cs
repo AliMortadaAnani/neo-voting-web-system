@@ -25,11 +25,11 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             return await _dbContext.Candidates.ToListAsync();
         }
 
-        public async Task<Candidate?> GetCandidateByNationalIdAsync(Guid id)
+        public async Task<Candidate?> GetCandidateByNationalIdAsync(Guid nationalId)
         {
             // FindAsync only works for Primary Keys. For other columns, use FirstOrDefault.
             return await _dbContext.Candidates
-                .FirstOrDefaultAsync(v => v.NationalId == id);
+                .FirstOrDefaultAsync(v => v.NationalId == nationalId);
         }
 
         public void Delete(Candidate candidate)

@@ -43,13 +43,10 @@ namespace GovernmentSystem.API.StartupExtensions
                 options.Password.RequiredLength = 4;
                 options.Password.RequiredUniqueChars = 1; // You can increase for stricter policy
             })
-
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-
                 .AddDefaultTokenProviders()
-
-
                 ;
+
 
             // The two lines below are unnecessary. The `.AddEntityFrameworkStores<TContext>()`
             // call you made above ALREADY registers these for you.
@@ -170,24 +167,12 @@ namespace GovernmentSystem.API.StartupExtensions
                 return request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase);
             }
 
-
-            // Add services to the container.
-
             services.AddControllers();
-
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
-
-
-
-
 
             // Register your Custom Handler
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails(); // Required for .NET 8 Exception Handler to work
-
-
-
 
             services.AddSwaggerGen(c =>
             {
@@ -227,8 +212,7 @@ namespace GovernmentSystem.API.StartupExtensions
                 });
 
                 // c.OperationFilter<GlobalResponseFilter>();
-
-
+                //for productResponsesTypes in controllers
             });
 
 

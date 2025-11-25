@@ -162,7 +162,7 @@ namespace GovernmentSystem.API.Application.Services
                 return Result<bool>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
             }
             if (voter.VotingToken != request.VotingToken!.Value
-              || !voter.IsRegistered ||!voter.ValidToken || !voter.EligibleForElection
+              || !voter.IsRegistered || !voter.ValidToken || !voter.EligibleForElection
                 )
             {
                 return Result<bool>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));

@@ -6,11 +6,12 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
     {
         Task<List<Voter>> GetAllVotersAsync();
 
-        Task<Voter?> GetVoterByNationalIdAsync(Guid id);
+        Task<Voter?> GetVoterByNationalIdAsync(Guid nationalId);
 
         Task<Voter> AddVoterAsync(Voter voter);
 
         Task ResetAllVotedFieldToFalse();
+
         // Add these back. They are simple, synchronous persistence operations.
         void Update(Voter voter);
         void Delete(Voter voter);

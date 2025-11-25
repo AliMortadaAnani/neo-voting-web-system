@@ -3,17 +3,21 @@ using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureServices(builder.Configuration, builder.Host);
-builder.Configuration.AddEnvironmentVariables();
+
+//builder.Configuration.AddEnvironmentVariables(); // called automatically by CreateBuilder
 
 var app = builder.Build();
 
+///
+/// CLI SEEDING LOGIC
+///
 /*// =================================================================
 // CLI SEEDING LOGIC
 // =================================================================
-if (args.Length > 0 && args[0].ToLower() == "seed")
+if (args.Length > 0 && args[0].ToLower() == "seed") // we run dotnet with command line argument "seed" => dotnet run seed "YourStrongPassword!"
 {
     // Check if Password argument is provided
-    if (args.Length < 2)
+    if (args.Length < 2) args[0] = seed and args[1] = password
     {
         Console.WriteLine("Error: Password argument missing.");
         Console.WriteLine("Usage: dotnet run seed \"YourStrongPassword!\"");
@@ -47,7 +51,8 @@ if (args.Length > 0 && args[0].ToLower() == "seed")
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseExceptionHandler();
+app.UseExceptionHandler(); // Custom Exception Handler Middleware : Global Exception Handling
+//in Application layer , registered in StartupExtensions/ServiceExtensions.cs
 
 // Configure the HTTP request pipeline.
 /*if (app.Environment.IsDevelopment())
@@ -60,9 +65,9 @@ app.UseExceptionHandler();
 app.UseHsts();
 app.UseHttpsRedirection();
 
-app.UseMiddleware<IpWhitelistMiddleware>();
+app.UseMiddleware<IpWhitelistMiddleware>(); // IP Whitelisting Middleware in API layer
 
-//app.UseStaticFiles();
+//app.UseStaticFiles();// For serving static files if needed
 app.UseRouting();
 
 app.UseAuthentication();
