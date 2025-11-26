@@ -1,5 +1,5 @@
 ﻿using GovernmentSystem.API.API.Controllers;
-using GovernmentSystem.API.API.Filters; // Ensure this points to where ApiKeyAuthAttribute is
+using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
@@ -23,11 +23,21 @@ namespace GovernmentSystem.API.Controllers
 
         // --- VOTER INTEGRATION ---
 
-        // POST api/external/voters/verify
-        // Used by Neo-Voting to check if a user can login
+        /// <summary>
+        /// Verifies a voter's credentials and eligibility(Required to proceed critical actions in Neo-Voting System : Registration,Reset password,Casting a Vote).
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and voting Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's voting token is invalid.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
         [HttpPost("voters/verify")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)] // Not Found
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyVoter([FromBody] NeoVoting_GetVoterRequestDTO request)
@@ -36,8 +46,18 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // PUT api/external/voters/register
-        // Used when a voter creates an account on Neo-Voting
+        /// <summary>
+        /// Marks a voter as registered in the Neo-Voting system(Required to proceed critical actions in Neo-Voting System : Reset password,Casting a Vote).
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and voting Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's voting token is invalid.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
         [HttpPut("voters/registered-in-neovoting")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -49,8 +69,19 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // PUT api/external/voters/vote-status
-        // Used when a voter successfully casts a vote
+        /// <summary>
+        /// Records that a voter has successfully cast their vote.
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and voting Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's voting token is invalid.
+        /// - Returns 401(Invalid) if user exists but is not registered in Neo-Voting System.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
         [HttpPut("voters/mark-as-voted")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -64,8 +95,18 @@ namespace GovernmentSystem.API.Controllers
 
         // --- CANDIDATE INTEGRATION ---
 
-        // POST api/external/candidates/verify
-        // Used by Candidates to login to their dashboard
+        /// <summary>
+        /// Verifies a candidate's credentials and eligibility(Required to proceed critical actions in Neo-Voting System : Registration,Reset password,Creating and Updating Candidate profile).
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and nomination Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's nomination token is invalid.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
         [HttpPost("candidates/verify")]
         [ProducesResponseType(typeof(NeoVoting_CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -77,8 +118,18 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // PUT api/external/candidates/register
-        // Used when a candidate activates their profile
+        /// <summary>
+        /// Marks a candidate as registered in the Neo-Voting system(Required to proceed critical actions in Neo-Voting System : Reset password,Creating and Updating Candidate profile).
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and nomination Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's nomination token is invalid.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
         [HttpPut("candidates/registered-in-neovoting")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -92,8 +143,16 @@ namespace GovernmentSystem.API.Controllers
 
         // --- SYSTEM UTILITIES ---
 
-        // POST api/external/reset-election
-        // Used to reset the simulation
+        /// <summary>
+        /// Resets the voting status for all users in the system(after completed election and before upcoming election).
+        /// </summary>
+        /// <remarks>
+        /// **Usage:**
+        /// - Should be called by NeoVoting Admin before starting a NEW election.
+        /// - Sets "HasVoted" to false for every voter.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
         [HttpPost("reset-vote-status")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]

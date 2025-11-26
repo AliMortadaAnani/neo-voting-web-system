@@ -7,59 +7,59 @@ builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 
 //builder.Configuration.AddEnvironmentVariables(); // called automatically by CreateBuilder
 // 2. Register Seeder
-//builder.Services.AddTransient<DbSeeder>();
+builder.Services.AddTransient<DbSeeder>();
 
 var app = builder.Build();
 
 
 // 3. CLI Logic
-//if (args.Length > 0 && args[0].Equals("seed", StringComparison.OrdinalIgnoreCase))
-//{
-//    using (var scope = app.Services.CreateScope())
-//    {
-//        var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
+if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnoreCase))
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
 
-//        // Pass how many records you want to create
-//        await seeder.SeedAsync(100,50);
-//    }
-//    return; // Exit
-//}
+        // Pass how many records you want to create
+        await seeder.SeedAsync(100, 150);
+    }
+    return; // Exit
+}
 
 
 
 // =================================================================
 // CLI SEEDING LOGIC
 // =================================================================
-//if (args.Length > 0 && args[0].ToLower() == "seed") // we run dotnet with command line argument "seed" => dotnet run seed "YourStrongPassword!"
-//{
-//    // Check if Password argument is provided
-//    if (args.Length < 2) //args[0] = seed and args[1] = password
-//    {
-//        Console.WriteLine("Error: Password argument missing.");
-//        Console.WriteLine("Usage: dotnet run seed \"YourStrongPassword!\"");
-//        return; // Exit
-//    }
+if (args.Length > 0 && args[0].ToLower() == "seedAdmin") // we run dotnet with command line argument "seed" => dotnet run seed "YourStrongPassword!"
+{
+    // Check if Password argument is provided
+    if (args.Length < 2) //args[0] = seed and args[1] = password
+    {
+        Console.WriteLine("Error: Password argument missing.");
+        Console.WriteLine("Usage: dotnet run seed \"YourStrongPassword!\"");
+        return; // Exit
+    }
 
-//    string passwordFromCli = args[1];
+    string passwordFromCli = args[1];
 
-//    Console.WriteLine("Starting Admin Seeding Process...");
+    Console.WriteLine("Starting Admin Seeding Process...");
 
-//    using (var scope = app.Services.CreateScope())
-//    {
-//        try
-//        {
-//            // Pass the password to the method
-//            await DbInitializer.SeedAdminUser(scope.ServiceProvider, passwordFromCli);
-//        }
-//        catch (Exception ex)
-//        {
-//            Console.WriteLine($"Critical Error: {ex.Message}");
-//        }
-//    }
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            // Pass the password to the method
+            await DbInitializer.SeedAdminUser(scope.ServiceProvider, passwordFromCli);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Critical Error: {ex.Message}");
+        }
+    }
 
-//    Console.WriteLine("Process complete. Exiting.");
-//    return; // Stop app, do not start web server
-//}
+    Console.WriteLine("Process complete. Exiting.");
+    return; // Stop app, do not start web server
+}
 // =================================================================
 
 

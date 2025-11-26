@@ -18,6 +18,14 @@ namespace GovernmentSystem.API.Controllers
             _candidateServices = candidateServices;
         }
 
+        /// <summary>
+        /// Retrieves a list of all candidates.
+        /// </summary>
+        /// <remarks>
+        /// **Notes:**
+        /// - Returns a full list of candidates in the system(with all db fields).
+        /// - Returns 404 if the database is empty.
+        /// </remarks>
         [HttpGet("all")]
         [ProducesResponseType(typeof(List<CandidateResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -27,7 +35,14 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // POST api/candidates/details
+        /// <summary>
+        /// Gets a specific candidate's profile(with all db fields)..
+        /// </summary>
+        /// <remarks>
+        /// **Rules:**
+        /// - Search is performed using the National ID.
+        /// - Returns 404 if no matching candidate is found.
+        /// </remarks>
         [HttpPost("details")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -38,6 +53,13 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
+        /// <summary>
+        /// Registers a new candidate in the system.
+        /// </summary>
+        /// <remarks>
+        /// **Rules:**
+        /// - Internal IDs are auto-generated(Id,nationalId,nominationToken).
+        /// </remarks>
         [HttpPost("add")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -48,6 +70,15 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
+        /// <summary>
+        /// Updates an existing candidate's personal details.
+        /// </summary>
+        /// <remarks>
+        /// **Restrictions:**
+        /// - Id and National ID cannot be changed here.
+        /// - Nomination Token cannot be changed here (use Generate Token endpoint).
+        /// - Returns 404 if no matching candidate is found.
+        /// </remarks>
         [HttpPut("update")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -58,7 +89,14 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // POST api/candidates/delete
+        /// <summary>
+        /// Permanently removes a candidate from the system.
+        /// </summary>
+        /// <remarks>
+        /// **Rules:**
+        /// - Requires a valid National ID.
+        /// - Returns 404 if no matching candidate is found.
+        /// </remarks>
         [HttpPost("delete")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -70,6 +108,16 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
+        /// <summary>
+        /// Generates a new secure access token for a candidate.
+        /// </summary>
+        /// <remarks>
+        /// **Usage:**
+        /// - Call this if the user forgot their token or it was compromised.
+        /// - The old token will immediately become invalid.
+        /// - The new token will be valid.
+        /// - Returns 404 if no matching candidate is found.
+        /// </remarks>
         [HttpPost("generate-token")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

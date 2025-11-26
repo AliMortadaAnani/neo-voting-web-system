@@ -21,12 +21,11 @@ namespace GovernmentSystem.API.Controllers
         /// <summary>
         /// Retrieves a list of all voters.
         /// </summary>
-        /// <remarks>This method returns a collection of voters
-        /// if voters are found, or a 404 Not Found response if no voters exist.
+        /// <remarks>
+        /// **Notes:**
+        /// - Returns a full list of voters in the system(with all db fields).
+        /// - Returns 404 if the database is empty.
         /// </remarks>
-
-        // GET api/voters/all
-        // (Safe to keep as GET because it exposes no IDs in the URL)
         [HttpGet("all")]
         [ProducesResponseType(typeof(List<VoterResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -36,8 +35,14 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // POST api/voters/details (Was GET /{id})
-        // Security: ID is hidden in JSON Body
+        /// <summary>
+        /// Gets a specific voter's profile(with all db fields).
+        /// </summary>
+        /// <remarks>
+        /// **Rules:**
+        /// - Search is performed using the National ID.
+        /// - Returns 404 if no matching voter is found.
+        /// </remarks>
         [HttpPost("details")]
         [ProducesResponseType(typeof(VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -48,7 +53,13 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // POST api/voters/add
+        /// <summary>
+        /// Registers a new voter in the system.
+        /// </summary>
+        /// <remarks>
+        /// **Rules:**
+        /// - Internal IDs are auto-generated(Id,nationalId,votingToken).
+        /// </remarks>
         [HttpPost("add")]
         [ProducesResponseType(typeof(VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -59,8 +70,15 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // PUT api/voters/update
-        // (Already secure, ID is in Body)
+        /// <summary>
+        /// Updates an existing voter's personal details.
+        /// </summary>
+        /// <remarks>
+        /// **Restrictions:**
+        /// - Id and National ID cannot be changed here.
+        /// - Voting Token cannot be changed here (use Generate Token endpoint).
+        /// - Returns 404 if no matching voter is found.
+        /// </remarks>
         [HttpPut("update")]
         [ProducesResponseType(typeof(VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -71,8 +89,14 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // POST api/voters/delete (Was DELETE /{id})
-        // Security: ID is hidden in JSON Body
+        /// <summary>
+        /// Permanently removes a voter from the system.
+        /// </summary>
+        /// <remarks>
+        /// **Rules:**
+        /// - Requires a valid National ID.
+        /// - Returns 404 if no matching voter is found.
+        /// </remarks>
         [HttpPost("delete")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -84,7 +108,16 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
-        // POST api/voters/generate-token
+        /// <summary>
+        /// Generates a new voting token for a voter.
+        /// </summary>
+        /// <remarks>
+        /// **Usage:**
+        /// - Call this if the user forgot their token or it was compromised.
+        /// - The old token will immediately become invalid.
+        /// - The new token will be valid.
+        /// - Returns 404 if no matching voter is found.
+        /// </remarks>
         [HttpPost("generate-token")]
         [ProducesResponseType(typeof(VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
