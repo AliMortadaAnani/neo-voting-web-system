@@ -13,7 +13,9 @@ using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 
 namespace GovernmentSystem.API.StartupExtensions
@@ -213,6 +215,17 @@ namespace GovernmentSystem.API.StartupExtensions
 
                 // c.OperationFilter<GlobalResponseFilter>();
                 //for productResponsesTypes in controllers
+
+                // 1. Get the name of the generated XML file (usually YourProjectName.xml)
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+                // 2. Combine with the base directory to get the full path
+                var fullPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+
+                // 3. Tell Swagger to use it
+                c.IncludeXmlComments(fullPath);
+
+
             });
 
 

@@ -18,6 +18,13 @@ namespace GovernmentSystem.API.Controllers
             _voterServices = voterServices;
         }
 
+        /// <summary>
+        /// Retrieves a list of all voters.
+        /// </summary>
+        /// <remarks>This method returns a collection of voters
+        /// if voters are found, or a 404 Not Found response if no voters exist.
+        /// </remarks>
+
         // GET api/voters/all
         // (Safe to keep as GET because it exposes no IDs in the URL)
         [HttpGet("all")]

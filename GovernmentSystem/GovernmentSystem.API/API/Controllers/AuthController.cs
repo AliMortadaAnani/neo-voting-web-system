@@ -18,6 +18,14 @@ namespace GovernmentSystem.API.API.Controllers
             _adminServices = adminServices;
         }
 
+        /// <summary>
+        /// Login to the Government System as an Admin.
+        /// </summary>
+        /// <remarks>
+        /// **Rules:**
+        /// - Correct Username and Password required
+        /// - Requested from allowed IPs only
+        /// </remarks>
 
         [HttpPost("login")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
@@ -29,6 +37,14 @@ namespace GovernmentSystem.API.API.Controllers
             return HandleResult(result);
         }
 
+
+        /// <summary>
+        /// Logout from the Government System.
+        /// </summary> 
+        /// <remarks>
+        /// **Rules:**
+        /// - Requested from allowed IPs only
+        /// </remarks>     
         [HttpPost("logout")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
