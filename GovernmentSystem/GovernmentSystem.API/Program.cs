@@ -7,22 +7,23 @@ builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 
 //builder.Configuration.AddEnvironmentVariables(); // called automatically by CreateBuilder
 // 2. Register Seeder
-builder.Services.AddTransient<DbSeeder>();
+//builder.Services.AddTransient<DbSeeder>();
+
 var app = builder.Build();
 
 
 // 3. CLI Logic
-if (args.Length > 0 && args[0].Equals("seed", StringComparison.OrdinalIgnoreCase))
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
+//if (args.Length > 0 && args[0].Equals("seed", StringComparison.OrdinalIgnoreCase))
+//{
+//    using (var scope = app.Services.CreateScope())
+//    {
+//        var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
 
-        // Pass how many records you want to create
-        await seeder.SeedAsync(100,50);
-    }
-    return; // Exit
-}
+//        // Pass how many records you want to create
+//        await seeder.SeedAsync(100,50);
+//    }
+//    return; // Exit
+//}
 
 
 
