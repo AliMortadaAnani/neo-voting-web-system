@@ -96,6 +96,7 @@ namespace GovernmentSystem.API.Controllers
         // Used to reset the simulation
         [HttpPost("reset-vote-status")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ResetElection()
         {
             var result = await _voterServices.ResetAllVotedAsFalseAsync();
