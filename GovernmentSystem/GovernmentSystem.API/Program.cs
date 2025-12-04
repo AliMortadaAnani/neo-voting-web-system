@@ -82,7 +82,7 @@ app.UseHsts();
 app.UseHttpsRedirection();
 
 app.UseMiddleware<IpWhitelistMiddleware>(); // IP Whitelisting Middleware in API layer
-
+//app.UseCors("FrontendPolicy"); // Must be before Auth
 //app.UseStaticFiles();// For serving static files if needed
 app.UseRouting();
 

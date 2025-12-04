@@ -27,7 +27,7 @@ namespace GovernmentSystem.API.Application.Services
             var result = await _signInManager.PasswordSignInAsync(
                 user,
                 loginDTO.Password!,
-                isPersistent: false,
+                isPersistent: true, //better be false for secutity reasons
                 lockoutOnFailure: false);
 
             if (result.Succeeded)

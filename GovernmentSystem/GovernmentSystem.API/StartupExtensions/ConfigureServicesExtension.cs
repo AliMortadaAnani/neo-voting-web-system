@@ -109,9 +109,10 @@ namespace GovernmentSystem.API.StartupExtensions
             // Cookie configuration with ProblemDetails for 401/403
             services.ConfigureApplicationCookie(options =>
             {
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.Strict;
+                // A. Security Settings
+                options.Cookie.HttpOnly = true; // Prevents JavaScript from reading the cookie
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Requires HTTPS
+                options.Cookie.SameSite = SameSiteMode.Strict; // strict prevents CSRF
                 options.Cookie.Name = "__Host-Gov-Auth";
 
                 options.Events.OnRedirectToLogin = context =>
@@ -168,6 +169,20 @@ namespace GovernmentSystem.API.StartupExtensions
                 // simple heuristic: all your APIs are under /api
                 return request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase);
             }
+
+
+            // 4. Setup CORS (Crucial if your frontend is on a different port, e.g., React/Angular)
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("FrontendPolicy", policy =>
+            //    {
+            //        policy.WithOrigins("http://localhost:3000") // Your Frontend URL
+            //              .AllowAnyMethod()
+            //              .AllowAnyHeader()
+            //              .AllowCredentials(); // <--- REQUIRED for Cookies to be sent/received
+            //    });
+            //});
+
 
             services.AddControllers();
             services.AddEndpointsApiExplorer();
