@@ -1,5 +1,4 @@
-﻿using Azure;
-using GovernmentSystem.API.Application.RequestDTOs;
+﻿using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Contracts;
@@ -25,14 +24,14 @@ namespace GovernmentSystem.API.Application.Services
             Candidate candidate = request.ToCandidate();
 
             var candidateAdded = await _candidateRepository.AddCandidateAsync(candidate);
-            
-            if(candidateAdded == null)
+
+            if (candidateAdded == null)
             {
                 return Result<CandidateResponseDTO>.Failure(Error.Failure("Candidate.AdditionFailed", "Candidate could not be added."));
             }
 
             int rowsAdded = await _unitOfWork.SaveChangesAsync();
-            
+
             if (rowsAdded == 0)
             {
                 return Result<CandidateResponseDTO>.Failure(Error.Failure("Candidate.AdditionFailed", "Candidate could not be added."));
@@ -81,6 +80,67 @@ namespace GovernmentSystem.API.Application.Services
             {
                 return Result<List<CandidateResponseDTO>>.Failure(Error.NotFound("Candidates.Missing", "No candidates found."));
             }
+            var response = candidates.Select(c => c.ToCandidateResponse()).ToList();
+            return Result<List<CandidateResponseDTO>>.Success(response);
+        }
+
+        public async Task<Result<List<CandidateResponseDTO>>> GetPaginatedCandidatesAsync(int pageNumber, int pageSize)
+        {
+            // 1. VALIDATION (Must be first)
+            if (pageNumber < 1)
+            {
+                return Result<List<CandidateResponseDTO>>.Failure(
+                    Error.Validation("Paging.Invalid", "PageNumber must be greater than 0."));
+            }
+            // 1. VALIDATION (Must be first)
+            if (pageSize < 1)
+            {
+                return Result<List<CandidateResponseDTO>>.Failure(
+                    Error.Validation("Paging.Invalid", "PageSize must be greater than 0."));
+            }
+
+            // 2. SECURITY: Cap the PageSize
+            // If they ask for 5000, force it down to 100 to protect RAM/Network.
+            if (pageSize > 100) pageSize = 100;
+            if (pageSize < 1) pageSize = 20; // Default safety
+
+            // 3. CALCULATION
+            int skip = (pageNumber - 1) * pageSize;
+            int take = pageSize;
+
+            // 4. DATA RETRIEVAL (Parallel Execution for Speed)
+            // We need both the Data (Page) and the Count (Total)
+            var candidatesTask = _candidateRepository.GetPagedCandidatesStoredProcAsync(skip, take);
+            var countTask = _candidateRepository.GetTotalCandidatesCountAsync(); // You need to add this Repo method
+            await Task.WhenAll(candidatesTask, countTask);
+
+            /*
+            Task 1 (Stored Proc): Uses Connection A (Created manually).
+
+            Task 2 (Count): Uses Connection B (Inside _dbContext).
+
+            Result: They are two different cables going to the database.
+            They can run at the same time. Task.WhenAll works.*/
+
+            //Here we are waiting for both tasks to complete but from different contexts.
+            //as candidatesTask is fetching data using ADO.NET and countTask is fetching data using Entity Framework Core.
+
+            var candidates = candidatesTask.Result;
+            var totalCount = countTask.Result;
+
+            // 5. HANDLE EMPTY RESULTS
+            if (candidates.Count == 0 && pageNumber == 1)
+            {
+                // It's not an error if the DB is empty, just return empty response
+                return Result<List<CandidateResponseDTO>>.Success(new List<CandidateResponseDTO>());
+            }
+            // If they ask for Page 100 but we only have 5 pages
+            if (candidates.Count == 0 && totalCount > 0)
+            {
+                return Result<List<CandidateResponseDTO>>.Failure(
+                    Error.NotFound("Paging.OutOfBounds", "Page number exceeds total pages."));
+            }
+
             var response = candidates.Select(c => c.ToCandidateResponse()).ToList();
             return Result<List<CandidateResponseDTO>>.Success(response);
         }
@@ -150,7 +210,7 @@ namespace GovernmentSystem.API.Application.Services
                 return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Invalid candidate credentials."));
             }
             if (candidate.IsRegistered)
-            {       
+            {
                 return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
             }
             candidate.MarkCandidateAsRegistered();

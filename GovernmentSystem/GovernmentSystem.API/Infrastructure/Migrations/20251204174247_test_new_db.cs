@@ -5,7 +5,7 @@
 namespace GovernmentSystem.API.Migrations
 {
     /// <inheritdoc />
-    public partial class init3 : Migration
+    public partial class test_new_db : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

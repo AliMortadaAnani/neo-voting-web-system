@@ -7,6 +7,7 @@ namespace GovernmentSystem.API.Domain.Entities
     {
         // 1. Properties
         public Guid Id { get; private set; }
+
         public Guid NationalId { get; private set; }
         public Guid VotingToken { get; private set; }
         public GovernorateId GovernorateId { get; private set; }
@@ -20,7 +21,8 @@ namespace GovernmentSystem.API.Domain.Entities
         public bool Voted { get; private set; }
 
         // 2. Private Constructor (EF Core requires this or a binding constructor)
-        private Voter() { }
+        private Voter()
+        { }
 
         // 3. Static Create Method
         public static Voter Create(
@@ -47,7 +49,7 @@ namespace GovernmentSystem.API.Domain.Entities
                 EligibleForElection = eligibleForElection,
                 ValidToken = true,             // Default to true on creation
                 IsRegistered = false,          // Default to false on creation
-                Voted = false                  // Default to false on creation 
+                Voted = false                  // Default to false on creation
             };
         }
 
@@ -85,6 +87,7 @@ namespace GovernmentSystem.API.Domain.Entities
             VotingToken = Guid.NewGuid();
             ValidToken = true; // Re-enable token if it was invalid
         }
+
         public void MarkVoterAsRegistered()
         {
             //Should not arrive here if well handled in the service layer
@@ -94,6 +97,7 @@ namespace GovernmentSystem.API.Domain.Entities
             }
             IsRegistered = true;
         }
+
         public void MarkVoterAsVoted()
         {
             //Should not arrive here if well handled in the service layer
@@ -103,6 +107,7 @@ namespace GovernmentSystem.API.Domain.Entities
             }
             Voted = true;
         }
+
         // 6. ToString Method
         public override string ToString()
         {
@@ -151,6 +156,37 @@ namespace GovernmentSystem.API.Domain.Entities
             {
                 throw new ArgumentException("Person must be at least 18 years old.");
             }
+        }
+
+        public static Voter FromAdoNet(
+    Guid id,
+    Guid nationalId,
+    Guid votingToken,
+    GovernorateId governorateId,
+    string firstName,
+    string lastName,
+    DateOnly dateOfBirth,
+    char gender,
+    bool eligibleForElection,
+    bool validToken,
+    bool isRegistered,
+    bool voted)
+        {
+            return new Voter
+            {
+                Id = id,
+                NationalId = nationalId,
+                VotingToken = votingToken,
+                GovernorateId = governorateId,
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Gender = char.ToUpper(gender),
+                EligibleForElection = eligibleForElection,
+                ValidToken = validToken,
+                IsRegistered = isRegistered,
+                Voted = voted
+            };
         }
     }
 }

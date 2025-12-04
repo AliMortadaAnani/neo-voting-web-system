@@ -36,6 +36,23 @@ namespace GovernmentSystem.API.Controllers
         }
 
         /// <summary>
+        /// Retrieves a paginated list of candidates.
+        /// </summary>
+        /// <param name="pageNumber">The current page number (starting from 1).</param>
+        /// <param name="pageSize">The maximum number of candidates per page.</param>
+        /// <remarks>
+        /// **Notes:**
+        /// - Returns a paginated list of candidates (all db fields).
+        /// </remarks>
+        [HttpGet("paged")]
+        [ProducesResponseType(typeof(List<CandidateResponseDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _candidateServices.GetPaginatedCandidatesAsync(pageNumber, pageSize);
+            return HandleResult(result);
+        }
+
+        /// <summary>
         /// Gets a specific candidate's profile(with all db fields)..
         /// </summary>
         /// <remarks>
@@ -75,6 +92,7 @@ namespace GovernmentSystem.API.Controllers
         /// </summary>
         /// <remarks>
         /// **Restrictions:**
+        /// - Search is performed using the National ID.
         /// - Id and National ID cannot be changed here.
         /// - Nomination Token cannot be changed here (use Generate Token endpoint).
         /// - Returns 404 if no matching candidate is found.

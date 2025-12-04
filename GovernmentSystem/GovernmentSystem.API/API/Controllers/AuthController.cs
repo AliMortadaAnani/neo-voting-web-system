@@ -1,5 +1,4 @@
-﻿using GovernmentSystem.API.API.Filters;
-using GovernmentSystem.API.Application.AdminDTOs;
+﻿using GovernmentSystem.API.Application.AdminDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,6 @@ namespace GovernmentSystem.API.API.Controllers
     [AllowAnonymous]
     public class AuthController : ApiController
     {
-
         private readonly IAdminServices _adminServices;
 
         public AuthController(IAdminServices adminServices)
@@ -37,14 +35,13 @@ namespace GovernmentSystem.API.API.Controllers
             return HandleResult(result);
         }
 
-
         /// <summary>
         /// Logout from the Government System.
-        /// </summary> 
+        /// </summary>
         /// <remarks>
         /// **Rules:**
         /// - Requested from allowed IPs only
-        /// </remarks>     
+        /// </remarks>
         [HttpPost("logout")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
@@ -69,7 +66,6 @@ namespace GovernmentSystem.API.API.Controllers
         {
             return Ok("Hello Caller!");
         }*/
-
 
         // Test Endpoint
         /*[HttpGet("test-ips")]

@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-
 namespace GovernmentSystem.API.API.Middlewares
 {
-
-
     public class IpWhitelistMiddleware
     {
         private readonly RequestDelegate _next;
@@ -65,7 +62,6 @@ namespace GovernmentSystem.API.API.Middlewares
                         type: "https://httpstatuses.com/403");
 
                     return;
-
                 }
             }
 

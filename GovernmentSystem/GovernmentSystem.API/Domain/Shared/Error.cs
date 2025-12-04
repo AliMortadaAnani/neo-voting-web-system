@@ -149,6 +149,7 @@
 }
 
 */
+
 namespace GovernmentSystem.API.Domain.Shared
 {
     public record Error(string Code, string Description, ErrorType Type)
@@ -160,7 +161,6 @@ namespace GovernmentSystem.API.Domain.Shared
             new("Error.NullValue", "Null value was provided", ErrorType.Failure);//static object representing null value error
 
         // we made these static readonly methods to create specific error types(no input here)
-
 
         public static Error NotFound(string code, string description) =>
             new(code, description, ErrorType.NotFound);
@@ -180,6 +180,5 @@ namespace GovernmentSystem.API.Domain.Shared
         public static Error Forbidden(string code, string description) =>
             new(code, description, ErrorType.Forbidden);
         //return an instance of Error with Forbidden type
-
     }
 }

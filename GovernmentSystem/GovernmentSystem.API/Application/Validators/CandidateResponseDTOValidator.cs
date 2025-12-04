@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using GovernmentSystem.API.Application.ResponseDTOs;
+
 namespace GovernmentSystem.API.Application.Validators
 {
-
     public class CandidateResponseDTOValidator : AbstractValidator<CandidateResponseDTO>
     {
         public CandidateResponseDTOValidator()

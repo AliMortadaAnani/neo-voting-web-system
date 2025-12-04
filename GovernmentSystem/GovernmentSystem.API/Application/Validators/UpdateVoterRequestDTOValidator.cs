@@ -7,7 +7,7 @@ namespace GovernmentSystem.API.Application.Validators
     public class UpdateVoterRequestDTOValidator : AbstractValidator<UpdateVoterRequestDTO>
     {
         public UpdateVoterRequestDTOValidator()
-        {   
+        {
             RuleFor(x => x.NationalId).NotNull().NotEmpty();
 
             RuleFor(x => x.FirstName).NotEmpty();
@@ -39,7 +39,6 @@ namespace GovernmentSystem.API.Application.Validators
 
             RuleFor(x => x.Voted)
                 .NotNull();
-
         }
 
         private bool BeAtLeast18YearsOld(DateOnly dob)

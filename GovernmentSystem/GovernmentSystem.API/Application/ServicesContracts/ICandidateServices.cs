@@ -8,16 +8,24 @@ namespace GovernmentSystem.API.Application.ServicesContracts
     {
         Task<Result<CandidateResponseDTO>> GetByNationalIdAsync
             (GetCandidateRequestDTO request);
+
         Task<Result<List<CandidateResponseDTO>>> GetAllCandidatesAsync();
+
+        Task<Result<List<CandidateResponseDTO>>> GetPaginatedCandidatesAsync(int PageNumber, int PageSize);
+
         Task<Result<CandidateResponseDTO>> AddCandidateAsync
             (CreateCandidateRequestDTO request);
+
         Task<Result<CandidateResponseDTO>> UpdateByNationalIdAsync
             (UpdateCandidateRequestDTO request);
+
         Task<Result<bool>> DeleteByNationalIdAsync
             (DeleteCandidateRequestDTO request);
+
         Task<Result<CandidateResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenCandidateRequestDTO request);
 
         Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToTrueAsync(NeoVoting_CandidateIsRegisteredRequestDTO request);
+
         Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateForNeoVotingAsync(NeoVoting_GetCandidateRequestDTO request);
     }
 }

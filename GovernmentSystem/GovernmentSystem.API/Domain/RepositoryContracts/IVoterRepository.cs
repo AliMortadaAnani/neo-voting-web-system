@@ -6,6 +6,10 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
     {
         Task<List<Voter>> GetAllVotersAsync();
 
+        Task<List<Voter>> GetPagedVotersStoredProcAsync(int skip, int take);
+
+        Task<int> GetTotalVotersCountAsync();
+
         Task<Voter?> GetVoterByNationalIdAsync(Guid nationalId);
 
         Task<Voter> AddVoterAsync(Voter voter);
@@ -14,6 +18,7 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 
         // Add these back. They are simple, synchronous persistence operations.
         void Update(Voter voter);
+
         void Delete(Voter voter);
     }
 }

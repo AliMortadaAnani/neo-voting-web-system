@@ -13,10 +13,8 @@ using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-
 
 namespace GovernmentSystem.API.StartupExtensions
 {
@@ -35,7 +33,6 @@ namespace GovernmentSystem.API.StartupExtensions
                 options.UseSqlServer(connectionString);
             });
 
-
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -49,7 +46,6 @@ namespace GovernmentSystem.API.StartupExtensions
                 .AddDefaultTokenProviders()
                 ;
 
-
             // The two lines below are unnecessary. The `.AddEntityFrameworkStores<TContext>()`
             // call you made above ALREADY registers these for you.
             // You are explicitly re-registering the exact same default implementations.
@@ -61,7 +57,6 @@ namespace GovernmentSystem.API.StartupExtensions
                <ApplicationRole, ApplicationDbContext, Guid>>()
                ;
             */
-
 
             /*// 2. Configure the "Most Secure" Cookie Settings
             // ---------------------------------------------------------
@@ -87,7 +82,7 @@ namespace GovernmentSystem.API.StartupExtensions
                 options.Cookie.Name = "__Host-Gov-Auth";
 
                 // API BEHAVIOR:
-                // Identity normally redirects to a Login HTML page on failure. 
+                // Identity normally redirects to a Login HTML page on failure.
                 // We are an API, so we force it to return 401/403 codes instead.
                 options.Events.OnRedirectToLogin = context =>
                 {
@@ -170,7 +165,6 @@ namespace GovernmentSystem.API.StartupExtensions
                 return request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase);
             }
 
-
             // 4. Setup CORS (Crucial if your frontend is on a different port, e.g., React/Angular)
             //services.AddCors(options =>
             //{
@@ -182,7 +176,6 @@ namespace GovernmentSystem.API.StartupExtensions
             //              .AllowCredentials(); // <--- REQUIRED for Cookies to be sent/received
             //    });
             //});
-
 
             services.AddControllers();
             services.AddEndpointsApiExplorer();
@@ -197,7 +190,7 @@ namespace GovernmentSystem.API.StartupExtensions
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Government System API", Version = "v1" });
 
                 // 1. DEFINITION: "Here is a security scheme that exists"
-                // This tells Swagger: "I support a security mode called 'ApiKey'. 
+                // This tells Swagger: "I support a security mode called 'ApiKey'.
                 // It works by sending a value in the Header named 'X-Gov-Api-Key'."
                 c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
                 {
@@ -239,11 +232,7 @@ namespace GovernmentSystem.API.StartupExtensions
 
                 // 3. Tell Swagger to use it
                 c.IncludeXmlComments(fullPath);
-
-
             });
-
-
 
             // --- REGISTER THE UNIT OF WORK ---
             // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
@@ -257,7 +246,6 @@ namespace GovernmentSystem.API.StartupExtensions
             services.AddScoped<IAdminServices, AdminServices>();
             services.AddScoped<IVoterServices, VoterServices>();
             services.AddScoped<ICandidateServices, CandidateServices>();
-
 
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<LoginDTOValidator>();

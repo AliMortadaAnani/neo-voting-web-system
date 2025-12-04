@@ -11,7 +11,6 @@ builder.Services.AddTransient<DbSeeder>();
 
 var app = builder.Build();
 
-
 // 3. CLI Logic
 if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnoreCase))
 {
@@ -24,8 +23,6 @@ if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnore
     }
     return; // Exit
 }
-
-
 
 // =================================================================
 // CLI SEEDING LOGIC
@@ -61,9 +58,6 @@ if (args.Length > 0 && args[0].ToLower() == "seedAdmin") // we run dotnet with c
     return; // Stop app, do not start web server
 }
 // =================================================================
-
-
-
 
 app.UseSwagger();
 app.UseSwaggerUI();

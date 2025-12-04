@@ -1,6 +1,5 @@
 ﻿using GovernmentSystem.API.Domain.Contracts;
 
-
 namespace GovernmentSystem.API.Infrastructure.DbContext
 {
     public class UnitOfWork : IUnitOfWork
@@ -12,7 +11,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
         {
             _context = context;
         }
-
 
         /// <summary>
         /// The implementation simply delegates the call to the underlying DbContext's SaveChangesAsync method.
@@ -30,7 +28,5 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
         {
             _context.Dispose();
         }
-
-
     }
 }

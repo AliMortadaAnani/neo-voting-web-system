@@ -5,7 +5,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 {
     public class DbInitializer
     {
-
         // Note: We added 'adminPassword' as a parameter
         public static async Task SeedAdminUser(IServiceProvider serviceProvider, string adminPassword)
         {
@@ -28,7 +27,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
             // 2. Create Role
             string adminRoleName = "Admin";
 
-
             if (await roleManager.FindByNameAsync("Admin") is null)
             {
                 ApplicationRole applicationRole = new ApplicationRole
@@ -36,9 +34,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                     Name = adminRoleName
                 };
                 await roleManager.CreateAsync(applicationRole);
-
             }
-
 
             // 3. Create User
             var adminUser = await userManager.FindByNameAsync(adminUsername);
@@ -48,7 +44,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 adminUser = new ApplicationUser
                 {
                     UserName = adminUsername,
-
                 };
 
                 // Use the password passed from the CLI argument
@@ -70,6 +65,5 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 Console.WriteLine("Admin user already exists.");
             }
         }
-
     }
 }

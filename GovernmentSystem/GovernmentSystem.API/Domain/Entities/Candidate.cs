@@ -7,6 +7,7 @@ namespace GovernmentSystem.API.Domain.Entities
     {
         // 1. Properties
         public Guid Id { get; private set; }
+
         public Guid NationalId { get; private set; }
         public Guid NominationToken { get; private set; }
         public GovernorateId GovernorateId { get; private set; }
@@ -18,11 +19,12 @@ namespace GovernmentSystem.API.Domain.Entities
         public bool ValidToken { get; private set; }
         public bool IsRegistered { get; private set; }
 
-        // Note: Candidates don't have a "Voted" field in this schema 
+        // Note: Candidates don't have a "Voted" field in this schema
         // (they vote using their Voter record)
 
         // 2. Private Constructor
-        private Candidate() { }
+        private Candidate()
+        { }
 
         // 3. Static Create Method
         public static Candidate Create(
@@ -84,6 +86,7 @@ namespace GovernmentSystem.API.Domain.Entities
             NominationToken = Guid.NewGuid();
             ValidToken = true;
         }
+
         public void MarkCandidateAsRegistered()
         {
             //Should not arrive here if well handled in the service layer
@@ -94,6 +97,7 @@ namespace GovernmentSystem.API.Domain.Entities
 
             IsRegistered = true;
         }
+
         // 6. ToString Method
         public override string ToString()
         {
@@ -125,6 +129,7 @@ namespace GovernmentSystem.API.Domain.Entities
             if (!Enum.IsDefined(typeof(GovernorateId), id))
                 throw new ArgumentException("Invalid Governorate ID. Must be 1-5.");
         }
+
         private static void ValidateAge(DateOnly dateOfBirth)
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
@@ -142,5 +147,34 @@ namespace GovernmentSystem.API.Domain.Entities
             }
         }
 
+        public static Candidate FromAdoNet(
+    Guid id,
+    Guid nationalId,
+    Guid nominationToken,
+    GovernorateId governorateId,
+    string firstName,
+    string lastName,
+    DateOnly dateOfBirth,
+    char gender,
+    bool eligibleForElection,
+    bool validToken,
+    bool isRegistered)
+        {
+            // No validation: assumes DB data is trusted
+            return new Candidate
+            {
+                Id = id,
+                NationalId = nationalId,
+                NominationToken = nominationToken,
+                GovernorateId = governorateId,
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Gender = char.ToUpper(gender),
+                EligibleForElection = eligibleForElection,
+                ValidToken = validToken,
+                IsRegistered = isRegistered
+            };
+        }
     }
 }

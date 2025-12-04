@@ -115,11 +115,14 @@ namespace GovernmentSystem.API.Domain.Shared
         }
 
         public bool IsSuccess { get; }
-        public bool IsFailure => !IsSuccess;
+
+        //public bool IsFailure => !IsSuccess;
         public Error Error { get; }
+
         public T Value { get; }
 
         public static Result<T> Success(T value) => new(true, Error.None, value);
+
         public static Result<T> Failure(Error error) => new(false, error, default!);
     }
 }

@@ -8,9 +8,7 @@ namespace GovernmentSystem.API.Application.Validators
     {
         public UpdateCandidateRequestDTOValidator()
         {
-
             RuleFor(x => x.NationalId).NotNull().NotEmpty();
-
 
             RuleFor(x => x.FirstName).NotEmpty();
             RuleFor(x => x.LastName).NotEmpty();
@@ -38,8 +36,6 @@ namespace GovernmentSystem.API.Application.Validators
 
             RuleFor(x => x.IsRegistered)
                 .NotNull();
-
-           
         }
 
         private bool BeAtLeast18YearsOld(DateOnly dob)

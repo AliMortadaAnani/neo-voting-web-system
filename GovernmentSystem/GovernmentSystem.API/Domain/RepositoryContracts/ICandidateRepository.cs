@@ -6,13 +6,17 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
     {
         Task<List<Candidate>> GetAllCandidatesAsync();
 
+        Task<List<Candidate>> GetPagedCandidatesStoredProcAsync(int skip, int take);
+
+        Task<int> GetTotalCandidatesCountAsync();
+
         Task<Candidate?> GetCandidateByNationalIdAsync(Guid nationalId);
 
         Task<Candidate> AddCandidateAsync(Candidate candidate);
 
-
         // Add these back. They are simple, synchronous persistence operations.
         void Update(Candidate candidate);
+
         void Delete(Candidate candidate);
     }
 }
