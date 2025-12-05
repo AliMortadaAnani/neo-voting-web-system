@@ -155,8 +155,11 @@ namespace GovernmentSystem.API.StartupExtensions
                     return Task.CompletedTask;
                 };
 
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-                options.SlidingExpiration = true;
+                options.ExpireTimeSpan = TimeSpan.FromDays(14); // 14 days
+                options.SlidingExpiration = true; // optional, for sliding window
+
+                //options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                //options.SlidingExpiration = true;
             });
 
             static bool IsApiRequest(HttpRequest request)
