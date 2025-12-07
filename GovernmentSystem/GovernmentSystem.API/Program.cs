@@ -3,6 +3,11 @@ using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
+// Add user-secrets and environment variables before calling ConfigureServices
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>(optional: true);
+}
 builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 
 //builder.Configuration.AddEnvironmentVariables(); // called automatically by CreateBuilder
@@ -67,9 +72,9 @@ app.UseExceptionHandler(); // Custom Exception Handler Middleware : Global Excep
 // Configure the HTTP request pipeline.
 /*if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseDeveloperExceptionPage();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }*/
 
 app.UseHsts();
