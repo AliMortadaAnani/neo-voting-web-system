@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AdminDTOs\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="ServicesContracts\" />
+    <Folder Include="Services\" />
     <Folder Include="ResponseDTOs\" />
   </ItemGroup>
 

@@ -76,6 +76,9 @@ namespace GovernmentSystem.API.Controllers
         /// <remarks>
         /// **Rules:**
         /// - Internal IDs are auto-generated(Id,nationalId,votingToken).
+        /// - Gender must be 'M' or 'F'.
+        /// - Date of Birth should be a valid past date.(18 years or older).
+        /// - GovernorateId must reference an existing governorate.(1-5)
         /// </remarks>
         [HttpPost("add")]
         [ProducesResponseType(typeof(VoterResponseDTO), StatusCodes.Status200OK)]
@@ -96,6 +99,9 @@ namespace GovernmentSystem.API.Controllers
         /// - Id and National ID cannot be changed here.
         /// - Voting Token cannot be changed here (use Generate Token endpoint).
         /// - Returns 404 if no matching voter is found.
+        /// - Gender must be 'M' or 'F'.
+        /// - Date of Birth should be a valid past date.(18 years or older).
+        /// - GovernorateId must reference an existing governorate.(1-5)
         /// </remarks>
         [HttpPut("update")]
         [ProducesResponseType(typeof(VoterResponseDTO), StatusCodes.Status200OK)]
