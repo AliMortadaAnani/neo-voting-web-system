@@ -81,13 +81,13 @@ namespace GovernmentSystem.API.Controllers
         /// - GovernorateId must reference an existing governorate.(1-5)
         /// </remarks>
         [HttpPost("add")]
-        [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Add([FromBody] CreateCandidateRequestDTO request)
         {
             var result = await _candidateServices.AddCandidateAsync(request);
-            return HandleResult(result);
+            return HandleResult(result,true);
         }
 
         /// <summary>

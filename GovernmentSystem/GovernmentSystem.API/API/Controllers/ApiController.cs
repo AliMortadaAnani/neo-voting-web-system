@@ -21,10 +21,15 @@ public async Task<IActionResult> VerifyVoter(VerifyRequest request)
     [Produces("application/json")]
     public abstract class ApiController : ControllerBase
     {
-        protected IActionResult HandleResult<T>(Result<T> result)
+        protected IActionResult HandleResult<T>(Result<T> result,bool Created = false)
         {
             if (result.IsSuccess)
-            {
+            {   
+                if(Created)
+                {
+                    // This returns HTTP 201 with the JSON body, but no Location header
+                    return StatusCode(StatusCodes.Status201Created, result.Value);
+                }
                 return Ok(result.Value);
             }
 

@@ -38,6 +38,7 @@ namespace GovernmentSystem.API.Domain.Entities
             ValidateGender(gender);
             ValidateGovernorate(governorateId);
             ValidateAge(dateOfBirth);
+            ValidateNames(firstName, lastName);
             return new Candidate
             {
                 Id = Guid.NewGuid(),
@@ -69,7 +70,7 @@ namespace GovernmentSystem.API.Domain.Entities
             ValidateGender(gender);
             ValidateGovernorate(governorateId);
             ValidateAge(dateOfBirth);
-
+            ValidateNames(firstName, lastName);
             GovernorateId = governorateId;
             FirstName = firstName;
             LastName = lastName;
@@ -117,6 +118,16 @@ namespace GovernmentSystem.API.Domain.Entities
         }
 
         // Helpers
+
+        private static void ValidateNames(string firstName, string lastName)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+                throw new ArgumentException("First name must not be null, empty, or whitespace.", nameof(firstName));
+            if (string.IsNullOrWhiteSpace(lastName))
+                throw new ArgumentException("Last name must not be null, empty, or whitespace.", nameof(lastName));
+        }
+
+
         private static void ValidateGender(char gender)
         {
             char g = char.ToUpper(gender);
