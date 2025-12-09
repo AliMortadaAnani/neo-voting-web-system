@@ -16,7 +16,7 @@ builder.Services.AddTransient<DbSeeder>();
 
 var app = builder.Build();
 
-// 3. CLI Logic
+//CLI data seeding logic
 if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnoreCase))
 {
     using (var scope = app.Services.CreateScope())
@@ -30,7 +30,7 @@ if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnore
 }
 
 // =================================================================
-// CLI SEEDING LOGIC
+// CLI admin seeding logic
 // =================================================================
 if (args.Length > 0 && args[0].ToLower() == "seedAdmin") // we run dotnet with command line argument "seed" => dotnet run seed "YourStrongPassword!"
 {
@@ -63,6 +63,43 @@ if (args.Length > 0 && args[0].ToLower() == "seedAdmin") // we run dotnet with c
     return; // Stop app, do not start web server
 }
 // =================================================================
+
+// =================================================================
+// CLI admin seeding logic
+// =================================================================
+if (args.Length > 0 && args[0].ToLower() == "updateadminpassword") // we run dotnet with command line argument "updateAdminPassword" => dotnet run updateAdminPassword "Yourusername" "NewStrongPassword!"
+{
+    // Check if Username and password arguments are provided
+    if (args.Length < 3) //args[0] = updateAdminPassword and args[1] = Username and args[2] = new password
+    {
+        Console.WriteLine("Error: Username or Password arguments missing.");
+        Console.WriteLine("Usage: dotnet run updateAdminPassword \"Yourusername\" \"NewStrongPassword!\" ");
+        return; // Exit
+    }
+
+    string usernameFromCli = args[1];
+    string passwordFromCli = args[2];
+
+    Console.WriteLine("Starting Admin Resetting Password Process...");
+
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            // Pass the password to the method
+            await DbInitializer.UpdateUserPassword(scope.ServiceProvider, usernameFromCli, passwordFromCli);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Critical Error: {ex.Message}");
+        }
+    }
+
+    Console.WriteLine("Process complete. Exiting.");
+    return; // Stop app, do not start web server
+}
+// =================================================================
+
 
 app.UseSwagger();
 app.UseSwaggerUI();

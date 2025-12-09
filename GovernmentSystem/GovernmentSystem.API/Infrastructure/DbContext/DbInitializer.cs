@@ -65,5 +65,38 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 Console.WriteLine("Admin user already exists.");
             }
         }
+
+        public static async Task UpdateUserPassword(IServiceProvider serviceProvider, string username, string newPassword)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            // 1. Find the user
+            var user = await userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                Console.WriteLine($"Error: User '{username}' not found. Cannot update password.");
+                return;
+            }
+
+            Console.WriteLine($"Updating password for user: {username}...");
+
+            // 2. Generate a reset token
+            // This allows us to change the password without knowing the current one.
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+            // 3. Reset the password
+            var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+
+            if (result.Succeeded)
+            {
+                Console.WriteLine($"Password for '{username}' has been updated successfully.");
+            }
+            else
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                Console.WriteLine($"Error updating password: {errors}");
+            }
+        }
     }
 }
