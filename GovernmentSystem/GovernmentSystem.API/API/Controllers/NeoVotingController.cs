@@ -69,6 +69,31 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
+
+        /// <summary>
+        /// Marks a voter as non registered in the Neo-Voting system(fallback if neo voting system registration went wrong).
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and voting Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's voting token is invalid.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
+        [HttpPut("voters/un-registered-in-neovoting")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UnRegisterVoter([FromBody] NeoVoting_VoterIsRegisteredRequestDTO request)
+        {
+            var result = await _voterServices.UpdateVoterIsRegisteredToFalseAsync(request);
+            return HandleResult(result);
+        }
+
+
         /// <summary>
         /// Records that a voter has successfully cast their vote.
         /// </summary>
@@ -90,6 +115,30 @@ namespace GovernmentSystem.API.Controllers
         public async Task<IActionResult> UpdateVoteStatus([FromBody] NeoVoting_VoterHasVotedRequestDTO request)
         {
             var result = await _voterServices.UpdateHasVotedToTrueAsync(request);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Records that a voter has not cast their vote.(fallback if neo voting system casting vote went wrong).
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and voting Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's voting token is invalid.
+        /// - Returns 401(Invalid) if user exists but is not registered in Neo-Voting System.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
+        [HttpPut("voters/mark-as-non-voted")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UpdateVoteStatusToFalse([FromBody] NeoVoting_VoterHasVotedRequestDTO request)
+        {
+            var result = await _voterServices.UpdateHasVotedToFalseAsync(request);
             return HandleResult(result);
         }
 
@@ -141,6 +190,29 @@ namespace GovernmentSystem.API.Controllers
             return HandleResult(result);
         }
 
+
+        /// <summary>
+        /// Marks a candidate as non registered in the Neo-Voting system(fallback if neo voting system registration went wrong).
+        /// </summary>
+        /// <remarks>
+        /// **Validation Rules:**
+        /// - Requires both valid National ID and nomination Token.
+        /// - Returns 404 if National ID does not exist.
+        /// - Returns 401(Invalid) if user exists but is not eligible for election.
+        /// - Returns 401(Invalid) if user exists but it's nomination token is invalid.
+        /// - Requires valid API Key for authorization.
+        /// - Requested from allowed IPs only
+        /// </remarks>
+        [HttpPut("candidates/un-registered-in-neovoting")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UnRegisterCandidate([FromBody] NeoVoting_CandidateIsRegisteredRequestDTO request)
+        {
+            var result = await _candidateServices.UpdateCandidateIsRegisteredToFalseAsync(request);
+            return HandleResult(result);
+        }
         // --- SYSTEM UTILITIES ---
 
         /// <summary>

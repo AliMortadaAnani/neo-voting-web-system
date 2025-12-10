@@ -219,5 +219,31 @@ namespace GovernmentSystem.API.Application.Services
             var response = candidate.ToNeoVoting_CandidateResponse();
             return Result<NeoVoting_CandidateResponseDTO>.Success(response);
         }
+
+        public async Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToFalseAsync(NeoVoting_CandidateIsRegisteredRequestDTO request)
+        {
+            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
+            if (candidate == null)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
+            }
+            if (candidate.NominationToken != request.NominationToken!.Value
+              || !candidate.ValidToken || !candidate.EligibleForElection
+                )
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Invalid candidate credentials."));
+            }
+            if (!candidate.IsRegistered)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
+            }
+            candidate.MarkCandidateAsNonRegistered();
+            _candidateRepository.Update(candidate);
+            await _unitOfWork.SaveChangesAsync();
+            var response = candidate.ToNeoVoting_CandidateResponse();
+            return Result<NeoVoting_CandidateResponseDTO>.Success(response);
+        }
+
+
     }
 }

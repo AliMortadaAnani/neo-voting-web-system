@@ -26,6 +26,9 @@ namespace GovernmentSystem.API.Application.ServicesContracts
 
         Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToTrueAsync(NeoVoting_CandidateIsRegisteredRequestDTO request);
 
+        Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToFalseAsync(NeoVoting_CandidateIsRegisteredRequestDTO request);
+
+
         Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateForNeoVotingAsync(NeoVoting_GetCandidateRequestDTO request);
     }
 }

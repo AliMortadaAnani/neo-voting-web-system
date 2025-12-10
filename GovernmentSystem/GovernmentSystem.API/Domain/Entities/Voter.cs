@@ -99,6 +99,17 @@ namespace GovernmentSystem.API.Domain.Entities
             IsRegistered = true;
         }
 
+
+        public void MarkVoterAsNonRegistered()
+        {
+            //Should not arrive here if well handled in the service layer
+            if (!ValidToken || !EligibleForElection)
+            {
+                throw new InvalidOperationException("Cannot register voter with invalid token or ineligible for election.");
+            }
+            IsRegistered = false;
+        }
+
         public void MarkVoterAsVoted()
         {
             //Should not arrive here if well handled in the service layer
@@ -107,6 +118,15 @@ namespace GovernmentSystem.API.Domain.Entities
                 throw new InvalidOperationException("Voter cannot vote with invalid token or ineligible for election or unregistered");
             }
             Voted = true;
+        }
+        public void MarkVoterAsNonVoted()
+        {
+            //Should not arrive here if well handled in the service layer
+            if (!IsRegistered || !ValidToken || !EligibleForElection)
+            {
+                throw new InvalidOperationException("Voter cannot vote with invalid token or ineligible for election or unregistered");
+            }
+            Voted = false;
         }
 
         // 6. ToString Method

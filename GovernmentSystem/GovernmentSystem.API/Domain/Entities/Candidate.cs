@@ -99,6 +99,16 @@ namespace GovernmentSystem.API.Domain.Entities
             IsRegistered = true;
         }
 
+        public void MarkCandidateAsNonRegistered()
+        {
+            //Should not arrive here if well handled in the service layer
+            if (!ValidToken || !EligibleForElection)
+            {
+                throw new InvalidOperationException("Cannot register candidate with invalid token or ineligible for election.");
+            }
+
+            IsRegistered = false;
+        }
         // 6. ToString Method
         public override string ToString()
         {
