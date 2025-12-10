@@ -184,7 +184,7 @@ namespace NeoVoting.Domain.IdentityEntities
         public void InvalidateRefreshToken()
         {
             RefreshToken = null;
-            RefreshTokenExpirationDateTime = null;
+            RefreshTokenExpirationDateTime = DateTime.UtcNow.AddMinutes(-1); ;
         }
 
         /// <summary>

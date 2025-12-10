@@ -26,17 +26,27 @@ namespace NeoVoting.Application.Services
             _userManager = userManager;
         }
 
-        public async Task<AuthenticationResponse> CreateTokensAsync(ApplicationUser user)
+        /*
+     * Practical recommendation
+
+   Keep this service without CancellationToken; it’s primarily token generation and a single quick Identity call.
+   Make sure higher-level repos/services/controllers accept and pass a CancellationToken, since those layers talk to the database.
+   We can keep the cancellation token in signature in case we use it in future.   
+     */
+
+
+        public async Task<AuthenticationResponse> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default)
         {
             // 1. Define Basic Claims
             var claims = new List<Claim>
     {
         // Standard JWT Claims
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // Subject (User ID)
+        new Claim(JwtRegisteredClaimNames.Sub, user!.Id.ToString()), // Subject (User ID)
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // Unique Token ID
         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()), // Issued At
         // App Specific Standard Claims
-        new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!)
+        new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),
+        new Claim(ClaimTypes.NameIdentifier, user!.Id.ToString())
     };
 
             // 2. Add Personal Details (Only if they are not null)
@@ -127,7 +137,7 @@ namespace NeoVoting.Application.Services
             };
 
         }
-        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -170,6 +180,7 @@ namespace NeoVoting.Application.Services
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-    
+
+        
     }
 }

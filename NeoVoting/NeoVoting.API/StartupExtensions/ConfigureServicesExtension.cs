@@ -77,12 +77,15 @@ namespace NeoVoting.API.StartupExtensions
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireNonAlphanumeric = true; // Set to false if you want to allow only letters and digits
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false; // Set to false if you want to allow only letters and digits
                 options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 3; // You can increase for stricter policy
+                options.Password.RequiredUniqueChars = 1; // You can increase for stricter policy
+                options.Lockout.AllowedForNewUsers = true;
+                options.Lockout.MaxFailedAccessAttempts = 5;        // ← how many times
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // lock duration
             })
 
                 .AddEntityFrameworkStores<ApplicationDbContext>()
