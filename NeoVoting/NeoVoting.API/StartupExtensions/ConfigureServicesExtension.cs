@@ -1,12 +1,18 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using NeoVoting.Application.Services;
+using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Contracts;
 using NeoVoting.Domain.IdentityEntities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 using NeoVoting.Infrastructure.Repositories;
 using System.Reflection;
+using System.Text;
 
 namespace NeoVoting.API.StartupExtensions
 {
@@ -15,6 +21,60 @@ namespace NeoVoting.API.StartupExtensions
         public static IServiceCollection ConfigureServices(this IServiceCollection services,
             IConfiguration configuration, ConfigureHostBuilder configureHostBuilder)
         {
+            // Add services to the container.
+
+            services.AddControllers();
+
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            services.AddEndpointsApiExplorer();
+            
+
+
+
+            // =========================================================================
+            // SWAGGER CONFIGURATION START
+            // =========================================================================
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "NeoVoting API",
+                    Version = "v1",
+                    Description = "API for the NeoVoting E-Voting System"
+                });
+
+                // 1. Define the Security Scheme (The "Padlock" definition)
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Description = "Enter the JWT token directly. \r\n\r\nExample: `eyJhbGciOiJIUzI1Ni...`",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http, // Use Http for standard Bearer auth
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT"
+                });
+
+                // 2. Define the Security Requirement (Apply the lock to endpoints)
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer" // Must match the name defined above
+                }
+            },
+            Array.Empty<string>() // Scopes (leave empty for standard JWT)
+        }
+    });
+            });
+            // =========================================================================
+            // SWAGGER CONFIGURATION END
+            // =========================================================================
+
+
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -74,7 +134,33 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
 
-            services.AddValidatorsFromAssembly(Assembly.Load("NeoVoting.Application.Validators"));
+            //  services.AddValidatorsFromAssembly(Assembly.Load("NeoVoting.Application.Validators"));
+
+
+
+            // 1. Add Scoped Service
+            services.AddScoped<ITokenServices, TokenServices>();
+
+            // 2. Configure Authentication
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    ValidAudience = configuration["JwtSettings:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
+                };
+            });
 
 
             return services;

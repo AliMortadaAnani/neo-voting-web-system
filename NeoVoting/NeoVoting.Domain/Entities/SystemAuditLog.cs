@@ -8,7 +8,7 @@ namespace NeoVoting.Domain.Entities
     /// Represents an immutable log entry for a significant action in the system. // CHANGED: Renamed from AdminAuditLog
     /// This is crucial for security, auditing, and tracking changes.
     /// </summary>
-    public class SystemAuditLog // CHANGED: Renamed from AdminAuditLog
+    public class SystemAuditLog // CHANGED: Renamed after it was AdminAuditLog
     {
         // --- Properties ---
 
@@ -25,6 +25,8 @@ namespace NeoVoting.Domain.Entities
         public Guid UserId { get; private set; } // The ID of the user who performed the action.
         public ApplicationUser User { get; private set; }
 
+        public Guid? ElectionId { get; private set; } // Optional FK to an Election, applicable for candidate profile registration.
+        public Election? Election { get; private set; } // Navigation property to Election.
 
         // --- Constructor ---
 
@@ -63,9 +65,14 @@ namespace NeoVoting.Domain.Entities
         /// <param name="details">Optional, detailed information about the action (e.g., JSON of the changed data).</param>
         /// <returns>A new, valid SystemAuditLog object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details) // CHANGED: Parameter is now an enum
+        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details,Guid? electionId) // CHANGED: Parameter is now an enum
         {
             Validate(userId, actionType);
+            
+            if(actionType == SystemActionTypesEnum.CANDIDATE_PROFILE_CREATED && electionId == null)
+            {
+                throw new ArgumentException("ElectionId is required when logging a CANDIDATE_PROFILE_CREATED action.");
+            }
 
             var logEntry = new SystemAuditLog
             {
@@ -73,11 +80,14 @@ namespace NeoVoting.Domain.Entities
                 UserId = userId,
                 ActionType = actionType,
                 Details = details,
+                ElectionId = electionId,
                 TimestampUTC = DateTime.UtcNow
             };
 
             return logEntry;
         }
+
+        
 
         /// <summary>
         /// Private helper method to validate the required parameters.

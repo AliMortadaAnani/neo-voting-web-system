@@ -109,7 +109,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             // var stopwatch = Stopwatch.StartNew();
             var result = await _dbContext.Voters
                 .AsNoTracking()
-                .Take(100)
+                //.Take(100)// Just to limit the result for performance
                 .ToListAsync();
             //stopwatch.Stop();
             //Console.WriteLine($"EF core LINQ Duration: {stopwatch.ElapsedMilliseconds} ms");  // Or log it
