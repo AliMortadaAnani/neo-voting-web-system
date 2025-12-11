@@ -137,6 +137,7 @@ namespace NeoVoting.Application.Services
             };
 
         }
+        // This method extracts claims from an expired JWT token without validating its lifetime.
         public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default)
         {
             var tokenValidationParameters = new TokenValidationParameters
