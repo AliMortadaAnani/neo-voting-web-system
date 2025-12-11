@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,11 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NeoVoting.Application.AuthDTOs;
-using NeoVoting.Application.NeoVotingResponsesDTOs;
+using NeoVoting.Application.NeoVotingDTOs;
+
 using NeoVoting.Application.ServicesContracts;
+using NeoVoting.Domain.Contracts;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.IdentityEntities;
+using NeoVoting.Domain.RepositoryContracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +37,10 @@ namespace NeoVoting.Application.Services
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<AuthServices> _logger;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        public AuthServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ITokenServices tokenServices, IConfiguration configuration, IHttpClientFactory httpClientFactory,ILogger<AuthServices> logger, RoleManager<ApplicationRole> roleManager)
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly ISystemAuditLogRepository _systemAuditLogRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        public AuthServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ITokenServices tokenServices, IConfiguration configuration, IHttpClientFactory httpClientFactory,ILogger<AuthServices> logger, RoleManager<ApplicationRole> roleManager,ISystemAuditLogRepository systemAuditLogRepository,IUnitOfWork unitOfWork)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -41,7 +48,9 @@ namespace NeoVoting.Application.Services
             _configuration = configuration;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
-            this.roleManager = roleManager;
+            _roleManager = roleManager;
+            _systemAuditLogRepository = systemAuditLogRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<AuthenticationResponse>> LoginAsync(LoginDTO loginDTO, CancellationToken cancellationToken = default)
@@ -193,169 +202,326 @@ namespace NeoVoting.Application.Services
             return value.Length <= maxLength ? value : value.Substring(0, maxLength) + "...";
         }
 
-        public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterAsync(RegisterVoterDTO registrationDTO, CancellationToken cancellationToken = default)
+        public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterAsync(RegisterVoterDTO voterRegistrationDTO, CancellationToken cancellationToken = default)
         {
 
             // 1. Validate Passwords Match
-            if (registrationDTO.NewPassword != registrationDTO.ConfirmPassword)
+            if (voterRegistrationDTO.NewPassword != voterRegistrationDTO.ConfirmPassword)
             {
                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.Mismatch", "Passwords do not match."));
             }
 
             // 2. Check for Duplicate Username
-            var existingUser = await _userManager.FindByNameAsync(registrationDTO.UserName!);
+            var existingUser = await _userManager.FindByNameAsync(voterRegistrationDTO.UserName!);
             if (existingUser != null)
             {
                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Conflict("User.Exists", "This username is already taken."));
             }
 
-            
-          
-            if (await roleManager.FindByNameAsync(RoleTypesEnum.Voter.ToString()) is null)
+
+
+            if (await _roleManager.FindByNameAsync(RoleTypesEnum.Voter.ToString()) is null)
             {
-                var applicationRole = ApplicationRole.CreateVoterRole();
-                await roleManager.CreateAsync(applicationRole);
+                var voterRole = ApplicationRole.CreateVoterRole();
+                await _roleManager.CreateAsync(voterRole);
             }
 
 
-            
-                var client = _httpClientFactory.CreateClient();
 
-                // You can move this URL to configuration
-                var baseUrl = _configuration["NeoVoting:BaseUrl"] ?? "https://localhost:5000";
-                var url = $"{baseUrl.TrimEnd('/')}/api/external/voters/verify";
+            var verifyVoterClient = _httpClientFactory.CreateClient();
 
-                HttpResponseMessage response;
+            // You can move this URL to configuration
+            var GovernmentSystemBaseUrl = _configuration["GovernmentSystem:BaseUrl"] ?? "https://localhost:5000";
+            var GovernmentSystemVerifyVoterUrl = $"{GovernmentSystemBaseUrl.TrimEnd('/')}/api/external/voters/verify";
 
-                try
-                {
+            HttpResponseMessage GovernmentSystemVerifyVoterResponse;
+
+            try
+            {
                 // Create body with two GUIDs
-                var body = new
+                var verifyVoterRequest = new NeoVoting_GetVoterRequestDTO
                 {
-                    nationalId  = registrationDTO.NationalId, // replace with your actual value
-                    votingToken = registrationDTO.VotingToken  // replace with your actual value
+                    NationalId = voterRegistrationDTO.NationalId, // replace with your actual value
+                    VotingToken = voterRegistrationDTO.VotingToken  // replace with your actual value
                 };
                 // Send request as JSON body
-                response = await client.PostAsJsonAsync(url, body, _jsonOptions, cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error while calling GovernmentSystem VerifyVoter endpoint.");
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
-                        Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
-                }
+                GovernmentSystemVerifyVoterResponse = await verifyVoterClient.PostAsJsonAsync(GovernmentSystemVerifyVoterUrl, verifyVoterRequest, _jsonOptions, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while calling GovernmentSystem voters/verify endpoint.");
+                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
+            }
 
-                var statusCode = (int)response.StatusCode;
-                string content = string.Empty;
+            var verifyVoterResponseStatusCode = (int)GovernmentSystemVerifyVoterResponse.StatusCode;
+            string verifyVoterResponseContent = string.Empty;
 
-                try
-                {
-                    content = await response.Content.ReadAsStringAsync(cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to read response content from GovernmentSystem VerifyVoter.");
+            try
+            {
+                verifyVoterResponseContent = await GovernmentSystemVerifyVoterResponse.Content.ReadAsStringAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to read response content from GovernmentSystem voters/verify .");
                 // If we can’t read content, still return a generic failure
                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(
                     Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
             }
 
-                // Handle 2xx OK
-                if (response.IsSuccessStatusCode)
-                {
-                    try
-                    {
-                        var voter = JsonSerializer.Deserialize<NeoVoting_VoterResponseDTO>(content, _jsonOptions);
-
-                        if (voter == null)
-                        {
-                            _logger.LogWarning("Government VerifyVoter returned 200 but body was null or invalid.");
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
-                        Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
-                        }
-
-                    DateTime dateOfBirthDateTime = voter.DateOfBirth.ToDateTime(TimeOnly.MinValue);
-                    int governorateIdInt = (int)voter.GovernorateId;
-
-                    var registeredVoter = ApplicationUser.CreateVoterOrCandidateAccount(
-                            registrationDTO.UserName!,
-                            voter.FirstName,
-                            voter.LastName,
-                            dateOfBirthDateTime,
-                            voter.Gender,
-                            governorateIdInt
-                            );
-
-                    var createResult = await _userManager.CreateAsync(registeredVoter, registrationDTO.NewPassword!);
-                    if (!createResult.Succeeded)
-                    {
-                        var errorMsg = string.Join(", ", createResult.Errors.Select(e => e.Description));
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.CreationFailed", errorMsg));
-                    }
-                    
-                    if (createResult.Succeeded)
-                    {
-                   
-                    // 6. Assign "Voter" Role
-                    var roleResult = await _userManager.AddToRoleAsync(registeredVoter, RoleTypesEnum.Voter.ToString());
-
-                    if (!roleResult.Succeeded)
-                    {
-                        // Optional: Cleanup user if role assignment fails
-                        await _userManager.DeleteAsync(registeredVoter);
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.RoleFailed", "Failed to assign voter role."));
-                    }
-
-                    var registerResponseDto = new Registration_ResetPassword_ResponseDTO
-                    {
-                        Id = registeredVoter.Id,
-                        UserName = registeredVoter.UserName,
-                        FirstName = registeredVoter.FirstName,
-                        LastName = registeredVoter.LastName,
-                        DateOfBirth = registeredVoter.DateOfBirth,
-                        GovernorateId = registeredVoter.GovernorateID,
-                        Gender = registeredVoter.Gender,
-                        Role =  RoleTypesEnum.Voter.ToString() 
-                        };
-
-                    return Result<Registration_ResetPassword_ResponseDTO>.Success(registerResponseDto);
-                    }
-                    catch (JsonException jex)
-                    {
-                        _logger.LogError(jex,
-                            "Failed to deserialize GovernmentSystem VerifyVoter successful response to NeoVoting_VoterResponseDTO. Content: {Content}",
-                            Truncate(content));
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
-                    Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
-                }
-                }
-
-                // Non-success: 400, 401, 404, 500, etc.
-                // Try to interpret as ProblemDetails / ValidationProblemDetails
+            // Handle 2xx OK
+            if (GovernmentSystemVerifyVoterResponse.IsSuccessStatusCode)
+            {
                 try
                 {
-                    // We first try ValidationProblemDetails for 400/401,
-                    // but ProblemDetails is enough for uniform handling.
-                    var problem = JsonSerializer.Deserialize<ProblemDetails>(content, _jsonOptions);
+                    var verifyVoterResponse = JsonSerializer.Deserialize<NeoVoting_VoterResponseDTO>(verifyVoterResponseContent, _jsonOptions);
 
-                    if (problem != null)
+                    if (verifyVoterResponse == null)
                     {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
-Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
-                }
+                        _logger.LogWarning("GovernmentSystem voters/verify returned 200 but body was null or invalid.");
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Error.GovernmentSystem", "GovernmentSystem returned null"));
+                    }
+
+                    DateTime verifyVoterUserDateOfBirthDateTime = verifyVoterResponse.DateOfBirth.ToDateTime(TimeOnly.MinValue);
+                    int verifyVoterUserGovernorateIdInt = (int)verifyVoterResponse.GovernorateId;
+
+                    // 1) Not eligible for election
+                    if (!verifyVoterResponse.EligibleForElection)
+                    {
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Voter.NotEligibleForElection", "Voter is not eligible for election."));
+                    }
+
+                    // 2) Token is not valid
+                    if (!verifyVoterResponse.ValidToken)
+                    {
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Voter.InvalidToken", "Voter token is not valid."));
+                    }
+
+                    // 3) Already registered
+                    if (verifyVoterResponse.IsRegistered)
+                    {
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Voter.AlreadyRegistered", "Voter is already registered in the system."));
+                    }
+
+                    // 4) Already voted
+                    if (verifyVoterResponse.Voted)
+                    {
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Voter.AlreadyVoted", "Voter has already voted and cannot register with new NeoVoting voter account.(Unexpected Behaviour)"));
+                    }
+
+
+                    var registeredVoter = ApplicationUser.CreateVoterOrCandidateAccount(
+                            voterRegistrationDTO.UserName!,
+                            verifyVoterResponse.FirstName,
+                            verifyVoterResponse.LastName,
+                            verifyVoterUserDateOfBirthDateTime,
+                            verifyVoterResponse.Gender,
+                            verifyVoterUserGovernorateIdInt
+                            );
+
+                    var createVoterAccountResult = await _userManager.CreateAsync(registeredVoter, voterRegistrationDTO.NewPassword!);
+                    if (!createVoterAccountResult.Succeeded)
+                    {
+                        var errorMsg = string.Join(", ", createVoterAccountResult.Errors.Select(e => e.Description));
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.CreationFailed", errorMsg));
+                    }
+
+                    if (createVoterAccountResult.Succeeded)
+                    {
+
+                        // 6. Assign "Voter" Role
+                        var assignVoterRoleResult = await _userManager.AddToRoleAsync(registeredVoter, RoleTypesEnum.Voter.ToString());
+
+                        if (!assignVoterRoleResult.Succeeded)
+                        {
+                            // Optional: Cleanup user if role assignment fails
+                            await _userManager.DeleteAsync(registeredVoter);
+                            return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.RoleFailed", "Failed to assign voter role."));
+                        }
+
+
+
+
+
+
+
+
+                        var registerVoterClient = _httpClientFactory.CreateClient();
+
+                        var GovernmentSystemRegisterVoterUrl = $"{GovernmentSystemBaseUrl.TrimEnd('/')}/api/external/voters/registered-in-neovoting";
+
+                        HttpResponseMessage GovernmentSystemRegisterVoterResponse;
+
+                        try
+                        {
+                            // Create body with two GUIDs
+                            var registerVoterRequest = new NeoVoting_VoterIsRegisteredRequestDTO
+                            {
+                                NationalId = voterRegistrationDTO.NationalId, // replace with your actual value
+                                VotingToken = voterRegistrationDTO.VotingToken  // replace with your actual value
+                            };
+                            // Send request as JSON body
+                            GovernmentSystemRegisterVoterResponse = await registerVoterClient.PostAsJsonAsync(GovernmentSystemRegisterVoterUrl, registerVoterRequest, _jsonOptions, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error while calling GovernmentSystem voters/registered-in-neovoting endpoint.");
+                            return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                                Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
+                        }
+
+                        var registerVoterResponseStatusCode = (int)GovernmentSystemRegisterVoterResponse.StatusCode;
+                        string registerVoterResponseContent = string.Empty;
+
+                        try
+                        {
+                            registerVoterResponseContent = await GovernmentSystemRegisterVoterResponse.Content.ReadAsStringAsync(cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to read response content from GovernmentSystem voters/registered-in-neovoting .");
+                            // If we can’t read content, still return a generic failure
+                            return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                                Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
+                        }
+
+                        if (GovernmentSystemRegisterVoterResponse.IsSuccessStatusCode)
+                        {
+                            var registerVoterResponse = JsonSerializer.Deserialize<NeoVoting_VoterResponseDTO>(registerVoterResponseContent, _jsonOptions);
+
+                            if (registerVoterResponse == null)
+                            {
+                                _logger.LogWarning("GovernmentSystem voters/registered-in-neovoting returned 200 but body was null or invalid.");
+                                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                                    Error.Failure("Error.GovernmentSystem", "GovernmentSystem returned null"));
+                            }
+
+                            bool isNowRegistered = registerVoterResponse.IsRegistered;
+                            if (!isNowRegistered)
+                            {
+                                _logger.LogWarning("GovernmentSystem voters/registered-in-neovoting returned IsRegistered=false after registration attempt.");
+                                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                                    Error.Failure("Error.GovernmentSystem", "GovernmentSystem did not register the voter."));
+                            }
+
+
+
+                        }
+                        else
+                        {
+                            _logger.LogWarning("GovernmentSystem voters/registered-in-neovoting returned non-success status: {StatusCode}, Content: {Content}",
+                                registerVoterResponseStatusCode, Truncate(registerVoterResponseContent));
+                            // Depending on requirements, you might want to rollback user creation here
+                        }
+
+
+
+
+                        var registerVoterLog = SystemAuditLog.Create(
+                            registeredVoter.Id,
+                            SystemActionTypesEnum.VOTER_REGISTERED,
+                            $"Voter '{registeredVoter.UserName}' registered successfully.",
+                            null
+                        );
+
+                        var addedLog = await _systemAuditLogRepository.AddSystemAuditLogAsync(registerVoterLog, cancellationToken);
+                        if (addedLog == null)
+                        {
+                            return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Failure("SystemLog.AdditionFailed", "System Log for voter registration could not be added."));
+                        }
+
+                        int rowsAdded = await _unitOfWork.SaveChangesAsync();
+
+                        if (rowsAdded == 0)
+                        {
+                            return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Failure("SystemLog.AdditionFailed", "System Log for voter registration could not be added."));
+                        }
+
+                        var registerResponseDto = new Registration_ResetPassword_ResponseDTO
+                        {
+                            Id = registeredVoter.Id,
+                            UserName = registeredVoter.UserName,
+                            FirstName = registeredVoter.FirstName,
+                            LastName = registeredVoter.LastName,
+                            DateOfBirth = registeredVoter.DateOfBirth,
+                            GovernorateId = registeredVoter.GovernorateID,
+                            Gender = registeredVoter.Gender,
+                            Role = RoleTypesEnum.Voter.ToString()
+                        };
+
+                        return Result<Registration_ResetPassword_ResponseDTO>.Success(registerResponseDto);
+                    }
                 }
                 catch (JsonException jex)
                 {
-                    _logger.LogWarning(jex,
-                        "Failed to deserialize NeoVoting error response as ProblemDetails. Status: {StatusCode}, Content: {Content}",
-                        statusCode, Truncate(content));
-
+                    _logger.LogError(jex,
+                        "Failed to deserialize GovernmentSystem voters/verify  successful response to NeoVoting_VoterResponseDTO. Content: {Content}",
+                        Truncate(verifyVoterResponseContent));
+                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
                 }
+            }
 
-            return Result<Registration_ResetPassword_ResponseDTO>.Failure(
-Error.Failure("Error.GovernmentSystem", "GovernmentSystem is down"));
+            // Non-success: 400, 401, 404, 500, etc.
+            try
+            {
+                var problem = JsonSerializer.Deserialize<ProblemDetails>(verifyVoterResponseContent, _jsonOptions);
+
+                // We don't *require* problem != null to handle by status,
+                // but if it's there we can use its Title/Detail.
+                var title = problem?.Title ?? "GovernmentSystem error";
+                var detail = problem?.Detail ?? "An error occurred while verifying voter.";
+
+                switch (verifyVoterResponseStatusCode)
+                {
+                    case StatusCodes.Status404NotFound:
+                        // Voter not found in government system
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Validation("Government.VoterNotFound",
+                                detail)); // or a fixed message if you prefer
+
+                    case StatusCodes.Status400BadRequest:
+                        // Request was invalid according to fluent validation in gov system
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Validation("Government.InvalidRequest",
+                                detail));
+
+                    case StatusCodes.Status401Unauthorized:
+                        // Likely API key / auth problem
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Government.Unauthorized",
+                                "Unauthorized to call GovernmentSystem (check API key or credentials)."));
+
+                    case StatusCodes.Status500InternalServerError:
+                        // Internal error in government VerifyVoter
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Government.InternalError",
+                                "GovernmentSystem encountered an internal error while verifying voter."));
+
+                    default:
+                        // Any other unexpected status
+                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                            Error.Failure("Government.UnexpectedStatus",
+                                $"GovernmentSystem returned unexpected status code {verifyVoterResponseStatusCode}."));
+                }
+            }
+            catch (JsonException jex)
+            {
+                _logger.LogWarning(jex,
+                    "Failed to deserialize GovernmentSystem error response as ProblemDetails. Status: {StatusCode}, Content: {Content}",
+                    verifyVoterResponseStatusCode, Truncate(verifyVoterResponseContent));
+
+                // Fallback when we can't parse the body at all
+                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    Error.Failure("Government.UnparseableError",
+                        $"GovernmentSystem returned status {verifyVoterResponseStatusCode} with an unreadable error body."));
+            }
         }
-        
 
         public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterPasswordAsync(ResetVoterPasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
         {

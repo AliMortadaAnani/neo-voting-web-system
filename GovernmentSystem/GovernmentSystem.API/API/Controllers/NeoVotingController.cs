@@ -59,7 +59,7 @@ namespace GovernmentSystem.API.Controllers
         /// - Requested from allowed IPs only
         /// </remarks>
         [HttpPut("voters/registered-in-neovoting")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]

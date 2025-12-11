@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeoVoting.Application.NeoVotingResponsesDTOs
+namespace NeoVoting.Application.NeoVotingDTOs
 {
     public enum GovernorateId
     {
