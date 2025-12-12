@@ -36,37 +36,37 @@ namespace NeoVoting.Application.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var data = await response.Content.ReadFromJsonAsync<GovVoterVerificationResult>(_jsonOptions, ct);
-                    return Result<GovVoterVerificationResult>.Success(data!);
+                    var data = await response.Content.ReadFromJsonAsync<NeoVoting_VoterResponseDTO>(_jsonOptions, ct);
+                    return Result<NeoVoting_VoterResponseDTO>.Success(data!);
                 }
 
-                return await HandleErrorResponse<GovVoterVerificationResult>(response, ct);
+                return await HandleErrorResponse<NeoVoting_VoterResponseDTO>(response, ct);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Gov System Verify call failed.");
-                return Result<GovVoterVerificationResult>.Failure(Error.Failure("System.GovDown", "Government system unreachable."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Failure("System.GovDown", "Government system unreachable."));
             }
         }
 
-        public async Task<Result<bool>> MarkVoterAsRegisteredAsync(Guid nationalId, Guid token, CancellationToken ct)
+        public async Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsRegisteredAsync(NeoVoting_VoterIsRegisteredRequestDTO requestDTO, CancellationToken ct)
         {
             try
             {
-                var request = new { NationalId = nationalId, VotingToken = token };
+                var request = new { requestDTO.NationalId,requestDTO.VotingToken };
                 var response = await _httpClient.PostAsJsonAsync("api/external/voters/registered-in-neovoting", request, ct);
 
                 if (response.IsSuccessStatusCode)
                 {
                     // We just need to know if the Gov system accepted it (IsRegistered = true)
-                    var data = await response.Content.ReadFromJsonAsync<GovVoterVerificationResult>(_jsonOptions, ct);
+                    var data = await response.Content.ReadFromJsonAsync<NeoVoting_VoterResponseDTO>(_jsonOptions, ct);
                     if (data != null && data.IsRegistered)
-                        return Result<bool>.Success(true);
+                        return Result<NeoVoting_VoterResponseDTO>.Success(NeoVoting_VoterResponseDTO);
 
-                    return Result<bool>.Failure(Error.Failure("Gov.LogicError", "Government system did not mark voter as registered."));
+                    return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Failure("Gov.LogicError", "Government system did not mark voter as registered."));
                 }
 
-                return await HandleErrorResponse<bool>(response, ct);
+                return await HandleErrorResponse<NeoVoting_VoterResponseDTO>(response, ct);
             }
             catch (Exception ex)
             {
