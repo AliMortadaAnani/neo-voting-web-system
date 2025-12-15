@@ -74,6 +74,18 @@ namespace NeoVoting.API.StartupExtensions
             // SWAGGER CONFIGURATION END
             // =========================================================================
 
+            services.AddHttpClient<IGovernmentSystemGateway, GovernmentSystemGateway>(client =>
+            {
+                var baseUrl = configuration["GovernmentSystem:BaseUrl"]
+                              ?? throw new Exception("GovernmentSystem:BaseUrl is missing");
+
+                client.BaseAddress = new Uri(baseUrl);
+
+                var apiKey = configuration["GovernmentSystem:ApiKey"]
+                             ?? throw new Exception("GovernmentSystem:ApiKey is missing");
+
+                client.DefaultRequestHeaders.Add("X-Gov-Api-Key", apiKey);
+            });
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
