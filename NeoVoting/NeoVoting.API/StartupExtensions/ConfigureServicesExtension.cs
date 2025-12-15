@@ -148,6 +148,8 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
+            services.AddScoped<IAuthServices, AuthServices>();
+            services.AddScoped<ITokenServices, TokenServices>();
 
             //  services.AddValidatorsFromAssembly(Assembly.Load("NeoVoting.Application.Validators"));
 

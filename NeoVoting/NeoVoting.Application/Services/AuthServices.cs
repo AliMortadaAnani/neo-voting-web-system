@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.NeoVotingDTOs;
-
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Contracts;
 using NeoVoting.Domain.Entities;
@@ -433,6 +432,21 @@ namespace NeoVoting.Application.Services
             };
         }
 
+        public Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterPasswordAsync(ResetVoterPasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterCandidateAsync(RegisterCandidateDTO registrationDTO, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<Registration_ResetPassword_ResponseDTO>> ResetCandidatePasswordAsync(ResetCandidatePasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
 
         /*public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterAsync(RegisterVoterDTO voterRegistrationDTO, CancellationToken cancellationToken = default)
         {
@@ -755,208 +769,208 @@ namespace NeoVoting.Application.Services
             }
         }*/
 
-//        public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterPasswordAsync(ResetVoterPasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
-//        {
-//            // 1. Validate Passwords Match
-//            if (resetPasswordDTO.NewPassword != resetPasswordDTO.ConfirmPassword)
-//            {
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.Mismatch", "Passwords do not match."));
-//            }
+        //        public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterPasswordAsync(ResetVoterPasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
+        //        {
+        //            // 1. Validate Passwords Match
+        //            if (resetPasswordDTO.NewPassword != resetPasswordDTO.ConfirmPassword)
+        //            {
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.Mismatch", "Passwords do not match."));
+        //            }
 
-//            // 2. Find User
-//            var user = await _userManager.FindByNameAsync(resetPasswordDTO.UserName!);
+        //            // 2. Find User
+        //            var user = await _userManager.FindByNameAsync(resetPasswordDTO.UserName!);
 
-//            if (user == null)
-//            {
-//                // Security Best Practice: Usually returns vague error, but for this context "Not Found" is acceptable
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("User.NotFound", "User account not found."));
-//            }
+        //            if (user == null)
+        //            {
+        //                // Security Best Practice: Usually returns vague error, but for this context "Not Found" is acceptable
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("User.NotFound", "User account not found."));
+        //            }
 
-//            // 3. Validate National ID match (Optional Security Check)
-//            // If the DTO sends a NationalId, verify it matches the User's ID
-//            if (resetPasswordDTO.NationalId.HasValue && user.Id != resetPasswordDTO.NationalId.Value)
-//            {
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.Mismatch", "National ID does not match the username provided."));
-//            }
+        //            // 3. Validate National ID match (Optional Security Check)
+        //            // If the DTO sends a NationalId, verify it matches the User's ID
+        //            if (resetPasswordDTO.NationalId.HasValue && user.Id != resetPasswordDTO.NationalId.Value)
+        //            {
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.Mismatch", "National ID does not match the username provided."));
+        //            }
 
-//            /* 
-//             * NOTE ON VOTING TOKEN:
-//             * The DTO contains 'VotingToken', but there is no 'Voters' table to verify it against,
-//             * and 'ApplicationUser' does not store it. 
-//             * Therefore, we cannot perform a token validation here in this isolated Identity context.
-//             * We proceed assuming the caller has been verified by other means or if we ignore the token.
-//             */
+        //            /* 
+        //             * NOTE ON VOTING TOKEN:
+        //             * The DTO contains 'VotingToken', but there is no 'Voters' table to verify it against,
+        //             * and 'ApplicationUser' does not store it. 
+        //             * Therefore, we cannot perform a token validation here in this isolated Identity context.
+        //             * We proceed assuming the caller has been verified by other means or if we ignore the token.
+        //             */
 
-//            // 4. Force Reset Password (Remove Old -> Add New)
-//            // This is an administrative reset/forgot password flow
-//            if (await _userManager.HasPasswordAsync(user))
-//            {
-//                var removeResult = await _userManager.RemovePasswordAsync(user);
-//                if (!removeResult.Succeeded)
-//                {
-//                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.RemoveFailed", "Failed to process password reset."));
-//                }
-//            }
+        //            // 4. Force Reset Password (Remove Old -> Add New)
+        //            // This is an administrative reset/forgot password flow
+        //            if (await _userManager.HasPasswordAsync(user))
+        //            {
+        //                var removeResult = await _userManager.RemovePasswordAsync(user);
+        //                if (!removeResult.Succeeded)
+        //                {
+        //                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.RemoveFailed", "Failed to process password reset."));
+        //                }
+        //            }
 
-//            var addResult = await _userManager.AddPasswordAsync(user, resetPasswordDTO.NewPassword!);
+        //            var addResult = await _userManager.AddPasswordAsync(user, resetPasswordDTO.NewPassword!);
 
-//            if (!addResult.Succeeded)
-//            {
-//                var errorMsg = string.Join(", ", addResult.Errors.Select(e => e.Description));
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.ChangeFailed", errorMsg));
-//            }
+        //            if (!addResult.Succeeded)
+        //            {
+        //                var errorMsg = string.Join(", ", addResult.Errors.Select(e => e.Description));
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.ChangeFailed", errorMsg));
+        //            }
 
-//            // 5. Invalidate existing sessions (Security Stamp)
-//            // This ensures any old cookies or tokens (if checking stamp) are invalidated
-//            await _userManager.UpdateSecurityStampAsync(user);
+        //            // 5. Invalidate existing sessions (Security Stamp)
+        //            // This ensures any old cookies or tokens (if checking stamp) are invalidated
+        //            await _userManager.UpdateSecurityStampAsync(user);
 
-//            // Also invalidate refresh token to force re-login
-//            user.InvalidateRefreshToken();
-//            await _userManager.UpdateAsync(user);
+        //            // Also invalidate refresh token to force re-login
+        //            user.InvalidateRefreshToken();
+        //            await _userManager.UpdateAsync(user);
 
-//            // 6. Return Response
-//            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Voter.ToString()));
-//        }
-
-       
+        //            // 6. Return Response
+        //            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Voter.ToString()));
+        //        }
 
 
-//public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterCandidateAsync(RegisterCandidateDTO registrationDTO, CancellationToken cancellationToken = default)
-//        {
-//            // 1. Retrieve Candidate
-//            var candidate = await _dbContext.Candidates
-//                .FirstOrDefaultAsync(c => c.NationalId == registrationDTO.NationalId, cancellationToken);
 
-//            // 2. Validations
-//            if (candidate == null)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "National ID not found in candidate registry."));
 
-//            if (candidate.IsRegistered)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Conflict("Candidate.AlreadyRegistered", "This candidate is already registered."));
+        //public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterCandidateAsync(RegisterCandidateDTO registrationDTO, CancellationToken cancellationToken = default)
+        //        {
+        //            // 1. Retrieve Candidate
+        //            var candidate = await _dbContext.Candidates
+        //                .FirstOrDefaultAsync(c => c.NationalId == registrationDTO.NationalId, cancellationToken);
 
-//            if (candidate.NominationToken != registrationDTO.NominationToken)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Forbidden("Candidate.InvalidToken", "Invalid Nomination Token."));
+        //            // 2. Validations
+        //            if (candidate == null)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "National ID not found in candidate registry."));
 
-//            // 3. Create Identity User
-//            string userName = registrationDTO.NationalId.ToString()!;
-//            ApplicationUser appUser;
-//            try
-//            {
-//                appUser = ApplicationUser.CreateVoterOrCandidateAccount(
-//                    userName,
-//                    candidate.FirstName,
-//                    candidate.LastName,
-//                    candidate.DateOfBirth,
-//                    candidate.Gender,
-//                    candidate.GovernorateId
-//                );
-//            }
-//            catch (ArgumentException ex)
-//            {
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Candidate.DataInvalid", ex.Message));
-//            }
+        //            if (candidate.IsRegistered)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Conflict("Candidate.AlreadyRegistered", "This candidate is already registered."));
 
-//            // 4. Save Identity User
-//            var createResult = await _userManager.CreateAsync(appUser);
-//            if (!createResult.Succeeded)
-//            {
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.CreationFailed", createResult.Errors.First().Description));
-//            }
+        //            if (candidate.NominationToken != registrationDTO.NominationToken)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Forbidden("Candidate.InvalidToken", "Invalid Nomination Token."));
 
-//            // 5. Assign Role
-//            var roleResult = await _userManager.AddToRoleAsync(appUser, RoleTypesEnum.Candidate.ToString());
-//            if (!roleResult.Succeeded)
-//            {
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.RoleFailed", "Failed to assign candidate role."));
-//            }
+        //            // 3. Create Identity User
+        //            string userName = registrationDTO.NationalId.ToString()!;
+        //            ApplicationUser appUser;
+        //            try
+        //            {
+        //                appUser = ApplicationUser.CreateVoterOrCandidateAccount(
+        //                    userName,
+        //                    candidate.FirstName,
+        //                    candidate.LastName,
+        //                    candidate.DateOfBirth,
+        //                    candidate.Gender,
+        //                    candidate.GovernorateId
+        //                );
+        //            }
+        //            catch (ArgumentException ex)
+        //            {
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Candidate.DataInvalid", ex.Message));
+        //            }
 
-//            // 6. Mark Candidate as Registered
-//            candidate.IsRegistered = true;
-//            await _dbContext.SaveChangesAsync(cancellationToken);
+        //            // 4. Save Identity User
+        //            var createResult = await _userManager.CreateAsync(appUser);
+        //            if (!createResult.Succeeded)
+        //            {
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.CreationFailed", createResult.Errors.First().Description));
+        //            }
 
-//            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(appUser, RoleTypesEnum.Candidate.ToString()));
-//        }
+        //            // 5. Assign Role
+        //            var roleResult = await _userManager.AddToRoleAsync(appUser, RoleTypesEnum.Candidate.ToString());
+        //            if (!roleResult.Succeeded)
+        //            {
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.RoleFailed", "Failed to assign candidate role."));
+        //            }
 
-//        public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterPasswordAsync(ResetVoterPasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
-//        {
-//            // 1. Validate Password Match
-//            if (resetPasswordDTO.NewPassword != resetPasswordDTO.ConfirmPassword)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.Mismatch", "Passwords do not match."));
+        //            // 6. Mark Candidate as Registered
+        //            candidate.IsRegistered = true;
+        //            await _dbContext.SaveChangesAsync(cancellationToken);
 
-//            // 2. Validate against Voter Registry (Security Check: Must have valid Token)
-//            var voter = await _dbContext.Voters
-//                .FirstOrDefaultAsync(v => v.NationalId == resetPasswordDTO.NationalId, cancellationToken);
+        //            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(appUser, RoleTypesEnum.Candidate.ToString()));
+        //        }
 
-//            if (voter == null)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter not found."));
+        //        public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterPasswordAsync(ResetVoterPasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
+        //        {
+        //            // 1. Validate Password Match
+        //            if (resetPasswordDTO.NewPassword != resetPasswordDTO.ConfirmPassword)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.Mismatch", "Passwords do not match."));
 
-//            if (voter.VotingToken != resetPasswordDTO.VotingToken)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Forbidden("Voter.InvalidToken", "Invalid Voting Token. Cannot reset password."));
+        //            // 2. Validate against Voter Registry (Security Check: Must have valid Token)
+        //            var voter = await _dbContext.Voters
+        //                .FirstOrDefaultAsync(v => v.NationalId == resetPasswordDTO.NationalId, cancellationToken);
 
-//            // 3. Find Identity User
-//            var user = await _userManager.FindByNameAsync(resetPasswordDTO.UserName!);
-//            if (user == null)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("User.NotFound", "User account not found."));
+        //            if (voter == null)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter not found."));
 
-//            // 4. Force Reset Password (Remove old, Add new)
-//            // Since we validated the VotingToken, we trust this request.
-//            if (await _userManager.HasPasswordAsync(user))
-//            {
-//                await _userManager.RemovePasswordAsync(user);
-//            }
+        //            if (voter.VotingToken != resetPasswordDTO.VotingToken)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Forbidden("Voter.InvalidToken", "Invalid Voting Token. Cannot reset password."));
 
-//            var addPassResult = await _userManager.AddPasswordAsync(user, resetPasswordDTO.NewPassword!);
+        //            // 3. Find Identity User
+        //            var user = await _userManager.FindByNameAsync(resetPasswordDTO.UserName!);
+        //            if (user == null)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("User.NotFound", "User account not found."));
 
-//            if (!addPassResult.Succeeded)
-//            {
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.ChangeFailed", addPassResult.Errors.First().Description));
-//            }
+        //            // 4. Force Reset Password (Remove old, Add new)
+        //            // Since we validated the VotingToken, we trust this request.
+        //            if (await _userManager.HasPasswordAsync(user))
+        //            {
+        //                await _userManager.RemovePasswordAsync(user);
+        //            }
 
-//            // 5. Important: Update Security Stamp to invalidate old cookies/tokens
-//            await _userManager.UpdateSecurityStampAsync(user);
+        //            var addPassResult = await _userManager.AddPasswordAsync(user, resetPasswordDTO.NewPassword!);
 
-//            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Voter.ToString()));
-//        }
+        //            if (!addPassResult.Succeeded)
+        //            {
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.ChangeFailed", addPassResult.Errors.First().Description));
+        //            }
 
-//        public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetCandidatePasswordAsync(ResetCandidatePasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
-//        {
-//            // 1. Validate Password Match
-//            if (resetPasswordDTO.NewPassword != resetPasswordDTO.ConfirmPassword)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.Mismatch", "Passwords do not match."));
+        //            // 5. Important: Update Security Stamp to invalidate old cookies/tokens
+        //            await _userManager.UpdateSecurityStampAsync(user);
 
-//            // 2. Validate against Candidate Registry
-//            var candidate = await _dbContext.Candidates
-//                .FirstOrDefaultAsync(c => c.NationalId == resetPasswordDTO.NationalId, cancellationToken);
+        //            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Voter.ToString()));
+        //        }
 
-//            if (candidate == null)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "Candidate not found."));
+        //        public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetCandidatePasswordAsync(ResetCandidatePasswordDTO resetPasswordDTO, CancellationToken cancellationToken = default)
+        //        {
+        //            // 1. Validate Password Match
+        //            if (resetPasswordDTO.NewPassword != resetPasswordDTO.ConfirmPassword)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.Mismatch", "Passwords do not match."));
 
-//            if (candidate.NominationToken != resetPasswordDTO.NominationToken)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Forbidden("Candidate.InvalidToken", "Invalid Nomination Token. Cannot reset password."));
+        //            // 2. Validate against Candidate Registry
+        //            var candidate = await _dbContext.Candidates
+        //                .FirstOrDefaultAsync(c => c.NationalId == resetPasswordDTO.NationalId, cancellationToken);
 
-//            // 3. Find Identity User
-//            var user = await _userManager.FindByNameAsync(resetPasswordDTO.UserName!);
-//            if (user == null)
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("User.NotFound", "User account not found."));
+        //            if (candidate == null)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "Candidate not found."));
 
-//            // 4. Force Reset Password
-//            if (await _userManager.HasPasswordAsync(user))
-//            {
-//                await _userManager.RemovePasswordAsync(user);
-//            }
+        //            if (candidate.NominationToken != resetPasswordDTO.NominationToken)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Forbidden("Candidate.InvalidToken", "Invalid Nomination Token. Cannot reset password."));
 
-//            var addPassResult = await _userManager.AddPasswordAsync(user, resetPasswordDTO.NewPassword!);
+        //            // 3. Find Identity User
+        //            var user = await _userManager.FindByNameAsync(resetPasswordDTO.UserName!);
+        //            if (user == null)
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.NotFound("User.NotFound", "User account not found."));
 
-//            if (!addPassResult.Succeeded)
-//            {
-//                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.ChangeFailed", addPassResult.Errors.First().Description));
-//            }
+        //            // 4. Force Reset Password
+        //            if (await _userManager.HasPasswordAsync(user))
+        //            {
+        //                await _userManager.RemovePasswordAsync(user);
+        //            }
 
-//            await _userManager.UpdateSecurityStampAsync(user);
+        //            var addPassResult = await _userManager.AddPasswordAsync(user, resetPasswordDTO.NewPassword!);
 
-//            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Candidate.ToString()));
-//        }
+        //            if (!addPassResult.Succeeded)
+        //            {
+        //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("Password.ChangeFailed", addPassResult.Errors.First().Description));
+        //            }
 
-        
+        //            await _userManager.UpdateSecurityStampAsync(user);
+
+        //            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Candidate.ToString()));
+        //        }
+
+
     }
 }
