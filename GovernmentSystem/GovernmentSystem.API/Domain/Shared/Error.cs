@@ -1,4 +1,5 @@
-﻿/*namespace GovernmentSystem.API.Domain.Shared
+﻿#region Code Implementation and Explanation in old way
+/*namespace GovernmentSystem.API.Domain.Shared
 {
     // We implement IEquatable<Error> to enforce standard equality checking methods.
     public class Error : IEquatable<Error>
@@ -149,6 +150,8 @@
 }
 
 */
+#endregion
+
 
 namespace GovernmentSystem.API.Domain.Shared
 {

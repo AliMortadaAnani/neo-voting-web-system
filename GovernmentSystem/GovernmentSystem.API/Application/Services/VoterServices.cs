@@ -134,23 +134,23 @@ namespace GovernmentSystem.API.Application.Services
             you must accept the trade-off of executing them sequentially.
              */
 
-            var voters = votersTask;  //votersTask.Result;
-            var totalCount = countTask; //countTask.Result;
+            var votersFromPagedVoters = votersTask;  //votersTask.Result;
+            var totalCountOfVotersInDB = countTask; //countTask.Result;
 
             // 5. HANDLE EMPTY RESULTS
-            if (voters.Count == 0 && pageNumber == 1)
+            if (votersFromPagedVoters.Count == 0 && pageNumber == 1)
             {
                 // It's not an error if the DB is empty, just return empty response
                 return Result<List<VoterResponseDTO>>.Success(new List<VoterResponseDTO>());
             }
             // If they ask for Page 100 but we only have 5 pages
-            if (voters.Count == 0 && totalCount > 0)
+            if (votersFromPagedVoters.Count == 0 && totalCountOfVotersInDB > 0)
             {
                 return Result<List<VoterResponseDTO>>.Failure(
                     Error.NotFound("Paging.OutOfBounds", "Page number exceeds total pages."));
             }
 
-            var response = voters.Select(v => v.ToVoterResponse()).ToList();
+            var response = votersFromPagedVoters.Select(v => v.ToVoterResponse()).ToList();
             return Result<List<VoterResponseDTO>>.Success(response);
         }
 
@@ -202,19 +202,24 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
-            if (voter.VotingToken != request.VotingToken!.Value
-              || !voter.ValidToken || !voter.EligibleForElection
-                )
+            if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
-            // Idempotency check (Optional optimization)
+            if (voter.VotingToken != request.VotingToken!.Value)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
+            }
+            if (!voter.ValidToken)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+            }
+            
             if (voter.IsRegistered)
             {
-                // Already done, just return success
-                return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict("Voter.AlreadyRegistered", "Voter with this nationalId and this voting token was already registered.You cannot register with a new account."));
             }
 
             voter.MarkVoterAsRegistered();
@@ -231,20 +236,21 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
-            if (voter.VotingToken != request.VotingToken!.Value
-              || !voter.ValidToken || !voter.EligibleForElection
-                )
+            if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
-            // Idempotency check (Optional optimization)
-            if (!voter.IsRegistered)
+            if (voter.VotingToken != request.VotingToken!.Value)
             {
-                // Already done, just return success
-                return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
             }
+            if (!voter.ValidToken)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+            }
+
 
             voter.MarkVoterAsNonRegistered();
             _voterRepository.Update(voter);
@@ -262,16 +268,30 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
-            if (voter.VotingToken != request.VotingToken!.Value
-              || !voter.IsRegistered || !voter.ValidToken || !voter.EligibleForElection
-                )
+            if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
-            if (voter.Voted) return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+            if (voter.VotingToken != request.VotingToken!.Value)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
+            }
+            if (!voter.ValidToken)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+            }
 
+            if (!voter.IsRegistered)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotRegistered", "Voter with this nationalId and this voting token was not registered.You cannot vote without registering an account."));
+            }
+
+            if (voter.Voted)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict("Voter.AlreadyVoted", "Voter with this nationalId and this voting token had already casted a vote in this election.You cannot vote!"));
+            }
             voter.MarkVoterAsVoted();
             _voterRepository.Update(voter);
 
@@ -287,15 +307,27 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
-            if (voter.VotingToken != request.VotingToken!.Value
-              || !voter.IsRegistered || !voter.ValidToken || !voter.EligibleForElection
-                )
+            if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
-            if (!voter.Voted) return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
+            if (voter.VotingToken != request.VotingToken!.Value)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
+            }
+            if (!voter.ValidToken)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+            }
+
+            if (!voter.IsRegistered)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotRegistered", "Voter with this nationalId and this voting token was not registered.You cannot vote without registering an account."));
+            }
+
+            
 
             voter.MarkVoterAsNonVoted();
             _voterRepository.Update(voter);
@@ -311,14 +343,21 @@ namespace GovernmentSystem.API.Application.Services
             var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
-            if (voter.VotingToken != request.VotingToken!.Value
-             || !voter.ValidToken || !voter.EligibleForElection
-                )
+            if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Invalid voter credentials."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
+            if (voter.VotingToken != request.VotingToken!.Value)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
+            }
+            if (!voter.ValidToken)
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+            }
+            
             var response = voter.ToNeoVoting_VoterResponse();
             return Result<NeoVoting_VoterResponseDTO>.Success(response);
         }

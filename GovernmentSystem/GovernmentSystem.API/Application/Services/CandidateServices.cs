@@ -156,22 +156,6 @@ namespace GovernmentSystem.API.Application.Services
             return Result<CandidateResponseDTO>.Success(response);
         }
 
-        public async Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateForNeoVotingAsync(NeoVoting_GetCandidateRequestDTO request)
-        {
-            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
-            if (candidate == null)
-            {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
-            }
-            if (candidate.NominationToken != request.NominationToken!.Value
-              || !candidate.ValidToken || !candidate.EligibleForElection
-                )
-            {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Invalid candidate credentials."));
-            }
-            return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
-        }
-
         public async Task<Result<CandidateResponseDTO>> UpdateByNationalIdAsync(UpdateCandidateRequestDTO request)
         {
             var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
@@ -196,22 +180,54 @@ namespace GovernmentSystem.API.Application.Services
             return Result<CandidateResponseDTO>.Success(response);
         }
 
+
+
+        public async Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateForNeoVotingAsync(NeoVoting_GetCandidateRequestDTO request)
+        {
+            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
+            if (candidate == null)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "Candidate with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
+            }
+            if (!candidate.EligibleForElection)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Candidate with this nationalId is not eligible for election. Please contact Government System for support."));
+            }
+            if (candidate.NominationToken != request.NominationToken!.Value)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please enter your nomination token correctly or contact Government System for support."));
+            }
+            if (!candidate.ValidToken)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please contact Government System for support."));
+            }
+
+            return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
+        }
+
+
         public async Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToTrueAsync(NeoVoting_CandidateIsRegisteredRequestDTO request)
         {
             var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
             if (candidate == null)
             {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "Candidate with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
-            if (candidate.NominationToken != request.NominationToken!.Value
-              || !candidate.ValidToken || !candidate.EligibleForElection
-                )
+            if (!candidate.EligibleForElection)
             {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Invalid candidate credentials."));
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Candidate with this nationalId is not eligible for election. Please contact Government System for support."));
+            }
+            if (candidate.NominationToken != request.NominationToken!.Value)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please enter your nomination token correctly or contact Government System for support."));
+            }
+            if (!candidate.ValidToken)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please contact Government System for support."));
             }
             if (candidate.IsRegistered)
             {
-                return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Conflict("Candidate.AlreadyRegistered", "Candidate with this nationalId was already registered. You cannot register with a new account."));
             }
             candidate.MarkCandidateAsRegistered();
             _candidateRepository.Update(candidate);
@@ -225,17 +241,19 @@ namespace GovernmentSystem.API.Application.Services
             var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
             if (candidate == null)
             {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "Candidate with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
-            if (candidate.NominationToken != request.NominationToken!.Value
-              || !candidate.ValidToken || !candidate.EligibleForElection
-                )
+            if (!candidate.EligibleForElection)
             {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Invalid candidate credentials."));
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Candidate with this nationalId is not eligible for election. Please contact Government System for support."));
             }
-            if (!candidate.IsRegistered)
+            if (candidate.NominationToken != request.NominationToken!.Value)
             {
-                return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please enter your nomination token correctly or contact Government System for support."));
+            }
+            if (!candidate.ValidToken)
+            {
+                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please contact Government System for support."));
             }
             candidate.MarkCandidateAsNonRegistered();
             _candidateRepository.Update(candidate);

@@ -15,6 +15,7 @@ namespace GovernmentSystem.API.Application.RequestDTOs
         // Mapping Method
         public Voter ToVoter()
         {
+            //we do not try catch here because DTOs should be dumb and any validation should be handled in the domain layer later or FluentValidation before reaching this point
             return Voter.Create(
                 (GovernorateId)GovernorateId!.Value,
                 FirstName!,

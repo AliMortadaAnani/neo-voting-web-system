@@ -91,9 +91,9 @@ namespace GovernmentSystem.API.Domain.Entities
         public void MarkCandidateAsRegistered()
         {
             //Should not arrive here if well handled in the service layer
-            if (!ValidToken || !EligibleForElection)
+            if (!ValidToken || !EligibleForElection || IsRegistered)
             {
-                throw new InvalidOperationException("Cannot register candidate with invalid token or ineligible for election.");
+                throw new InvalidOperationException("Cannot register candidate with invalid token or ineligible for election or already registered.");
             }
 
             IsRegistered = true;
@@ -109,24 +109,7 @@ namespace GovernmentSystem.API.Domain.Entities
 
             IsRegistered = false;
         }
-        // 6. ToString Method
-        public override string ToString()
-        {
-            return new StringBuilder()
-                .AppendLine($"[Candidate Record]")
-                .AppendLine($"Id: {Id}")
-                .AppendLine($"NationalID: {NationalId}")
-                .AppendLine($"NominationToken: {NominationToken}")
-                .AppendLine($"Governorate: {GovernorateId}")
-                .AppendLine($"Name: {FirstName} {LastName}")
-                .AppendLine($"DOB: {DateOfBirth}")
-                .AppendLine($"Gender: {Gender}")
-                .AppendLine($"Eligible: {EligibleForElection}")
-                .AppendLine($"ValidToken: {ValidToken}")
-                .AppendLine($"Registered: {IsRegistered}")
-                .ToString();
-        }
-
+       
         // Helpers
 
         private static void ValidateNames(string firstName, string lastName)

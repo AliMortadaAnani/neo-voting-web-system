@@ -92,9 +92,9 @@ namespace GovernmentSystem.API.Domain.Entities
         public void MarkVoterAsRegistered()
         {
             //Should not arrive here if well handled in the service layer
-            if (!ValidToken || !EligibleForElection)
+            if (!ValidToken || !EligibleForElection || IsRegistered)
             {
-                throw new InvalidOperationException("Cannot register voter with invalid token or ineligible for election.");
+                throw new InvalidOperationException("Cannot register voter with invalid token or ineligible for election or already registered.");
             }
             IsRegistered = true;
         }
@@ -105,7 +105,7 @@ namespace GovernmentSystem.API.Domain.Entities
             //Should not arrive here if well handled in the service layer
             if (!ValidToken || !EligibleForElection)
             {
-                throw new InvalidOperationException("Cannot register voter with invalid token or ineligible for election.");
+                throw new InvalidOperationException("Cannot unregister voter with invalid token or ineligible for election.");
             }
             IsRegistered = false;
         }
@@ -113,9 +113,9 @@ namespace GovernmentSystem.API.Domain.Entities
         public void MarkVoterAsVoted()
         {
             //Should not arrive here if well handled in the service layer
-            if (!IsRegistered || !ValidToken || !EligibleForElection)
+            if (!IsRegistered || !ValidToken || !EligibleForElection || Voted)
             {
-                throw new InvalidOperationException("Voter cannot vote with invalid token or ineligible for election or unregistered");
+                throw new InvalidOperationException("Voter cannot vote with invalid token or ineligible for election or unregistered or already voted in this election");
             }
             Voted = true;
         }
@@ -124,29 +124,12 @@ namespace GovernmentSystem.API.Domain.Entities
             //Should not arrive here if well handled in the service layer
             if (!IsRegistered || !ValidToken || !EligibleForElection)
             {
-                throw new InvalidOperationException("Voter cannot vote with invalid token or ineligible for election or unregistered");
+                throw new InvalidOperationException("Voter cannot un-vote with invalid token or ineligible for election or unregistered");
             }
             Voted = false;
         }
 
-        // 6. ToString Method
-        public override string ToString()
-        {
-            return new StringBuilder()
-                .AppendLine($"[Voter Record]")
-                .AppendLine($"Id: {Id}")
-                .AppendLine($"NationalID: {NationalId}")
-                .AppendLine($"VotingToken: {VotingToken}")
-                .AppendLine($"Governorate: {GovernorateId}")
-                .AppendLine($"Name: {FirstName} {LastName}")
-                .AppendLine($"DOB: {DateOfBirth}")
-                .AppendLine($"Gender: {Gender}")
-                .AppendLine($"Eligible: {EligibleForElection}")
-                .AppendLine($"ValidToken: {ValidToken}")
-                .AppendLine($"Registered: {IsRegistered}")
-                .AppendLine($"Voted: {Voted}")
-                .ToString();
-        }
+        
 
         // Helpers
         private static void ValidateNames(string firstName, string lastName)
