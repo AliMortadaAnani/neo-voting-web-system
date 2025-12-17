@@ -11,19 +11,8 @@ namespace GovernmentSystem.API.API.Filters
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            /*var logger = context.HttpContext.RequestServices
-                .GetRequiredService<ILogger<ApiKeyAuthAttribute>>();
-
-            logger.LogTrace("ApiKeyAuth.OnAuthorizationAsync started for {Path} at {Time}",
-                context.HttpContext.Request.Path, DateTime.UtcNow);
-
-            foreach (var h in context.HttpContext.Request.Headers)
-                logger.LogTrace("Header received: {Key}: {Value}", h.Key, h.Value);*/
-
             if (!context.HttpContext.Request.Headers.TryGetValue(HeaderName, out var extractedApiKey))
             {
-                //logger.LogTrace("Header {HeaderName} not found. Rejecting request.", HeaderName);
-
                 context.Result = new ObjectResult(new ProblemDetails
                 {
                     Status = StatusCodes.Status401Unauthorized,
@@ -41,15 +30,8 @@ namespace GovernmentSystem.API.API.Filters
             var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
             var apiKey = configuration.GetValue<string>(ConfigKey);
 
-            /*logger.LogTrace(
-                "Extracted API Key from header: {Extracted}. Configured API Key: {Configured}",
-                extractedApiKey,
-                string.IsNullOrEmpty(apiKey) ? "<null or empty>" : "<hidden>");*/
-
             if (string.IsNullOrEmpty(apiKey))
             {
-                //logger.LogTrace("API key is empty or missing in server config.");
-
                 context.Result = new ObjectResult(new ProblemDetails
                 {
                     Status = StatusCodes.Status500InternalServerError,
@@ -66,10 +48,6 @@ namespace GovernmentSystem.API.API.Filters
 
             if (!apiKey.Equals(extractedApiKey))
             {
-                /*logger.LogTrace(
-                    "API key mismatch. Provided: {Provided}, Expected: {Expected}.",
-                    extractedApiKey, "<hidden>");*/
-
                 context.Result = new ObjectResult(new ProblemDetails
                 {
                     Status = StatusCodes.Status401Unauthorized,
@@ -83,8 +61,6 @@ namespace GovernmentSystem.API.API.Filters
 
                 return;
             }
-
-            /*logger.LogTrace("API Key validation succeeded for {Path}", context.HttpContext.Request.Path);*/
 
             await Task.CompletedTask;
         }

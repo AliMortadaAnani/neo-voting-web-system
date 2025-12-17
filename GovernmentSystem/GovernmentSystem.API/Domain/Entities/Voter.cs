@@ -1,13 +1,10 @@
 ﻿using GovernmentSystem.API.Domain.Shared;
-using System.Text;
 
 namespace GovernmentSystem.API.Domain.Entities
 {
     public class Voter
     {
-        // 1. Properties
         public Guid Id { get; private set; }
-
         public Guid NationalId { get; private set; }
         public Guid VotingToken { get; private set; }
         public GovernorateId GovernorateId { get; private set; }
@@ -20,11 +17,11 @@ namespace GovernmentSystem.API.Domain.Entities
         public bool IsRegistered { get; private set; }
         public bool Voted { get; private set; }
 
-        // 2. Private Constructor (EF Core requires this or a binding constructor)
+        //Private Constructor (EF Core requires this or a binding constructor)
         private Voter()
         { }
 
-        // 3. Static Create Method
+        //Static Create Method (Factory Method)
         public static Voter Create(
             GovernorateId governorateId,
             string firstName,
@@ -39,8 +36,8 @@ namespace GovernmentSystem.API.Domain.Entities
             ValidateNames(firstName, lastName);
             return new Voter
             {
-                Id = Guid.NewGuid(),
-                NationalId = Guid.NewGuid(),   // Generated automatically
+                Id = Guid.NewGuid(),           // Generated automatically
+                NationalId = Guid.NewGuid(),   // Generated automatically (No available citizens datbase so we need to provide an id on our own)
                 VotingToken = Guid.NewGuid(),  // Generated automatically
                 GovernorateId = governorateId,
                 FirstName = firstName,
@@ -54,7 +51,8 @@ namespace GovernmentSystem.API.Domain.Entities
             };
         }
 
-        // 4. Update Method (All fields except Id and VotingToken)
+        //Update Method (All fields except Id, nationalId and VotingToken)
+        //Search for record by nationalId and then call this method to update other details
         public void UpdateDetails(
 
             GovernorateId governorateId,
@@ -82,56 +80,39 @@ namespace GovernmentSystem.API.Domain.Entities
             Voted = voted;
         }
 
-        // 5. Set New Token Method
+        //Set New Token Method for governmental and security purposes based on legal requests
         public void GenerateNewVotingToken()
         {
             VotingToken = Guid.NewGuid();
             ValidToken = true; // Re-enable token if it was invalid
         }
 
-        public void MarkVoterAsRegistered()
+        public void MarkVoterAsRegistered() //Initially called by NeoVoting system when registering the voter (voter registration is system wide, not per election)
         {
             //Should not arrive here if well handled in the service layer
             if (!ValidToken || !EligibleForElection || IsRegistered)
             {
                 throw new InvalidOperationException("Cannot register voter with invalid token or ineligible for election or already registered.");
+                //we are not accepting re-registration requests because that could be a sign of malicious activity
             }
             IsRegistered = true;
         }
 
-
-        public void MarkVoterAsNonRegistered()
-        {
-            //Should not arrive here if well handled in the service layer
-            if (!ValidToken || !EligibleForElection)
-            {
-                throw new InvalidOperationException("Cannot unregister voter with invalid token or ineligible for election.");
-            }
-            IsRegistered = false;
-        }
-
-        public void MarkVoterAsVoted()
+        public void MarkVoterAsVoted() //Initially called by NeoVoting system when voter is casting his vote (casitng a vote is not related to a specific election)
+                                       // we rely on Voted flag to determine if the voter has voted
+                                       // in the current election or not
+                                       // we always reset the Voted flag after each election
         {
             //Should not arrive here if well handled in the service layer
             if (!IsRegistered || !ValidToken || !EligibleForElection || Voted)
             {
                 throw new InvalidOperationException("Voter cannot vote with invalid token or ineligible for election or unregistered or already voted in this election");
+                //we are not accepting voting requests if Voted flag is true because that could be a sign of malicious activity and to prevent double voting
             }
             Voted = true;
         }
-        public void MarkVoterAsNonVoted()
-        {
-            //Should not arrive here if well handled in the service layer
-            if (!IsRegistered || !ValidToken || !EligibleForElection)
-            {
-                throw new InvalidOperationException("Voter cannot un-vote with invalid token or ineligible for election or unregistered");
-            }
-            Voted = false;
-        }
 
-        
-
-        // Helpers
+        //Helpers to sanitize and validate inputs(last resort, should be handled in validation layer ideally by Fluent Validators)
         private static void ValidateNames(string firstName, string lastName)
         {
             if (string.IsNullOrWhiteSpace(firstName))
@@ -168,37 +149,6 @@ namespace GovernmentSystem.API.Domain.Entities
             {
                 throw new ArgumentException("Person must be at least 18 years old.");
             }
-        }
-
-        public static Voter FromAdoNet(
-    Guid id,
-    Guid nationalId,
-    Guid votingToken,
-    GovernorateId governorateId,
-    string firstName,
-    string lastName,
-    DateOnly dateOfBirth,
-    char gender,
-    bool eligibleForElection,
-    bool validToken,
-    bool isRegistered,
-    bool voted)
-        {
-            return new Voter
-            {
-                Id = id,
-                NationalId = nationalId,
-                VotingToken = votingToken,
-                GovernorateId = governorateId,
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                Gender = char.ToUpper(gender),
-                EligibleForElection = eligibleForElection,
-                ValidToken = validToken,
-                IsRegistered = isRegistered,
-                Voted = voted
-            };
         }
     }
 }

@@ -23,7 +23,6 @@ namespace GovernmentSystem.API.Application.Services
         {
             Voter voter = request.ToVoter();
 
-            // Note: AddAsync inside repo usually just tracks the entity.
             var voterAdded = await _voterRepository.AddVoterAsync(voter);
 
             if (voterAdded == null)
@@ -31,13 +30,7 @@ namespace GovernmentSystem.API.Application.Services
                 return Result<VoterResponseDTO>.Failure(Error.Failure("Voter.AdditionFailed", "Voter could not be added."));
             }
 
-            int rowsAdded = await _unitOfWork.SaveChangesAsync();
-
-            // For ADD, checking > 0 is fine because a new row MUST be created.
-            if (rowsAdded == 0)
-            {
-                return Result<VoterResponseDTO>.Failure(Error.Failure("Voter.AdditionFailed", "Voter could not be added."));
-            }
+            await _unitOfWork.SaveChangesAsync();
 
             return Result<VoterResponseDTO>.Success(voter.ToVoterResponse());
         }
@@ -53,13 +46,7 @@ namespace GovernmentSystem.API.Application.Services
 
             _voterRepository.Delete(voter);
 
-            int rowsDeleted = await _unitOfWork.SaveChangesAsync();
-
-            // For DELETE, checking > 0 is fine.
-            if (rowsDeleted == 0)
-            {
-                return Result<bool>.Failure(Error.Failure("Voter.DeletionFailed", "Voter could not be deleted."));
-            }
+            await _unitOfWork.SaveChangesAsync();
 
             return Result<bool>.Success(true);
         }
@@ -77,7 +64,6 @@ namespace GovernmentSystem.API.Application.Services
             voter.GenerateNewVotingToken();
             _voterRepository.Update(voter);
 
-            // FIX: Don't fail if 0 rows updated (though for a new GUID token, it should always update)
             await _unitOfWork.SaveChangesAsync();
 
             return Result<VoterResponseDTO>.Success(voter.ToVoterResponse());
@@ -85,7 +71,6 @@ namespace GovernmentSystem.API.Application.Services
 
         public async Task<Result<List<VoterResponseDTO>>> GetAllVotersAsync()
         {
-            // FIX: Await here!
             var voters = await _voterRepository.GetAllVotersAsync();
 
             if (voters.Count == 0)
@@ -178,7 +163,6 @@ namespace GovernmentSystem.API.Application.Services
 
             _voterRepository.Update(voter);
 
-            // FIX: We do NOT check rowsUpdated > 0 here.
             // If the admin clicks save without changing data, it should still say Success.
             await _unitOfWork.SaveChangesAsync();
 
@@ -196,6 +180,7 @@ namespace GovernmentSystem.API.Application.Services
             return Result<VoterResponseDTO>.Success(response);
         }
 
+        // NeoVoting Specific Services
         public async Task<Result<NeoVoting_VoterResponseDTO>> UpdateVoterIsRegisteredToTrueAsync(NeoVoting_VoterIsRegisteredRequestDTO request)
         {
             var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
@@ -216,7 +201,7 @@ namespace GovernmentSystem.API.Application.Services
             {
                 return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
             }
-            
+
             if (voter.IsRegistered)
             {
                 return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict("Voter.AlreadyRegistered", "Voter with this nationalId and this voting token was already registered.You cannot register with a new account."));
@@ -229,38 +214,6 @@ namespace GovernmentSystem.API.Application.Services
 
             return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
         }
-
-        public async Task<Result<NeoVoting_VoterResponseDTO>> UpdateVoterIsRegisteredToFalseAsync(NeoVoting_VoterIsRegisteredRequestDTO request)
-        {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
-
-            if (voter == null)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
-            }
-            if (!voter.EligibleForElection)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
-            }
-            if (voter.VotingToken != request.VotingToken!.Value)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
-            }
-            if (!voter.ValidToken)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
-            }
-
-
-            voter.MarkVoterAsNonRegistered();
-            _voterRepository.Update(voter);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
-        }
-
-
 
         public async Task<Result<NeoVoting_VoterResponseDTO>> UpdateHasVotedToTrueAsync(NeoVoting_VoterHasVotedRequestDTO request)
         {
@@ -300,44 +253,6 @@ namespace GovernmentSystem.API.Application.Services
             return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
         }
 
-
-        public async Task<Result<NeoVoting_VoterResponseDTO>> UpdateHasVotedToFalseAsync(NeoVoting_VoterHasVotedRequestDTO request)
-        {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
-
-            if (voter == null)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
-            }
-            if (!voter.EligibleForElection)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
-            }
-            if (voter.VotingToken != request.VotingToken!.Value)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
-            }
-            if (!voter.ValidToken)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
-            }
-
-            if (!voter.IsRegistered)
-            {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotRegistered", "Voter with this nationalId and this voting token was not registered.You cannot vote without registering an account."));
-            }
-
-            
-
-            voter.MarkVoterAsNonVoted();
-            _voterRepository.Update(voter);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return Result<NeoVoting_VoterResponseDTO>.Success(voter.ToNeoVoting_VoterResponse());
-        }
-
-
         public async Task<Result<NeoVoting_VoterResponseDTO>> GetVoterForNeoVotingAsync(NeoVoting_GetVoterRequestDTO request)
         {
             var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
@@ -357,7 +272,7 @@ namespace GovernmentSystem.API.Application.Services
             {
                 return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
             }
-            
+
             var response = voter.ToNeoVoting_VoterResponse();
             return Result<NeoVoting_VoterResponseDTO>.Success(response);
         }

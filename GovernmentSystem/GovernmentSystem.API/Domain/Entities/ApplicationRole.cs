@@ -4,6 +4,5 @@ namespace GovernmentSystem.API.Domain.Entities
 {
     public class ApplicationRole : IdentityRole<Guid>
     {
-
     }
 }

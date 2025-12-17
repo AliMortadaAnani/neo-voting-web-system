@@ -16,7 +16,5 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
         public bool ValidToken { get; set; }
         public bool IsRegistered { get; set; }
         public bool Voted { get; set; }
-
-        
     }
 }

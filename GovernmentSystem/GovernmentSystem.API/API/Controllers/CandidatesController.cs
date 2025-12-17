@@ -87,7 +87,7 @@ namespace GovernmentSystem.API.Controllers
         public async Task<IActionResult> Add([FromBody] CreateCandidateRequestDTO request)
         {
             var result = await _candidateServices.AddCandidateAsync(request);
-            return HandleResult(result,true);
+            return HandleResult(result, true);
         }
 
         /// <summary>

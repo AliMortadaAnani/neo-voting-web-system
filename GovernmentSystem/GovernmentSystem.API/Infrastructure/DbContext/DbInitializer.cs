@@ -5,7 +5,8 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 {
     public class DbInitializer
     {
-        // Note: We added 'adminPassword' as a parameter
+        // Note: We added 'adminPassword' as a parameter instead of fetching it from configuration
+        // This allows passing the password securely from the CLI argument
         public static async Task SeedAdminUser(IServiceProvider serviceProvider, string adminPassword)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -14,6 +15,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 
             // 1. Get Username from Environment Variable
             // We look for a variable from environment configuration
+            // we can also pass it through cli args if we want to enhance it later
             string adminUsername = configuration["Admin:Username"] ?? "none";
 
             if (string.IsNullOrEmpty(adminUsername) || adminUsername == "none")
@@ -68,6 +70,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 
         public static async Task UpdateUserPassword(IServiceProvider serviceProvider, string username, string newPassword)
         {
+            // here both username and newPassword are passed from CLI arguments
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             // 1. Find the user

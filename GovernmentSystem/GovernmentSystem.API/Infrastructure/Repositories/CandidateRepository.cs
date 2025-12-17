@@ -21,15 +21,6 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
 
         public async Task<List<Candidate>> GetPagedCandidatesStoredProcAsync(int skip, int take)
         {
-            //    return await _dbContext.Candidates
-            //.FromSqlRaw("EXEC GetPagedCandidates @Skip, @Take",
-            //    new SqlParameter("@Skip", skip),
-            //    new SqlParameter("@Take", take))
-            //.AsNoTracking() // <--- Performance optimization
-            //.ToListAsync();
-
-            //var stopwatch = Stopwatch.StartNew();
-
             var result = new List<Candidate>();
 
             using (var connection = new SqlConnection(_connectionString))
@@ -51,8 +42,6 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
                     }
                 }
             }
-            //stopwatch.Stop();
-            //Console.WriteLine($"ADO Duration: {stopwatch.ElapsedMilliseconds} ms");  // Or log it
             return result;
         }
 
@@ -76,8 +65,6 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
 
         public async Task<int> GetTotalCandidatesCountAsync()
         {
-            // Simple EF Core count is optimized enough.
-            // It generates "SELECT COUNT(*) FROM Voters"
             return await _dbContext.Candidates.CountAsync();
         }
 

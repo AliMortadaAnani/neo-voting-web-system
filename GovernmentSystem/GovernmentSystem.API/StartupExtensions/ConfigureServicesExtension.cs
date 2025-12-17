@@ -224,9 +224,6 @@ namespace GovernmentSystem.API.StartupExtensions
                     }
                 });
 
-                // c.OperationFilter<GlobalResponseFilter>();
-                //for productResponsesTypes in controllers
-
                 // 1. Get the name of the generated XML file (usually YourProjectName.xml)
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 

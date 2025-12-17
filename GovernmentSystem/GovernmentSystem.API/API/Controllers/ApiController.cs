@@ -3,29 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-    /*
-     * [HttpPost("verify")]
-public async Task<IActionResult> VerifyVoter(VerifyRequest request)
-{
-    // Validations (FluentValidation) ran automatically before this line.
-
-    var result = await _voterService.VerifyVoterAsync(request.NationalId, request.Token);
-
-    // One line handling!
-    return HandleResult(result);
-}
-     */
-
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
     public abstract class ApiController : ControllerBase
     {
-        protected IActionResult HandleResult<T>(Result<T> result,bool Created = false)
+        protected IActionResult HandleResult<T>(Result<T> result, bool Created = false)
         {
             if (result.IsSuccess)
-            {   
-                if(Created)
+            {
+                if (Created)
                 {
                     // This returns HTTP 201 with the JSON body, but no Location header
                     return StatusCode(StatusCodes.Status201Created, result.Value);

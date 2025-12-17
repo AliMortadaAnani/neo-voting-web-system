@@ -14,7 +14,6 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 
         Task<Candidate> AddCandidateAsync(Candidate candidate);
 
-        // Add these back. They are simple, synchronous persistence operations.
         void Update(Candidate candidate);
 
         void Delete(Candidate candidate);

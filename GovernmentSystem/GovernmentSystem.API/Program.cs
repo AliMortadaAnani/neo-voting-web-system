@@ -3,14 +3,17 @@ using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Add user-secrets and environment variables before calling ConfigureServices
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddUserSecrets<Program>(optional: true);
 }
+
 builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 
 //builder.Configuration.AddEnvironmentVariables(); // called automatically by CreateBuilder
+
 // 2. Register Seeder
 builder.Services.AddTransient<DbSeeder>();
 
@@ -65,7 +68,7 @@ if (args.Length > 0 && args[0].ToLower() == "seedAdmin") // we run dotnet with c
 // =================================================================
 
 // =================================================================
-// CLI admin seeding logic
+// CLI admin reset password logic
 // =================================================================
 if (args.Length > 0 && args[0].ToLower() == "updateadminpassword") // we run dotnet with command line argument "updateAdminPassword" => dotnet run updateAdminPassword "Yourusername" "NewStrongPassword!"
 {
@@ -99,7 +102,6 @@ if (args.Length > 0 && args[0].ToLower() == "updateadminpassword") // we run dot
     return; // Stop app, do not start web server
 }
 // =================================================================
-
 
 app.UseSwagger();
 app.UseSwaggerUI();

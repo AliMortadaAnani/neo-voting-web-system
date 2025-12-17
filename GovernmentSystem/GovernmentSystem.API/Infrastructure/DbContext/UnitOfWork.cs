@@ -16,9 +16,9 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
         /// The implementation simply delegates the call to the underlying DbContext's SaveChangesAsync method.
         /// This is where the actual database transaction happens.
         /// </summary>
-        public Task<int> SaveChangesAsync()
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return _context.SaveChangesAsync();
+            return _context.SaveChangesAsync(cancellationToken);
         }
 
         /// <summary>

@@ -30,12 +30,7 @@ namespace GovernmentSystem.API.Application.Services
                 return Result<CandidateResponseDTO>.Failure(Error.Failure("Candidate.AdditionFailed", "Candidate could not be added."));
             }
 
-            int rowsAdded = await _unitOfWork.SaveChangesAsync();
-
-            if (rowsAdded == 0)
-            {
-                return Result<CandidateResponseDTO>.Failure(Error.Failure("Candidate.AdditionFailed", "Candidate could not be added."));
-            }
+            await _unitOfWork.SaveChangesAsync();
 
             var response = candidate.ToCandidateResponse();
 
@@ -50,11 +45,8 @@ namespace GovernmentSystem.API.Application.Services
                 return Result<bool>.Failure(Error.NotFound("Candidate.Missing", "Candidate not found."));
             }
             _candidateRepository.Delete(candidate);
-            int rowsDeleted = await _unitOfWork.SaveChangesAsync();
-            if (rowsDeleted == 0)
-            {
-                return Result<bool>.Failure(Error.Failure("Candidate.DeletionFailed", "Candidate could not be deleted."));
-            }
+            await _unitOfWork.SaveChangesAsync();
+
             return Result<bool>.Success(true);
         }
 
@@ -180,8 +172,7 @@ namespace GovernmentSystem.API.Application.Services
             return Result<CandidateResponseDTO>.Success(response);
         }
 
-
-
+        // NeoVoting Specific Services
         public async Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateForNeoVotingAsync(NeoVoting_GetCandidateRequestDTO request)
         {
             var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
@@ -204,7 +195,6 @@ namespace GovernmentSystem.API.Application.Services
 
             return Result<NeoVoting_CandidateResponseDTO>.Success(candidate.ToNeoVoting_CandidateResponse());
         }
-
 
         public async Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToTrueAsync(NeoVoting_CandidateIsRegisteredRequestDTO request)
         {
@@ -235,33 +225,5 @@ namespace GovernmentSystem.API.Application.Services
             var response = candidate.ToNeoVoting_CandidateResponse();
             return Result<NeoVoting_CandidateResponseDTO>.Success(response);
         }
-
-        public async Task<Result<NeoVoting_CandidateResponseDTO>> UpdateCandidateIsRegisteredToFalseAsync(NeoVoting_CandidateIsRegisteredRequestDTO request)
-        {
-            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
-            if (candidate == null)
-            {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.NotFound("Candidate.NotFound", "Candidate with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
-            }
-            if (!candidate.EligibleForElection)
-            {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.NotValid", "Candidate with this nationalId is not eligible for election. Please contact Government System for support."));
-            }
-            if (candidate.NominationToken != request.NominationToken!.Value)
-            {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please enter your nomination token correctly or contact Government System for support."));
-            }
-            if (!candidate.ValidToken)
-            {
-                return Result<NeoVoting_CandidateResponseDTO>.Failure(Error.Unauthorized("Candidate.UnauthorizedToken", "Candidate with this nationalId and this nomination token was not authorized. Please contact Government System for support."));
-            }
-            candidate.MarkCandidateAsNonRegistered();
-            _candidateRepository.Update(candidate);
-            await _unitOfWork.SaveChangesAsync();
-            var response = candidate.ToNeoVoting_CandidateResponse();
-            return Result<NeoVoting_CandidateResponseDTO>.Success(response);
-        }
-
-
     }
 }

@@ -87,7 +87,7 @@ namespace GovernmentSystem.API.Controllers
         public async Task<IActionResult> Add([FromBody] CreateVoterRequestDTO request)
         {
             var result = await _voterServices.AddVoterAsync(request);
-            return HandleResult(result,true);
+            return HandleResult(result, true);
         }
 
         /// <summary>

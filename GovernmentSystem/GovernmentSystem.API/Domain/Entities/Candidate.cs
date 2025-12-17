@@ -1,11 +1,9 @@
 ﻿using GovernmentSystem.API.Domain.Shared;
-using System.Text;
 
 namespace GovernmentSystem.API.Domain.Entities
 {
     public class Candidate
     {
-        // 1. Properties
         public Guid Id { get; private set; }
 
         public Guid NationalId { get; private set; }
@@ -20,13 +18,11 @@ namespace GovernmentSystem.API.Domain.Entities
         public bool IsRegistered { get; private set; }
 
         // Note: Candidates don't have a "Voted" field in this schema
-        // (they vote using their Voter record)
+        // (they vote using their Voter record here - Voter account in NeoVoting)
 
-        // 2. Private Constructor
         private Candidate()
         { }
 
-        // 3. Static Create Method
         public static Candidate Create(
             GovernorateId governorateId,
             string firstName,
@@ -55,7 +51,6 @@ namespace GovernmentSystem.API.Domain.Entities
             };
         }
 
-        // 4. Update Method (All fields except Id and NominationToken)
         public void UpdateDetails(
 
             GovernorateId governorateId,
@@ -81,7 +76,6 @@ namespace GovernmentSystem.API.Domain.Entities
             IsRegistered = isRegistered;
         }
 
-        // 5. Set New Token Method
         public void GenerateNewNominationToken()
         {
             NominationToken = Guid.NewGuid();
@@ -90,7 +84,6 @@ namespace GovernmentSystem.API.Domain.Entities
 
         public void MarkCandidateAsRegistered()
         {
-            //Should not arrive here if well handled in the service layer
             if (!ValidToken || !EligibleForElection || IsRegistered)
             {
                 throw new InvalidOperationException("Cannot register candidate with invalid token or ineligible for election or already registered.");
@@ -99,19 +92,7 @@ namespace GovernmentSystem.API.Domain.Entities
             IsRegistered = true;
         }
 
-        public void MarkCandidateAsNonRegistered()
-        {
-            //Should not arrive here if well handled in the service layer
-            if (!ValidToken || !EligibleForElection)
-            {
-                throw new InvalidOperationException("Cannot register candidate with invalid token or ineligible for election.");
-            }
-
-            IsRegistered = false;
-        }
-       
-        // Helpers
-
+        //Helpers
         private static void ValidateNames(string firstName, string lastName)
         {
             if (string.IsNullOrWhiteSpace(firstName))
@@ -119,7 +100,6 @@ namespace GovernmentSystem.API.Domain.Entities
             if (string.IsNullOrWhiteSpace(lastName))
                 throw new ArgumentException("Last name must not be null, empty, or whitespace.", nameof(lastName));
         }
-
 
         private static void ValidateGender(char gender)
         {
@@ -151,6 +131,9 @@ namespace GovernmentSystem.API.Domain.Entities
             }
         }
 
+        //Ado.Net Materialization Method
+        //We tried to communicate with Database using ADO.Net directly for performance reasons
+        //this method is used to fill the Candidate entity from the data retrieved from the database
         public static Candidate FromAdoNet(
     Guid id,
     Guid nationalId,
@@ -164,7 +147,6 @@ namespace GovernmentSystem.API.Domain.Entities
     bool validToken,
     bool isRegistered)
         {
-            // No validation: assumes DB data is trusted
             return new Candidate
             {
                 Id = id,
