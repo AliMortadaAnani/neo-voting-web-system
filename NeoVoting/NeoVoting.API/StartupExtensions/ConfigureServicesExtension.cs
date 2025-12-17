@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -40,7 +41,7 @@ namespace NeoVoting.API.StartupExtensions
                 {
                     Title = "NeoVoting API",
                     Version = "v1",
-                    Description = "API for the NeoVoting E-Voting System"
+                    Description = "API for the NeoVoting System"
                 });
 
                 // 1. Define the Security Scheme (The "Padlock" definition)
@@ -148,14 +149,11 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
-            services.AddScoped<IAuthServices, AuthServices>();
-            services.AddScoped<ITokenServices, TokenServices>();
+          
 
             //  services.AddValidatorsFromAssembly(Assembly.Load("NeoVoting.Application.Validators"));
 
-
-
-            // 1. Add Scoped Service
+            services.AddScoped<IAuthServices, AuthServices>();
             services.AddScoped<ITokenServices, TokenServices>();
 
             // 2. Configure Authentication
@@ -176,6 +174,48 @@ namespace NeoVoting.API.StartupExtensions
                     ValidAudience = configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    // Handle 401 Unauthorized (Token invalid or missing)
+                    OnChallenge = async context =>
+                    {
+                        // Skip the default logic
+                        context.HandleResponse();
+
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/problem+json";
+
+                        var problem = new ProblemDetails
+                        {
+                            Type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                            Title = "Unauthorized",
+                            Status = StatusCodes.Status401Unauthorized,
+                            Detail = "Authentication failed. Token is missing, invalid, or expired.",
+                            Instance = context.Request.Path
+                        };
+
+                        await context.Response.WriteAsJsonAsync(problem);
+                    },
+
+                    // Handle 403 Forbidden (Token valid, but Role/Policy failed)
+                    OnForbidden = async context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/problem+json";
+
+                        var problem = new ProblemDetails
+                        {
+                            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
+                            Title = "Forbidden",
+                            Status = StatusCodes.Status403Forbidden,
+                            Detail = "You do not have permission to access this resource.",
+                            Instance = context.Request.Path
+                        };
+
+                        await context.Response.WriteAsJsonAsync(problem);
+                    }
                 };
             });
 
