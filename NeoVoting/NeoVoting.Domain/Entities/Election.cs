@@ -6,54 +6,30 @@ namespace NeoVoting.Domain.Entities
 {
     public class Election
     {
-        // --- Properties ---
-
+        
         public Guid Id { get; private set; }
-        public required string Name { get; set; }
+        public string Name { get; private set; } = string.Empty;
         public DateTime NominationStartDate { get; private set; }
         public DateTime NominationEndDate { get; private set; }
         public DateTime VotingStartDate { get; private set; }
         public DateTime VotingEndDate { get; private set; }
 
+        public int? FinalNumberOfRegisteredVoters { get; private set; }
+        // number of registered voters in the system just after this election is completed
+
         // --- Foreign Key & Navigation Property ---
 
-        public int ElectionStatusId { get; private set; } // to enforce controlled state transitions
+        public int ElectionStatusId { get; private set; } 
         public ElectionStatus ElectionStatus { get; private set; }
 
-
-        // --- Constructor ---
-
-        /// <summary>
-        /// A private constructor to force all object creation to go through the
-        /// controlled, static factory method. EF Core uses this for materializing.
-        /// </summary>
+        
         private Election()
         {
             ElectionStatus = null!;
         }
 
 
-        // --- ToString() Override ---
-
-        /// <summary>
-        /// Provides a detailed, multi-line string representation of the election's state,
-        /// which is extremely useful for debugging and logging.
-        /// </summary>
-        /// <returns>A comprehensive string summary of the election.</returns>
-        public override string ToString()
-        {
-
-
-            var sb = new StringBuilder();
-            sb.AppendLine($"Election: '{Name}' (Id: {Id})");
-            sb.AppendLine($"  Status: ({ElectionStatusId}) " +
-                $"{((ElectionStatusEnum)ElectionStatusId).GetDescription()}");
-            sb.AppendLine($"  Nomination: {NominationStartDate:yyyy-MM-dd HH:mm} to {NominationEndDate:yyyy-MM-dd HH:mm} UTC");
-            sb.AppendLine($"  Voting:     {VotingStartDate:yyyy-MM-dd HH:mm} to {VotingEndDate:yyyy-MM-dd HH:mm} UTC");
-            return sb.ToString();
-        }
-
-
+       
         // --- Factory Method ---
 
         /// <summary>
@@ -70,7 +46,7 @@ namespace NeoVoting.Domain.Entities
         public static Election Create(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
         {
             // --- Centralized Validation Logic ---
-            Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate);
+            Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate,isCreating:true);
 
             var election = new Election
             {
@@ -86,23 +62,6 @@ namespace NeoVoting.Domain.Entities
             return election;
         }
 
-        public void Update(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
-        {
-            // --- Centralized Validation Logic ---
-            Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate);
-
-
-            this.Name = name;
-            this.NominationStartDate = nominationStartDate;
-            this.NominationEndDate = nominationEndDate;
-            this.VotingStartDate = votingStartDate;
-            this.VotingEndDate = votingEndDate;
-
-
-
-        }
-
-
         /// <summary>
         /// Moves the election to the Nomination phase.
         /// Throws an exception if the election is not in the 'Upcoming' state.
@@ -117,14 +76,27 @@ namespace NeoVoting.Domain.Entities
         }
 
         /// <summary>
-        /// Moves the election to the Voting phase.
+        /// Moves the election to the pre-Voting phase.
         /// Throws an exception if the election is not in the 'Nomination' state.
         /// </summary>
-        public void StartVoting()
+        public void StartPreVotingPhase()
         {
             if (ElectionStatusId != (int)ElectionStatusEnum.Nomination)
             {
-                throw new InvalidOperationException("Cannot start voting unless the election is in the 'Nomination' state.");
+                throw new InvalidOperationException("Cannot start pre-voting phase unless the election is in the 'Nomination' state.");
+            }
+            ElectionStatusId = (int)ElectionStatusEnum.PreVotingPhase;
+        }
+
+        /// <summary>
+        /// Moves the election to the Voting phase.
+        /// Throws an exception if the election is not in the 'pre-Voting' state.
+        /// </summary>
+        public void StartVoting()
+        {
+            if (ElectionStatusId != (int)ElectionStatusEnum.PreVotingPhase)
+            {
+                throw new InvalidOperationException("Cannot start voting unless the election is in the 'pre-Voting' state.");
             }
             ElectionStatusId = (int)ElectionStatusEnum.Voting;
         }
@@ -133,28 +105,56 @@ namespace NeoVoting.Domain.Entities
         /// Moves the election to the Completed phase.
         /// Throws an exception if the election is not in the 'Voting' state.
         /// </summary>
-        public void CompleteElection()
+        public void CompleteElection(int count)
         {
             if (ElectionStatusId != (int)ElectionStatusEnum.Voting)
             {
                 throw new InvalidOperationException("Cannot complete the election unless it is in the 'Voting' state.");
             }
             ElectionStatusId = (int)ElectionStatusEnum.Completed;
+            SetNumberOfRegisteredVoters(count);
         }
 
+        //Calculated just after completing the election
+        //final calculated number of registered voters
+        private void SetNumberOfRegisteredVoters(int count)
+        {
+            if (count < 0)
+            {
+                throw new ArgumentException("Number of registered voters cannot be negative.");
+            }
+
+            if (ElectionStatusId != (int)ElectionStatusEnum.Completed)
+            {
+                throw new InvalidOperationException("Cannot update registered voter count before election is completed.");
+            }
 
 
+            FinalNumberOfRegisteredVoters = count;
+        }
 
         /// <summary>
         /// Private helper method to contain all validation rules for creating an election.
         /// </summary>
-        private static void Validate(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
+        private static void Validate(
+            string name,
+            DateTime nominationStartDate,
+            DateTime nominationEndDate,
+            DateTime votingStartDate,
+            DateTime votingEndDate,
+            bool isCreating = false // default false for update
+            )
         {
             var errors = new StringBuilder();
 
             if (string.IsNullOrWhiteSpace(name))
             {
                 errors.AppendLine("Election name is required.");
+            }
+            //when creating, nomination start date must be in the future
+            if (isCreating && nominationStartDate <= DateTime.UtcNow)
+            {
+                errors.AppendLine("Nomination start date must be in the future.");
             }
 
             // Rule 1: Nomination end date must be after start date.

@@ -4,10 +4,12 @@ namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface ICandidateProfileRepository
     {
-        //test git
-        Task<List<CandidateProfile>> GetAllCandidatesProfilesAsync(CancellationToken cancellationToken);
+        
+        Task<List<CandidateProfile>> GetAllCandidatesProfilesByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken);
+        Task<List<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAsync(Guid ElectionId, int skip,int take,CancellationToken cancellationToken);
 
-        Task<CandidateProfile?> GetCandidateProfileByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<int> GetTotalCandidatesProfilesCountByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken);
+        Task<CandidateProfile?> GetCandidateProfileByUserIdAndElectionIdAsync(Guid UserId,Guid ElectionId,CancellationToken cancellationToken);
 
         Task<CandidateProfile> AddCandidateProfileAsync(CandidateProfile candidateProfile, CancellationToken cancellationToken);
 

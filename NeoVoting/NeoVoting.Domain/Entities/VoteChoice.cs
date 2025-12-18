@@ -20,13 +20,6 @@ namespace NeoVoting.Domain.Entities
         public Guid CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
 
-
-        // --- Constructor ---
-
-        /// <summary>
-        /// A private constructor to force all object creation to go through the
-        /// controlled, static factory method. EF Core uses this for materializing.
-        /// </summary>
         private VoteChoice()
         {
             Vote = null!;
@@ -34,16 +27,7 @@ namespace NeoVoting.Domain.Entities
         }
 
 
-        // --- ToString() Override ---
-
-        /// <summary>
-        /// Provides a clear string representation of the link between a vote and a candidate.
-        /// </summary>
-        /// <returns>A string summary of the vote choice.</returns>
-        public override string ToString()
-        {
-            return $"VoteChoice [Id: {Id}, VoteId: {VoteId}, CandidateProfileId: {CandidateProfileId}]";
-        }
+      
 
 
         // --- Factory Method ---

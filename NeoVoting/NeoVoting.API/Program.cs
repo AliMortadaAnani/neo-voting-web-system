@@ -21,6 +21,7 @@ app.UseHsts();
 app.UseHttpsRedirection();
 
 
+// Enable serving static files (images, css, js) // wwwroot/uploads are gitignored 
 app.UseStaticFiles();
 app.UseRouting();
 

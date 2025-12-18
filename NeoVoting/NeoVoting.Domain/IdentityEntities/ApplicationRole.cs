@@ -71,17 +71,7 @@ namespace NeoVoting.Domain.IdentityEntities
             return candidateRole;
         }
 
-        /// <summary>
-        /// Overrides the default ToString() method to provide a more meaningful
-        /// representation of the role, primarily for debugging and logging.
-        /// </summary>
-        /// <returns>A string representing the role, e.g., "Admin (role-guid-123)".</returns>
-        /// 
-        public override string ToString()
-        {
-            // The Name is the most important property. The Id is useful for debugging uniqueness.
-            return $"{Name} (Id: {Id})";
-        }
+        
 
 
     }

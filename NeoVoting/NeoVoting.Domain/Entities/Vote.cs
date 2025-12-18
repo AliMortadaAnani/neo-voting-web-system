@@ -24,13 +24,6 @@ namespace NeoVoting.Domain.Entities
         public int GovernorateId { get; private set; }
         public Governorate Governorate { get; private set; }
 
-
-        // --- Constructor ---
-
-        /// <summary>
-        /// A private constructor to force all object creation to go through the
-        /// controlled, static factory method. EF Core uses this for materializing.
-        /// </summary>
         private Vote()
         {
             Election = null!;
@@ -38,21 +31,7 @@ namespace NeoVoting.Domain.Entities
         }
 
 
-        // --- ToString() Override ---
-
-        /// <summary>
-        /// Provides a detailed, single-line string representation of the vote,
-        /// which is extremely useful for debugging and logging.
-        /// </summary>
-        /// <returns>A comprehensive string summary of the vote.</returns>
-        public override string ToString()
-        {
-            // This format includes all key fields in a structured key-value style for clarity in logs.
-            // The 'o' format for the timestamp is the ISO 8601 round-trip format, which is unambiguous.
-            return $"Vote [Id: {Id}, ElectionId: {ElectionId}, Voter: {VoterAge}-{VoterGender}, GovId: {GovernorateId}, Timestamp: {TimestampUTC:o}]";
-        }
-
-
+      
         // --- Factory Method ---
 
         /// <summary>

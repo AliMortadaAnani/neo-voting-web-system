@@ -4,10 +4,10 @@ namespace NeoVoting.Domain.Enums
 {
     public enum GovernoratesEnum
     {
-        [Description("Beirut")]
+        [Description("Beirut")] 
         Beirut = 1,
 
-        [Description("Mount Lebanon")]
+        [Description("Mount Lebanon")]// We used GetDescription extension method to get the string value as it is -> "Mount Lebanon"
         MountLebanon = 2,
 
         [Description("South")]

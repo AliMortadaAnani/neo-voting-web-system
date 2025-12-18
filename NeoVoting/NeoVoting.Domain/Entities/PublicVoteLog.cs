@@ -9,8 +9,7 @@ namespace NeoVoting.Domain.Entities
     /// </summary>
     public class PublicVoteLog
     {
-        // --- Properties ---
-
+       
         public long Id { get; private set; }
         public DateTime TimestampUTC { get; private set; }
 

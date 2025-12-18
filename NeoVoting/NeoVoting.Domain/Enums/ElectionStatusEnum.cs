@@ -10,10 +10,13 @@ namespace NeoVoting.Domain.Enums
         [Description("Nomination")]
         Nomination = 2,
 
+        [Description("Pre-Voting Phase")]
+        PreVotingPhase = 3,
+
         [Description("Voting")]
-        Voting = 3,
+        Voting = 4,
 
         [Description("Completed")]
-        Completed = 4
+        Completed = 5
     }
 }

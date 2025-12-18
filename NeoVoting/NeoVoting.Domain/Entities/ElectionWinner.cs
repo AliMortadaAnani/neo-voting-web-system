@@ -22,12 +22,6 @@ namespace NeoVoting.Domain.Entities
         public CandidateProfile CandidateProfile { get; private set; }
 
 
-        // --- Constructor ---
-
-        /// <summary>
-        /// A private constructor to force all object creation to go through the
-        /// controlled, static factory method. EF Core uses this for materializing.
-        /// </summary>
         private ElectionWinner()
         {
             // Initialize non-nullable navigation properties to satisfy the C# compiler.
@@ -37,17 +31,7 @@ namespace NeoVoting.Domain.Entities
         }
 
 
-        // --- ToString() Override ---
-
-        /// <summary>
-        /// Provides a clear, single-line string representation of the election winner.
-        /// </summary>
-        /// <returns>A string summary of the winner record.</returns>
-        public override string ToString()
-        {
-            string voteCountDisplay = VoteCount.HasValue ? VoteCount.Value.ToString() : "N/A";
-            return $"ElectionWinner [Id: {Id}, ElectionId: {ElectionId}, CandidateId: {CandidateProfileId}, Votes: {voteCountDisplay}]";
-        }
+        
 
 
         // --- Factory Method ---
@@ -67,7 +51,7 @@ namespace NeoVoting.Domain.Entities
             var winner = new ElectionWinner
             {
                 // The 'Id' is typically database-generated (identity column), so we don't set it here.
-                // done : check post incremental ids in db and Ef core configuration if needed. (AdminLog,PublicLog, ElectionWinner)
+               
                 ElectionId = electionId,
                 CandidateProfileId = candidateProfileId,
                 VoteCount = voteCount

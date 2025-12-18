@@ -9,10 +9,14 @@ namespace NeoVoting.Domain.ErrorHandling
     public record Error(string Code, string Description, ErrorType Type)
     {
         public static readonly Error None =
-            new(string.Empty, string.Empty, ErrorType.None);//static object representing no error
+            new(string.Empty, string.Empty, ErrorType.None);
+        //static object representing no error
+        // returned when response is success and we will return the proper data type (not an error)
 
         public static readonly Error NullValue =
-            new("Error.NullValue", "Null value was provided", ErrorType.Failure);//static object representing null value error
+            new("Error.NullValue", "Null value was provided", ErrorType.Failure);
+        //static object representing null value error
+        //usually we dont encounter this error
 
         // we made these static readonly methods to create specific error types(no input here)
 
@@ -27,7 +31,7 @@ namespace NeoVoting.Domain.ErrorHandling
         //return an instance of Error with Conflict type
         public static Error Failure(string code, string description) =>
             new(code, description, ErrorType.Failure);
-        //return an instance of Error with Failure type(general errors)
+        //return an instance of Error with Failure type(general errors like 500 or unknown...)
         public static Error Unauthorized(string code, string description) =>
             new(code, description, ErrorType.Unauthorized);
         //return an instance of Error with UnAuthorized type

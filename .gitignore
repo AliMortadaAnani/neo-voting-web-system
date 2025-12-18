@@ -58,3 +58,6 @@ __pycache__/
 # Ignore yarn/pnpm
 yarn.lock
 pnpm-lock.yaml
+
+# Ignore all files uploaded by users at runtime
+/wwwroot/uploads/

@@ -1,17 +1,15 @@
-﻿using NeoVoting.Domain.Enums; // CHANGED: Added enum namespace
+﻿using NeoVoting.Domain.Enums; 
 using NeoVoting.Domain.IdentityEntities;
 using System.Text;
 
 namespace NeoVoting.Domain.Entities
 {
     /// <summary>
-    /// Represents an immutable log entry for a significant action in the system. // CHANGED: Renamed from AdminAuditLog
+    /// Represents an immutable log entry for a significant action in the system. 
     /// This is crucial for security, auditing, and tracking changes.
     /// </summary>
-    public class SystemAuditLog // CHANGED: Renamed after it was AdminAuditLog
+    public class SystemAuditLog 
     {
-        // --- Properties ---
-
         public long Id { get; private set; }
         public DateTime TimestampUTC { get; private set; }
 
@@ -28,32 +26,10 @@ namespace NeoVoting.Domain.Entities
         public Guid? ElectionId { get; private set; } // Optional FK to an Election, applicable for candidate profile registration.
         public Election? Election { get; private set; } // Navigation property to Election.
 
-        // --- Constructor ---
-
-        /// <summary>
-        /// A private constructor to force all object creation to go through the
-        /// controlled, static factory method. EF Core uses this for materializing.
-        /// </summary>
-        private SystemAuditLog() // CHANGED: Renamed from AdminAuditLog
+        private SystemAuditLog() 
         {
-            // Initialize non-nullable properties to satisfy the C# compiler.
-
             User = null!;
         }
-
-
-        // --- ToString() Override ---
-
-        /// <summary>
-        /// Provides a clear, single-line string representation of the audit log entry.
-        /// </summary>
-        /// <returns>A string summary of the system audit log.</returns>
-        public override string ToString()
-        {
-            // CHANGED: Renamed class name and use the enum's string representation.
-            return $"SystemAuditLog [Id: {Id}, UserId: {UserId}, Action: '{ActionType}', Timestamp: {TimestampUTC:o}]";
-        }
-
 
         // --- Factory Method ---
 
@@ -65,7 +41,7 @@ namespace NeoVoting.Domain.Entities
         /// <param name="details">Optional, detailed information about the action (e.g., JSON of the changed data).</param>
         /// <returns>A new, valid SystemAuditLog object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details,Guid? electionId) // CHANGED: Parameter is now an enum
+        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details,Guid? electionId) 
         {
             Validate(userId, actionType);
             

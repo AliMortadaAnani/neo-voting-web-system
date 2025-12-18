@@ -5,12 +5,11 @@ namespace NeoVoting.Domain.Entities
 {
     public class CandidateProfile
     {
-        // --- Properties ---
-
+       
         public Guid Id { get; private set; }
-        public string Goals { get; set; } = string.Empty;
-        public string NominationReasons { get; set; } = string.Empty;
-        public string? ProfilePhotoUrl { get; set; }
+        public string Goals { get; private set; } = string.Empty;
+        public string NominationReasons { get; private set; } = string.Empty;
+        public string? ProfilePhotoFilename { get; private set; }
 
         // --- Foreign Keys & Navigation Properties ---
 
@@ -18,15 +17,11 @@ namespace NeoVoting.Domain.Entities
         public ApplicationUser User { get; private set; }
 
         public Guid ElectionId { get; private set; } // The election they are running in
+        //same user as candidate can have multiple profiles in different elections (one profile per election to be considered nominated for that election)
         public Election Election { get; private set; }
 
 
-        // --- Constructor ---
-
-        /// <summary>
-        /// A private constructor to force all object creation to go through the
-        /// controlled, static factory method. EF Core uses this for materializing.
-        /// </summary>
+        
         private CandidateProfile()
         {
             User = null!;
@@ -34,24 +29,7 @@ namespace NeoVoting.Domain.Entities
         }
 
 
-        // --- ToString() Override ---
-
-        /// <summary>
-        /// Provides a detailed, multi-line string representation of the candidate profile,
-        /// which is extremely useful for debugging and logging.
-        /// </summary>
-        /// <returns>A comprehensive string summary of the profile.</returns>
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine($"CandidateProfile (Id: {Id})");
-            sb.AppendLine($"  For User ID: {UserId}");
-            sb.AppendLine($"  In Election ID: {ElectionId}");
-            sb.AppendLine($"  Goals: {Goals.Substring(0, Math.Min(Goals.Length, 70))}...");
-            sb.AppendLine($"  Photo URL: {(string.IsNullOrEmpty(ProfilePhotoUrl) ? "None" : ProfilePhotoUrl)}");
-            return sb.ToString();
-        }
-
+       
 
         // --- Factory Method ---
 
@@ -68,7 +46,7 @@ namespace NeoVoting.Domain.Entities
         public static CandidateProfile Create(Guid userId, Guid electionId, string goals, string nominationReasons, string? profilePhotoUrl = null)
         {
             // --- Centralized Validation Logic ---
-            Validate(goals, nominationReasons);
+            ValidateCreation(userId,electionId,goals, nominationReasons);
 
             var profile = new CandidateProfile
             {
@@ -77,7 +55,7 @@ namespace NeoVoting.Domain.Entities
                 ElectionId = electionId,
                 Goals = goals,
                 NominationReasons = nominationReasons,
-                ProfilePhotoUrl = profilePhotoUrl // A photo is not required at creation and is managed separately.
+                ProfilePhotoFilename = profilePhotoUrl // A photo is not required at creation and is managed separately.
             };
 
             return profile;
@@ -93,10 +71,10 @@ namespace NeoVoting.Domain.Entities
         public void UpdateDetails(string goals, string nominationReasons)
         {
             // --- Re-use the same validation logic ---
-            Validate(goals, nominationReasons);
+            ValidateUpdate(goals, nominationReasons);
 
-            this.Goals = goals;
-            this.NominationReasons = nominationReasons;
+            Goals = goals;
+            NominationReasons = nominationReasons;
         }
 
         /// <summary>
@@ -109,7 +87,7 @@ namespace NeoVoting.Domain.Entities
             {
                 throw new ArgumentException("Profile photo URL cannot be empty.", nameof(photoUrl));
             }
-            this.ProfilePhotoUrl = photoUrl;
+            ProfilePhotoFilename = photoUrl;
         }
 
         /// <summary>
@@ -118,7 +96,7 @@ namespace NeoVoting.Domain.Entities
         /// </summary>
         public void RemoveProfilePhoto()
         {
-            this.ProfilePhotoUrl = null;
+            ProfilePhotoFilename = null;
         }
 
 
@@ -127,7 +105,34 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Private helper method to contain all validation rules for profile text fields.
         /// </summary>
-        private static void Validate(string goals, string nominationReasons)
+        private static void ValidateCreation(Guid userId,Guid electionId,string goals, string nominationReasons)
+        {
+            var errors = new StringBuilder();
+
+            if (userId == Guid.Empty)
+            {
+                errors.AppendLine("UserId is required for the creation of candidate profile.");
+            }
+            if (electionId == Guid.Empty)
+            {
+                errors.AppendLine("ElectionId is required for the creation of candidate profile.");
+            }
+            if (string.IsNullOrWhiteSpace(goals))
+            {
+                errors.AppendLine("Candidate goals are required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(nominationReasons))
+            {
+                errors.AppendLine("Nomination reasons are required.");
+            }
+
+            if (errors.Length > 0)
+            {
+                throw new ArgumentException(errors.ToString());
+            }
+        }
+        private static void ValidateUpdate(string goals, string nominationReasons)
         {
             var errors = new StringBuilder();
 
@@ -146,5 +151,6 @@ namespace NeoVoting.Domain.Entities
                 throw new ArgumentException(errors.ToString());
             }
         }
+
     }
 }
