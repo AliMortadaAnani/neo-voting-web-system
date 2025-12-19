@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace NeoVoting.Infrastructure.Migrations
+namespace GovernmentSystem.API.Migrations
 {
     /// <inheritdoc />
-    public partial class domain_infra_completed_v_10 : Migration
+    public partial class v7_0_finishedDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

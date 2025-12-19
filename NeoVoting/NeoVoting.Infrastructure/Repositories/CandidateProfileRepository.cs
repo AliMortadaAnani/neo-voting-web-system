@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
@@ -19,26 +20,46 @@ namespace NeoVoting.Infrastructure.Repositories
             return candidateProfile;
         }
 
-        public async Task<List<CandidateProfile>> GetAllCandidatesProfilesAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<CandidateProfile>> GetAllCandidatesProfilesByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
         {
             return await _dbContext.CandidateProfiles
                 .Include(c => c.User)
                 .Include(c => c.Election)
+                .Where(c => c.ElectionId == ElectionId)
+                .OrderBy(c => c.User.UserName)
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<CandidateProfile?> GetCandidateProfileByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<CandidateProfile?> GetCandidateProfileByUserIdAndElectionIdAsync(Guid UserId, Guid ElectionId, CancellationToken cancellationToken)
         {
             return await _dbContext.CandidateProfiles
                 .Include(c => c.User)
-                .Include(c => c.Election).
-                FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+                .Include(c => c.Election)
+                .FirstOrDefaultAsync(c => c.UserId == UserId && c.ElectionId == ElectionId, cancellationToken);
+        }
+
+        public async Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAsync(Guid ElectionId, int skip, int take, CancellationToken cancellationToken)
+        {
+            return await _dbContext.CandidateProfiles
+                .Include(c => c.User)
+                .Include(c => c.Election)
+                .Where(c => c.ElectionId == ElectionId)
+                .OrderBy(c => c.User.UserName)
+                .Skip(skip)
+                .Take(take)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<int> GetTotalCandidatesProfilesCountByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.CandidateProfiles.CountAsync(c => c.ElectionId == ElectionId, cancellationToken);
         }
 
         public void Update(CandidateProfile candidateProfile)
         {
             _dbContext.CandidateProfiles.Update(candidateProfile);
         }
-
     }
 }

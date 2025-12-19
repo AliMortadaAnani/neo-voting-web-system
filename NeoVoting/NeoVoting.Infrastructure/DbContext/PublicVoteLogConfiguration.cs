@@ -20,7 +20,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasOne(e => e.Vote)
                 .WithMany()
                 .HasForeignKey(e => e.VoteId)
-                .IsRequired()
+                .IsRequired(false)//because some votes might be soft deleted
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.Election)
@@ -35,12 +35,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Table name and constraints
-            builder.ToTable(tb =>
-            {
-                // GovernorateId must be between 1 and 5
-                tb.HasCheckConstraint("CK_YourEntity_GovernorateId", "[GovernorateId] BETWEEN 1 AND 5");
-            });
+            
 
             builder.HasIndex(pv => new { pv.ElectionId, pv.VoteId }).IsUnique();
 

@@ -143,7 +143,7 @@ namespace NeoVoting.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("ProfilePhotoUrl")
+                    b.Property<string>("ProfilePhotoFilename")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -173,6 +173,9 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.Property<int>("ElectionStatusId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FinalNumberOfRegisteredVoters")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -199,8 +202,6 @@ namespace NeoVoting.Infrastructure.Migrations
 
                     b.ToTable("Elections", t =>
                         {
-                            t.HasCheckConstraint("CK_Election_ElectionStatusID", "[ElectionStatusId] BETWEEN 1 and 4");
-
                             t.HasCheckConstraint("CK_Election_Name", "LEN([Name]) > 0");
 
                             t.HasCheckConstraint("CK_Election_NominationDates", "[NominationEndDate] > [NominationStartDate]");
@@ -239,11 +240,16 @@ namespace NeoVoting.Infrastructure.Migrations
                         new
                         {
                             Id = 3,
-                            Name = "Voting"
+                            Name = "Pre-Voting Phase"
                         },
                         new
                         {
                             Id = 4,
+                            Name = "Voting"
+                        },
+                        new
+                        {
+                            Id = 5,
                             Name = "Completed"
                         });
                 });
@@ -328,6 +334,10 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.Property<Guid>("ElectionId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("GovernorateId")
                         .HasColumnType("int");
 
@@ -346,10 +356,7 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.HasIndex("ElectionId", "VoteId")
                         .IsUnique();
 
-                    b.ToTable("PublicVoteLogs", t =>
-                        {
-                            t.HasCheckConstraint("CK_YourEntity_GovernorateId", "[GovernorateId] BETWEEN 1 AND 5");
-                        });
+                    b.ToTable("PublicVoteLogs");
                 });
 
             modelBuilder.Entity("NeoVoting.Domain.Entities.SystemAuditLog", b =>
@@ -386,7 +393,7 @@ namespace NeoVoting.Infrastructure.Migrations
 
                     b.ToTable("SystemAuditLogs", null, t =>
                         {
-                            t.HasCheckConstraint("CK_SystemAuditLog_ActionType", "[ActionType] IN ('VOTER_REGISTERED','CANDIDATE_REGISTERED','CANDIDATE_PROFILE_CREATED')");
+                            t.HasCheckConstraint("CK_SystemAuditLog_ActionType", "[ActionType] IN ('VOTER_REGISTERED','CANDIDATE_REGISTERED','ERROR_VOTER_NOT_REGISTERED','ERROR_CANDIDATE_NOT_REGISTERED','CANDIDATE_PROFILE_CREATED')");
                         });
                 });
 
@@ -395,11 +402,17 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("ElectionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("GovernorateId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("TimestampUTC")
                         .HasColumnType("datetime2");
@@ -410,7 +423,8 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.Property<string>("VoterGender")
                         .IsRequired()
                         .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(1)");
 
                     b.HasKey("Id");
 
@@ -418,10 +432,10 @@ namespace NeoVoting.Infrastructure.Migrations
 
                     b.HasIndex("GovernorateId");
 
+                    b.HasIndex("IsDeleted");
+
                     b.ToTable("Votes", t =>
                         {
-                            t.HasCheckConstraint("CK_Vote_GovernorateId", "[GovernorateId] BETWEEN 1 AND 5");
-
                             t.HasCheckConstraint("CK_Vote_VoterAge", "[VoterAge] >= 18");
 
                             t.HasCheckConstraint("CK_Vote_VoterGender", "[VoterGender] IN ('M','F')");
@@ -436,12 +450,20 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.Property<Guid>("CandidateProfileId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("VoteId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CandidateProfileId");
+
+                    b.HasIndex("IsDeleted");
 
                     b.HasIndex("VoteId", "CandidateProfileId")
                         .IsUnique();
@@ -506,7 +528,8 @@ namespace NeoVoting.Infrastructure.Migrations
 
                     b.Property<string>("Gender")
                         .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(1)");
 
                     b.Property<int?>("GovernorateID")
                         .HasColumnType("int");
@@ -574,8 +597,6 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", null, t =>
                         {
                             t.HasCheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F') OR [Gender] IS NULL");
-
-                            t.HasCheckConstraint("CK_User_GovernorateID", "[GovernorateID] BETWEEN 1 AND 5 OR [GovernorateID] IS NULL");
                         });
                 });
 
@@ -696,8 +717,7 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.HasOne("NeoVoting.Domain.Entities.Vote", "Vote")
                         .WithMany()
                         .HasForeignKey("VoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Election");
 

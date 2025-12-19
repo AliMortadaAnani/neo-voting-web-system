@@ -27,9 +27,9 @@ namespace NeoVoting.Infrastructure.DbContext
             // We can use HasMaxLength(1) for a char, though it's often implicit.
             // Using HasColumnType("nchar(1)") can be more explicit for SQL Server.
             builder.Property(u => u.Gender)
-                .HasMaxLength(1);
+                .HasMaxLength(1)
+                .IsUnicode(false);
 
-            
 
 
             //we wont add check constraint for date of birth here because it may cause issues with users who are creating accounts on their birthday. (dynamic not static)
@@ -56,12 +56,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .OnDelete(DeleteBehavior.Restrict); // Important! Prevents deleting a governorate if users are assigned to it.
 
 
-            builder.ToTable(tb =>
-            tb.HasCheckConstraint(
-                "CK_User_GovernorateID",
-                "[GovernorateID] BETWEEN 1 AND 5 OR [GovernorateID] IS NULL"
-            ));
-
+          
             builder.ToTable(tb =>
             tb.HasCheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F') OR [Gender] IS NULL"));
 

@@ -15,6 +15,10 @@
         /// </summary>
         CANDIDATE_REGISTERED,
 
+        ERROR_VOTER_NOT_REGISTERED,
+
+        ERROR_CANDIDATE_NOT_REGISTERED,
+
         /// <summary>
         /// A candidate profile was successfully created for an election.
         /// </summary>

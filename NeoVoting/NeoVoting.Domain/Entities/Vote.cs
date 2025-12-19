@@ -1,4 +1,5 @@
-﻿using NeoVoting.Domain.Enums; // Assuming enums for Governorates are here
+﻿using NeoVoting.Domain.Contracts;
+using NeoVoting.Domain.Enums; // Assuming enums for Governorates are here
 using System.Text;
 
 namespace NeoVoting.Domain.Entities
@@ -7,7 +8,7 @@ namespace NeoVoting.Domain.Entities
     /// Represents a single, immutable vote cast in an election.
 
     /// </summary>
-    public class Vote
+    public class Vote : ISoftDeletable
     {
         // --- Properties ---
 
@@ -24,6 +25,10 @@ namespace NeoVoting.Domain.Entities
         public int GovernorateId { get; private set; }
         public Governorate Governorate { get; private set; }
 
+
+        // --- Soft Delete Implementation ---
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
         private Vote()
         {
             Election = null!;

@@ -136,7 +136,7 @@ namespace GovernmentSystem.API.Domain.Entities
 
         private static void ValidateAge(DateOnly dateOfBirth)
         {
-            var today = DateOnly.FromDateTime(DateTime.Now);
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var age = today.Year - dateOfBirth.Year;
 
             // Adjust age if the birthday hasn't occurred yet this year

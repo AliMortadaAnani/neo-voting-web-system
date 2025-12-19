@@ -8,8 +8,8 @@ namespace GovernmentSystem.API.Application.Validators
     {
         public CreateCandidateRequestDTOValidator()
         {
-            RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.FirstName).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.LastName).NotEmpty().MaximumLength(100);
 
             RuleFor(x => x.GovernorateId)
                 .NotNull()
@@ -32,9 +32,14 @@ namespace GovernmentSystem.API.Application.Validators
 
         private bool BeAtLeast18YearsOld(DateOnly dob)
         {
-            var today = DateOnly.FromDateTime(DateTime.Today);
+            // Use UtcNow to avoid Server Timezone issues
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
             var age = today.Year - dob.Year;
+
+            // Check if birthday has passed this year
             if (dob > today.AddYears(-age)) age--;
+
             return age >= 18;
         }
     }

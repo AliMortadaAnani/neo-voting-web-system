@@ -32,6 +32,9 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(e => e.VotingEndDate)
                 .IsRequired();
 
+
+            builder.Property(e => e.FinalNumberOfRegisteredVoters)
+                .IsRequired(false); // nullable, set when election complete
             // Foreign key relationship
             builder.HasOne(e => e.ElectionStatus)
                 .WithMany() // no back navigation
@@ -54,8 +57,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 tb.HasCheckConstraint("CK_Election_VotingAfterNomination",
                     "[VotingStartDate] >= [NominationEndDate]");
 
-                tb.HasCheckConstraint("CK_Election_ElectionStatusID",
-                    "[ElectionStatusId] BETWEEN 1 and 4");
+                
 
                 tb.HasCheckConstraint("CK_Election_Name", "LEN([Name]) > 0");
 

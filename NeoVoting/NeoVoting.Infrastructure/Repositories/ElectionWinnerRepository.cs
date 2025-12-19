@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
@@ -13,19 +14,16 @@ namespace NeoVoting.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<ElectionWinner?> GetWinnerByIdAsync(int winnerId, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
         {
             return await _dbContext.ElectionWinners
-                .Include(w => w.Election)
+                .Where(w => w.ElectionId == ElectionId)
+                .OrderByDescending(w => w.VoteCount)
+                .ThenBy(w => w.CandidateProfile.User.UserName)
                 .Include(w => w.CandidateProfile)
-                .FirstOrDefaultAsync(w => w.Id == winnerId, cancellationToken);
-        }
-
-        public async Task<List<ElectionWinner>> GetAllWinnersAsync(CancellationToken cancellationToken)
-        {
-            return await _dbContext.ElectionWinners
+                .ThenInclude(cp => cp.User)
                 .Include(w => w.Election)
-                .Include(w => w.CandidateProfile)
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
@@ -14,7 +15,10 @@ namespace NeoVoting.Infrastructure.Repositories
         }
         public async Task<IReadOnlyList<Governorate>> GetAllGovernoratesAsync(CancellationToken cancellationToken)
         {
-            return await _dbContext.Governorates.ToListAsync(cancellationToken);
+            return await _dbContext.Governorates
+                .OrderBy(g => g.Id)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         }
     }
 }

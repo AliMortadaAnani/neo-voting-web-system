@@ -22,7 +22,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .HasMaxLength(1000); // adjust as needed
 
-            builder.Property(cp => cp.ProfilePhotoUrl)
+            builder.Property(cp => cp.ProfilePhotoFilename)
                 .HasMaxLength(500); // optional, allow null
 
             // Relationships

@@ -18,8 +18,8 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired();
 
             builder.Property(v => v.VoterGender)
-                .IsRequired()
-                .HasMaxLength(1);
+                .HasMaxLength(1)
+                .IsUnicode(false);
 
             builder.Property(v => v.TimestampUTC)
                 .IsRequired();
@@ -40,9 +40,6 @@ namespace NeoVoting.Infrastructure.DbContext
             // Table name and constraints
             builder.ToTable(tb =>
             {
-                // GovernorateId must be between 1 and 5
-                tb.HasCheckConstraint("CK_Vote_GovernorateId", "[GovernorateId] BETWEEN 1 AND 5");
-
                 // VoterAge must be >= 18
                 tb.HasCheckConstraint("CK_Vote_VoterAge", "[VoterAge] >= 18");
 
@@ -50,7 +47,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 tb.HasCheckConstraint("CK_Vote_VoterGender", "[VoterGender] IN ('M','F')");
             });
 
-
+            builder.HasIndex(v => v.IsDeleted);
 
         }
     }

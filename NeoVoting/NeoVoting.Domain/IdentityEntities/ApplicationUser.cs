@@ -128,7 +128,7 @@ namespace NeoVoting.Domain.IdentityEntities
         //helper method to check age
         private static bool IsAtLeast18YearsOld(DateTime dateOfBirth, DateTime? asOfDate = null)
         {
-            var today = (asOfDate ?? DateTime.Now).Date;
+            var today = (asOfDate ?? DateTime.UtcNow).Date;
             var age = today.Year - dateOfBirth.Year;
             // Adjust if birthday hasn't occurred yet this year
             if (dateOfBirth.Date > today.AddYears(-age)) age--;

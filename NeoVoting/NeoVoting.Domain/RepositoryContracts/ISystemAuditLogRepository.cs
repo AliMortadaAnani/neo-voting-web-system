@@ -1,4 +1,5 @@
-﻿using NeoVoting.Domain.Entities;
+﻿using System.Collections.Generic;
+using NeoVoting.Domain.Entities;
 using System.Diagnostics.Metrics;
 
 namespace NeoVoting.Domain.RepositoryContracts

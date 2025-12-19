@@ -20,6 +20,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasData(
                 ElectionStatus.CreateUpcomingStatus(),
                 ElectionStatus.CreateNominationStatus(),
+                ElectionStatus.CreatePreVotingStatus(),
                 ElectionStatus.CreateVotingStatus(),
                 ElectionStatus.CreateCompletedStatus()
             );

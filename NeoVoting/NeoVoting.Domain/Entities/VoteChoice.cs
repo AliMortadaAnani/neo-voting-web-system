@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using NeoVoting.Domain.Contracts;
+using System.Text;
 
 namespace NeoVoting.Domain.Entities
 {
@@ -6,7 +7,7 @@ namespace NeoVoting.Domain.Entities
     /// Represents the link between a single Vote and a single CandidateProfile.
     /// A collection of these objects represents a single voter's choices.
     /// </summary>
-    public class VoteChoice
+    public class VoteChoice : ISoftDeletable
     {
         // --- Properties ---
 
@@ -20,6 +21,9 @@ namespace NeoVoting.Domain.Entities
         public Guid CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
 
+        // --- Soft Delete Implementation ---
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
         private VoteChoice()
         {
             Vote = null!;

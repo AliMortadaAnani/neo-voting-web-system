@@ -1,11 +1,12 @@
-﻿using NeoVoting.Domain.Entities;
+﻿using System.Collections.Generic;
+using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface IElectionRepository
     {
         
-        Task<List<Election>> GetAllElectionsAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<Election>> GetAllElectionsAsync(CancellationToken cancellationToken);
 
         Task<Election?> GetElectionByIdAsync(Guid ElectionId, CancellationToken cancellationToken);
 

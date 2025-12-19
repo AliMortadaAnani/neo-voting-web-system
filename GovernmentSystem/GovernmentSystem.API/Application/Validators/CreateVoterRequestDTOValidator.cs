@@ -11,8 +11,8 @@ namespace GovernmentSystem.API.Application.Validators
             // ADD THIS TEMPORARILY
             //Console.WriteLine("--> VALIDATORS LOADED: AddVoterValidator...");
 
-            RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.FirstName).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.LastName).NotEmpty().MaximumLength(100);
 
             // 1. Governorate Validation
             RuleFor(x => x.GovernorateId)
@@ -36,12 +36,16 @@ namespace GovernmentSystem.API.Application.Validators
                 .NotNull();
         }
 
-        // Helper for DateOnly Age Calculation
         private bool BeAtLeast18YearsOld(DateOnly dob)
         {
-            var today = DateOnly.FromDateTime(DateTime.Today);
+            // Use UtcNow to avoid Server Timezone issues
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
             var age = today.Year - dob.Year;
+
+            // Check if birthday has passed this year
             if (dob > today.AddYears(-age)) age--;
+
             return age >= 18;
         }
     }

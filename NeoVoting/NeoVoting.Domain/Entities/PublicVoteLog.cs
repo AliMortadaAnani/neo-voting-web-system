@@ -13,6 +13,8 @@ namespace NeoVoting.Domain.Entities
         public long Id { get; private set; }
         public DateTime TimestampUTC { get; private set; }
 
+        public string ErrorMessage { get; private set; } = string.Empty;
+
         // --- Foreign Keys & Navigation Properties ---
 
         public Guid VoteId { get; private set; }
@@ -40,18 +42,6 @@ namespace NeoVoting.Domain.Entities
         }
 
 
-        // --- ToString() Override ---
-
-        /// <summary>
-        /// Provides a clear, single-line string representation of the log entry.
-        /// </summary>
-        /// <returns>A string summary of the public vote log.</returns>
-        public override string ToString()
-        {
-            return $"PublicVoteLog [Id: {Id}, VoteId: {VoteId}, ElectionId: {ElectionId}, GovId: {GovernorateId}, Timestamp: {TimestampUTC:o}]";
-        }
-
-
         // --- Factory Method ---
 
         /// <summary>
@@ -62,7 +52,7 @@ namespace NeoVoting.Domain.Entities
         /// <param name="governorateId">The ID of the governorate where the vote was cast.</param>
         /// <returns>A new, valid PublicVoteLog object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static PublicVoteLog Create(Guid voteId, Guid electionId, int governorateId)
+        public static PublicVoteLog Create(Guid voteId, Guid electionId, int governorateId,string? errorMessage)
         {
             Validate(voteId, electionId);
 
@@ -72,7 +62,8 @@ namespace NeoVoting.Domain.Entities
                 VoteId = voteId,
                 ElectionId = electionId,
                 GovernorateId = governorateId,
-                TimestampUTC = DateTime.UtcNow // The timestamp is always set at the moment of creation.
+                TimestampUTC = DateTime.UtcNow, // The timestamp is always set at the moment of creation.
+                ErrorMessage = errorMessage ?? string.Empty
             };
 
             return logEntry;
