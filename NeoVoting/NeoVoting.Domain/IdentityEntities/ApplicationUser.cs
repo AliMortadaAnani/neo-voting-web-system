@@ -57,7 +57,7 @@ namespace NeoVoting.Domain.IdentityEntities
                 // The Id is generated here, making the object complete.
                 Id = Guid.NewGuid(),
                 UserName = userName,
-
+              
             };
 
             return adminUser;
