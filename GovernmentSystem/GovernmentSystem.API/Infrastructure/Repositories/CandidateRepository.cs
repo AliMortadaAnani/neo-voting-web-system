@@ -59,7 +59,10 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
                 reader.GetString(reader.GetOrdinal("Gender"))[0],
                 reader.GetBoolean(reader.GetOrdinal("EligibleForElection")),
                 reader.GetBoolean(reader.GetOrdinal("ValidToken")),
-                reader.GetBoolean(reader.GetOrdinal("IsRegistered"))
+                reader.GetBoolean(reader.GetOrdinal("IsRegistered")),
+                reader.IsDBNull(reader.GetOrdinal("RegisteredUsername"))
+        ? null
+        : reader.GetString(reader.GetOrdinal("RegisteredUsername"))
             );
         }
 

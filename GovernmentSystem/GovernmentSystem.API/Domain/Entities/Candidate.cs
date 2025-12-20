@@ -17,6 +17,8 @@ namespace GovernmentSystem.API.Domain.Entities
         public bool ValidToken { get; private set; }
         public bool IsRegistered { get; private set; }
 
+        public string? RegisteredUsername { get; private set; }
+
         // Note: Candidates don't have a "Voted" field in this schema
         // (they vote using their Voter record here - Voter account in NeoVoting)
 
@@ -47,7 +49,8 @@ namespace GovernmentSystem.API.Domain.Entities
                 Gender = char.ToUpper(gender),
                 EligibleForElection = eligibleForElection,
                 ValidToken = true,
-                IsRegistered = false
+                IsRegistered = false,
+                RegisteredUsername = null
             };
         }
 
@@ -73,7 +76,7 @@ namespace GovernmentSystem.API.Domain.Entities
             Gender = char.ToUpper(gender);
             EligibleForElection = eligibleForElection;
             ValidToken = validToken;
-            IsRegistered = isRegistered;
+            IsRegistered = isRegistered;// We allow updating IsRegistered flag in case of manual corrections by admin when critical issues arise
         }
 
         public void GenerateNewNominationToken()
@@ -82,14 +85,19 @@ namespace GovernmentSystem.API.Domain.Entities
             ValidToken = true;
         }
 
-        public void MarkCandidateAsRegistered()
-        {
+        public void MarkCandidateAsRegisteredWithNewRegisteredUsername(string registeredUsername)
+        {   
+            if(string.IsNullOrWhiteSpace(registeredUsername))
+            {
+                throw new ArgumentException("Registered username must not be null, empty, or whitespace.", nameof(registeredUsername));
+            }
             if (!ValidToken || !EligibleForElection || IsRegistered)
             {
                 throw new InvalidOperationException("Cannot register candidate with invalid token or ineligible for election or already registered.");
             }
 
             IsRegistered = true;
+            RegisteredUsername = registeredUsername;
         }
 
         //Helpers
@@ -145,7 +153,9 @@ namespace GovernmentSystem.API.Domain.Entities
     char gender,
     bool eligibleForElection,
     bool validToken,
-    bool isRegistered)
+    bool isRegistered,
+    string? registeredUsername
+            )
         {
             return new Candidate
             {
@@ -159,7 +169,8 @@ namespace GovernmentSystem.API.Domain.Entities
                 Gender = char.ToUpper(gender),
                 EligibleForElection = eligibleForElection,
                 ValidToken = validToken,
-                IsRegistered = isRegistered
+                IsRegistered = isRegistered,
+                RegisteredUsername = registeredUsername
             };
         }
     }

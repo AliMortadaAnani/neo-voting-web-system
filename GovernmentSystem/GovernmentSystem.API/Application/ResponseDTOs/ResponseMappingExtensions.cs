@@ -19,7 +19,8 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
                 EligibleForElection = voter.EligibleForElection,
                 ValidToken = voter.ValidToken,
                 IsRegistered = voter.IsRegistered,
-                Voted = voter.Voted
+                Voted = voter.Voted,
+                RegisteredUsername = voter.RegisteredUsername
             };
         }
 
@@ -35,7 +36,8 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
                 EligibleForElection = voter.EligibleForElection,
                 ValidToken = voter.ValidToken,
                 IsRegistered = voter.IsRegistered,
-                Voted = voter.Voted
+                Voted = voter.Voted,
+                RegisteredUsername = voter.RegisteredUsername
             };
         }
 
@@ -55,7 +57,8 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
                 Gender = candidate.Gender,
                 EligibleForElection = candidate.EligibleForElection,
                 ValidToken = candidate.ValidToken,
-                IsRegistered = candidate.IsRegistered
+                IsRegistered = candidate.IsRegistered,
+                RegisteredUsername = candidate.RegisteredUsername
             };
         }
 
@@ -70,7 +73,8 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
                 Gender = candidate.Gender,
                 EligibleForElection = candidate.EligibleForElection,
                 ValidToken = candidate.ValidToken,
-                IsRegistered = candidate.IsRegistered
+                IsRegistered = candidate.IsRegistered,
+                RegisteredUsername = candidate.RegisteredUsername
             };
         }
     }

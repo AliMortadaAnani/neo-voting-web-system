@@ -9,6 +9,7 @@ namespace GovernmentSystem.API.Application.Validators
         {
             RuleFor(x => x.NationalId).NotNull().NotEmpty();
             RuleFor(x => x.NominationToken).NotNull().NotEmpty();
+            RuleFor(x => x.RegisteredUsername).NotNull().NotEmpty().MaximumLength(100); ;
         }
     }
 }

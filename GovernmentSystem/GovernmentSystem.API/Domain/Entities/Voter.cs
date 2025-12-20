@@ -17,6 +17,9 @@ namespace GovernmentSystem.API.Domain.Entities
         public bool IsRegistered { get; private set; }
         public bool Voted { get; private set; }
 
+
+        public string? RegisteredUsername { get; private set; }
+
         //Private Constructor (EF Core requires this or a binding constructor)
         private Voter()
         { }
@@ -47,7 +50,8 @@ namespace GovernmentSystem.API.Domain.Entities
                 EligibleForElection = eligibleForElection,
                 ValidToken = true,             // Default to true on creation
                 IsRegistered = false,          // Default to false on creation
-                Voted = false                  // Default to false on creation
+                Voted = false,                  // Default to false on creation
+                RegisteredUsername = null    // Default to null on creation
             };
         }
 
@@ -76,8 +80,8 @@ namespace GovernmentSystem.API.Domain.Entities
             Gender = char.ToUpper(gender);
             EligibleForElection = eligibleForElection;
             ValidToken = validToken;
-            IsRegistered = isRegistered;
-            Voted = voted;
+            IsRegistered = isRegistered;// We allow updating IsRegistered flag in case of manual corrections by admin when critical issues arise
+            Voted = voted;// We allow updating Voted flag in case of manual corrections by admin when critical issues arise
         }
 
         //Set New Token Method for governmental and security purposes based on legal requests
@@ -87,8 +91,13 @@ namespace GovernmentSystem.API.Domain.Entities
             ValidToken = true; // Re-enable token if it was invalid
         }
 
-        public void MarkVoterAsRegistered() //Initially called by NeoVoting system when registering the voter (voter registration is system wide, not per election)
+        public void MarkVoterAsRegisteredWithNewRegisteredUsername(string registeredUsername) //Initially called by NeoVoting system when registering the voter (voter registration is system wide, not per election)
         {
+            if (string.IsNullOrWhiteSpace(registeredUsername))
+            {
+                throw new ArgumentException("Registered username must not be null, empty, or whitespace.", nameof(registeredUsername));
+            }
+
             //Should not arrive here if well handled in the service layer
             if (!ValidToken || !EligibleForElection || IsRegistered)
             {
@@ -96,6 +105,7 @@ namespace GovernmentSystem.API.Domain.Entities
                 //we are not accepting re-registration requests because that could be a sign of malicious activity
             }
             IsRegistered = true;
+            RegisteredUsername = registeredUsername;
         }
 
         public void MarkVoterAsVoted() //Initially called by NeoVoting system when voter is casting his vote (casitng a vote is not related to a specific election)

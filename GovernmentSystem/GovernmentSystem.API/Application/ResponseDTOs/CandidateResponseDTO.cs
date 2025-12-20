@@ -15,5 +15,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
         public bool EligibleForElection { get; set; }
         public bool ValidToken { get; set; }
         public bool IsRegistered { get; set; }
+
+        public string? RegisteredUsername { get; set; }
     }
 }

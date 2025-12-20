@@ -17,5 +17,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
         public bool ValidToken { get; set; } // Boolean status only
         public bool IsRegistered { get; set; }
         public bool Voted { get; set; }
+
+        public string? RegisteredUsername { get; set; }
     }
 }

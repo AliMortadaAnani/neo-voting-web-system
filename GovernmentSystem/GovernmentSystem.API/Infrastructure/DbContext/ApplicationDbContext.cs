@@ -50,7 +50,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 entity.Property(e => e.ValidToken).IsRequired();
                 entity.Property(e => e.IsRegistered).IsRequired();
                 entity.Property(e => e.Voted).IsRequired();
-
+                entity.Property(e => e.RegisteredUsername).IsRequired(false).HasMaxLength(100);// Nullable
                 // SQL Check Constraints (The Guards)
                 // Ensure Gender is only M or F
                 entity.ToTable(t => t.HasCheckConstraint("CK_Voters_Gender", "[Gender] IN ('M', 'F')"));
@@ -88,7 +88,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 entity.Property(e => e.EligibleForElection).IsRequired();
                 entity.Property(e => e.ValidToken).IsRequired();
                 entity.Property(e => e.IsRegistered).IsRequired();
-
+                entity.Property(e => e.RegisteredUsername).IsRequired(false).HasMaxLength(100);// Nullable
                 // SQL Check Constraints
                 entity.ToTable(t => t.HasCheckConstraint("CK_Candidates_Gender", "[Gender] IN ('M', 'F')"));
                 entity.ToTable(t => t.HasCheckConstraint("CK_Candidates_GovernorateId", "[GovernorateId] BETWEEN 1 AND 5"));

@@ -4,5 +4,7 @@ namespace GovernmentSystem.API.Application.RequestDTOs
     {
         public Guid? NationalId { get; set; }
         public Guid? NominationToken { get; set; }
+
+        public string? RegisteredUsername { get; set; }
     }
 }

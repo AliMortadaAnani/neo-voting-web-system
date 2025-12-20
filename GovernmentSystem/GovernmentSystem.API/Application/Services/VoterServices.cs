@@ -206,8 +206,11 @@ namespace GovernmentSystem.API.Application.Services
             {
                 return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict("Voter.AlreadyRegistered", "Voter with this nationalId and this voting token was already registered.You cannot register with a new account."));
             }
-
-            voter.MarkVoterAsRegistered();
+            if (string.IsNullOrEmpty(request.RegisteredUsername))
+            {
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Validation("Voter.InvalidUsername", "Username cannot be null or empty when registering as voter in NeoVoting."));
+            }
+            voter.MarkVoterAsRegisteredWithNewRegisteredUsername(request.RegisteredUsername);
             _voterRepository.Update(voter);
 
             await _unitOfWork.SaveChangesAsync();
