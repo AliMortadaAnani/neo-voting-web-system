@@ -35,7 +35,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasIndex(v => v.IsDeleted);
 
             // OR a filtered index (Better for performance)
-            /*builder.HasIndex(vc => vc.ElectionId)
+            /*builder.HasIndex(vc => vc.ExampleFieldId)
                    .HasFilter("[IsDeleted] = 0");*/
 
 

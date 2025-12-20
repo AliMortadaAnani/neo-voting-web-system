@@ -111,8 +111,10 @@ namespace NeoVoting.Domain.Entities
             {
                 throw new InvalidOperationException("Cannot complete the election unless it is in the 'Voting' state.");
             }
-            ElectionStatusId = (int)ElectionStatusEnum.Completed;
+
             SetNumberOfRegisteredVoters(count);
+            ElectionStatusId = (int)ElectionStatusEnum.Completed;
+            
         }
 
         //Calculated just after completing the election

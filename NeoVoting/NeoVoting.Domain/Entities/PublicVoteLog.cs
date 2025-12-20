@@ -17,8 +17,7 @@ namespace NeoVoting.Domain.Entities
 
         // --- Foreign Keys & Navigation Properties ---
 
-        public Guid VoteId { get; private set; }
-        public Vote Vote { get; private set; }
+       
 
         public Guid ElectionId { get; private set; }
         public Election Election { get; private set; }
@@ -27,16 +26,18 @@ namespace NeoVoting.Domain.Entities
         public Governorate Governorate { get; private set; }
 
 
-        // --- Constructor ---
+        // 1. Keep the ID Required (Guid, not Guid?)
+        // This ensures the Database Column is NOT NULL.
+        public Guid VoteId { get; private set; }
 
-        /// <summary>
-        /// A private constructor to force all object creation to go through the
-        /// controlled, static factory method. EF Core uses this for materializing.
-        /// </summary>
+        // 2. Make the Navigation Nullable (Vote?)
+        // This admits that "Even though the ID exists, the Object might be hidden/deleted."
+        public Vote? Vote { get; private set; } // <--- Changed to nullable
+
         private PublicVoteLog()
         {
-            // Initialize non-nullable navigation properties to satisfy the C# compiler.
-            Vote = null!;
+            // 3. Remove "Vote = null!;"
+            // We don't need to force it anymore because it is allowed to be null.
             Election = null!;
             Governorate = null!;
         }

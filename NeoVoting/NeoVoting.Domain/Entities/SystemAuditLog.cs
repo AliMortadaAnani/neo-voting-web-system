@@ -20,16 +20,14 @@ namespace NeoVoting.Domain.Entities
 
         // --- Foreign Key & Navigation Property ---
 
-        public Guid UserId { get; private set; } // The ID of the user who performed the action.
-        public ApplicationUser User { get; private set; }
+        public Guid? UserId { get; private set; } // The ID of the user who performed the action.
+        public ApplicationUser? User { get; private set; }
 
         public Guid? ElectionId { get; private set; } // Optional FK to an Election, applicable for candidate profile registration.
         public Election? Election { get; private set; } // Navigation property to Election.
 
         private SystemAuditLog() 
-        {
-            User = null!;
-        }
+        {}
 
         // --- Factory Method ---
 

@@ -19,7 +19,7 @@ namespace NeoVoting.Infrastructure.DbContext
             // Relationships
             builder.HasOne(e => e.Vote)
                 .WithMany()
-                .HasForeignKey(e => e.VoteId)
+                .HasForeignKey(e => e.VoteId)//voteId is always present even if the vote is soft deleted
                 .IsRequired(false)//because some votes might be soft deleted
                 .OnDelete(DeleteBehavior.Restrict);
 

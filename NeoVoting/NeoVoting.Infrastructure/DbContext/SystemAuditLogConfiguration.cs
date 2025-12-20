@@ -19,16 +19,17 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(sal => sal.ActionType)
                 .HasConversion<string>()   // store enum as string
                 .IsRequired()
-                .HasMaxLength(50);         // optional: cap string length
+                .HasMaxLength(200);         // optional: cap string length
 
             builder.Property(sal => sal.Details)
                 .HasMaxLength(2000);       // optional: cap details length
 
             builder.HasOne(sal => sal.User)
                 .WithMany()
-                .HasForeignKey(sal => sal.UserId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(sal => sal.UserId) // user might be deleted
+                                                  // so userId and navigation are optional
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(sal => sal.Election)
                 .WithMany()
