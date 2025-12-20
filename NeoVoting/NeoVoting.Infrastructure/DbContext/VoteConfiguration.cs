@@ -4,8 +4,6 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-
-
     public class VoteConfiguration : IEntityTypeConfiguration<Vote>
     {
         public void Configure(EntityTypeBuilder<Vote> builder)
@@ -48,8 +46,6 @@ namespace NeoVoting.Infrastructure.DbContext
             });
 
             builder.HasIndex(v => v.IsDeleted);
-
         }
     }
-
 }

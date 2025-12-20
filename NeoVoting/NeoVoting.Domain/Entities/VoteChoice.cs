@@ -23,16 +23,14 @@ namespace NeoVoting.Domain.Entities
 
         // --- Soft Delete Implementation ---
         public bool IsDeleted { get; set; }
+
         public DateTimeOffset? DeletedAt { get; set; }
+
         private VoteChoice()
         {
             Vote = null!;
             CandidateProfile = null!;
         }
-
-
-      
-
 
         // --- Factory Method ---
 

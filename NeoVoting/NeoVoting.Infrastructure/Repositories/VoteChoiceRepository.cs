@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
@@ -9,6 +8,7 @@ namespace NeoVoting.Infrastructure.Repositories
     public class VoteChoiceRepository : IVoteChoiceRepository
     {
         private readonly ApplicationDbContext _dbContext;
+
         public VoteChoiceRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -59,19 +59,21 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _dbContext.VoteChoices
                 .Include(vc => vc.Vote)
                 .Include(vc => vc.CandidateProfile)
+                .ThenInclude(cp => cp.User)
                 .Where(vc => vc.VoteId == VoteId)
-                .OrderByDescending(vc => vc.Vote.TimestampUTC)
+                .OrderBy(vc => vc.CandidateProfile.User.UserName)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
 
         #region Soft Delete Demonstration
+
         /*
          // SCENARIO 1: The Standard Delete
     // You call Remove, but the DbContext Interceptor converts it to Soft Delete
     public void Delete(Vote vote)
     {
-        _dbContext.Votes.Remove(vote); 
+        _dbContext.Votes.Remove(vote);
     }
 
     // SCENARIO 2: Standard Get
@@ -106,6 +108,7 @@ namespace NeoVoting.Infrastructure.Repositories
             .ToListAsync(ct);
     }
          */
-        #endregion
+
+        #endregion Soft Delete Demonstration
     }
 }

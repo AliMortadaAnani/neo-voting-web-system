@@ -4,8 +4,6 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-
-
     public class ElectionWinnerConfiguration : IEntityTypeConfiguration<ElectionWinner>
     {
         public void Configure(EntityTypeBuilder<ElectionWinner> builder)
@@ -24,7 +22,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-
             builder.HasOne(ew => ew.CandidateProfile)
                 .WithMany() // no back navigation from CandidateProfile
                 .HasForeignKey(ew => ew.CandidateProfileId)
@@ -35,5 +32,4 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasIndex(ew => new { ew.ElectionId, ew.CandidateProfileId }).IsUnique();
         }
     }
-
 }

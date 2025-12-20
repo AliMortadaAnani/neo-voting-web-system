@@ -19,8 +19,6 @@ namespace NeoVoting.Application.RequestDTOs.Validators
 
             RuleFor(x => x.VoterGender)
                 .Must(g => g == 'M' || g == 'F').WithMessage("Voter gender must be either 'M' or 'F'.");
-
-
         }
     }
 }

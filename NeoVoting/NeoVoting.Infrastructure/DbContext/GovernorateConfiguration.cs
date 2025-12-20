@@ -2,11 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
 
-
-
 namespace NeoVoting.Infrastructure.DbContext
 {
-
     namespace NeoVoting.Infrastructure.DbContext
     {
         public class GovernorateConfiguration : IEntityTypeConfiguration<Governorate>
@@ -32,5 +29,4 @@ namespace NeoVoting.Infrastructure.DbContext
             }
         }
     }
-
 }

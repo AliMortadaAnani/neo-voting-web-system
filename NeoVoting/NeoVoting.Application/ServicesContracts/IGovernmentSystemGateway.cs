@@ -1,10 +1,5 @@
 ﻿using NeoVoting.Application.NeoVotingDTOs;
 using NeoVoting.Domain.ErrorHandling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.ServicesContracts
 {
@@ -14,9 +9,11 @@ namespace NeoVoting.Application.ServicesContracts
         In essence:
         A gateway hides the complexity of talking to another system, so the rest of your application interacts with external APIs or services in a clean, reliable, and testable way.
      */
+
     public interface IGovernmentSystemGateway
     {
         Task<Result<NeoVoting_VoterResponseDTO>> VerifyVoterAsync(NeoVoting_GetVoterRequestDTO request, CancellationToken ct);
+
         Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsRegisteredAsync(NeoVoting_VoterIsRegisteredRequestDTO request, CancellationToken ct);
     }
 }

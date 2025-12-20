@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using NeoVoting.Domain.Entities;
+﻿using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface IGovernorateRepository
     {
-        
         Task<IReadOnlyList<Governorate>> GetAllGovernoratesAsync(CancellationToken cancellationToken);
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
@@ -9,6 +8,7 @@ namespace NeoVoting.Infrastructure.Repositories
     public class PublicVoteLogRepository : IPublicVoteLogRepository
     {
         private readonly ApplicationDbContext _dbContext;
+
         public PublicVoteLogRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -39,7 +39,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Include(l => l.Vote)
                 .Include(l => l.Election)
                 .Where(l => l.ElectionId == ElectionId)
-                .OrderByDescending (l => l.TimestampUTC)
+                .OrderByDescending(l => l.TimestampUTC)
                 .Skip(skip)
                 .Take(take)
                 .AsNoTracking()

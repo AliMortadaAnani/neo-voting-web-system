@@ -21,7 +21,6 @@ namespace NeoVoting.Domain.Entities
         public Guid CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
 
-
         private ElectionWinner()
         {
             // Initialize non-nullable navigation properties to satisfy the C# compiler.
@@ -29,10 +28,6 @@ namespace NeoVoting.Domain.Entities
             Election = null!;
             CandidateProfile = null!;
         }
-
-
-        
-
 
         // --- Factory Method ---
 
@@ -51,7 +46,7 @@ namespace NeoVoting.Domain.Entities
             var winner = new ElectionWinner
             {
                 // The 'Id' is typically database-generated (identity column), so we don't set it here.
-               
+
                 ElectionId = electionId,
                 CandidateProfileId = candidateProfileId,
                 VoteCount = voteCount
@@ -59,7 +54,6 @@ namespace NeoVoting.Domain.Entities
 
             return winner;
         }
-
 
         // --- Public Behavior Methods ---
 
@@ -76,7 +70,6 @@ namespace NeoVoting.Domain.Entities
             }
             this.VoteCount = newVoteCount;
         }
-
 
         /// <summary>
         /// Private helper method to contain all validation rules.

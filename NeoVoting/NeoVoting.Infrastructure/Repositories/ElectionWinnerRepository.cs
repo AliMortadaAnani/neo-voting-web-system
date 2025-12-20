@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
@@ -9,6 +8,7 @@ namespace NeoVoting.Infrastructure.Repositories
     public class ElectionWinnerRepository : IElectionWinnerRepository
     {
         private readonly ApplicationDbContext _dbContext;
+
         public ElectionWinnerRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;

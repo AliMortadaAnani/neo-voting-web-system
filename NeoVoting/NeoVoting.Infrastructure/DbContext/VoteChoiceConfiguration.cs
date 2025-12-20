@@ -4,8 +4,6 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-
-
     public class VoteChoiceConfiguration : IEntityTypeConfiguration<VoteChoice>
     {
         public void Configure(EntityTypeBuilder<VoteChoice> builder)
@@ -20,7 +18,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-
             builder.HasOne(vc => vc.CandidateProfile)
                 .WithMany() // no back navigation from CandidateProfile
                 .HasForeignKey(vc => vc.CandidateProfileId)
@@ -31,18 +28,13 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasIndex(vc => new { vc.VoteId, vc.CandidateProfileId })
               .IsUnique();
 
-
             builder.HasIndex(v => v.IsDeleted);
 
             // OR a filtered index (Better for performance)
             /*builder.HasIndex(vc => vc.ExampleFieldId)
                    .HasFilter("[IsDeleted] = 0");*/
 
-
-
             /*Why ? 99 % of your queries will be WHERE ElectionId = X AND IsDeleted = 0.Without a filtered index, the DB scans deleted rows too.*/
-
         }
     }
-
 }

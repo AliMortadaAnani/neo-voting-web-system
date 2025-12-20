@@ -5,8 +5,6 @@ using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-
-
     public class SystemAuditLogConfiguration : IEntityTypeConfiguration<SystemAuditLog>
     {
         public void Configure(EntityTypeBuilder<SystemAuditLog> builder)
@@ -53,5 +51,4 @@ namespace NeoVoting.Infrastructure.DbContext
             });
         }
     }
-
 }

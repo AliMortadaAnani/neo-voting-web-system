@@ -2,10 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
 
-
 namespace NeoVoting.Infrastructure.DbContext
 {
-
     public class CandidateProfileConfiguration : IEntityTypeConfiguration<CandidateProfile>
     {
         public void Configure(EntityTypeBuilder<CandidateProfile> builder)
@@ -48,11 +46,8 @@ namespace NeoVoting.Infrastructure.DbContext
                 tb.HasCheckConstraint("CK_CandidateProfile_NominationReasons", "LEN([NominationReasons]) > 0");
             });
 
-
             builder.HasIndex(cp => new { cp.UserId, cp.ElectionId })
               .IsUnique();
-
         }
     }
-
 }

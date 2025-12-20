@@ -3,14 +3,12 @@
 namespace NeoVoting.Domain.Entities
 {
     public class ElectionStatus
-    {   
+    {
         public int Id { get; private set; }
-        public required string Name { get; init; }
+        public string Name { get; init; }
 
-        private ElectionStatus() { }
-
-        
-
+        private ElectionStatus()
+        { }
 
         // --- Factory Methods (Dependent on the Enum) ---
 
@@ -37,6 +35,7 @@ namespace NeoVoting.Domain.Entities
                 Name = ElectionStatusEnum.Nomination.GetDescription()
             };
         }
+
         /// <summary>
         /// Creates a new instance representing the pre-Voting status,which is after nomination ends and before voting starts.
         /// </summary>

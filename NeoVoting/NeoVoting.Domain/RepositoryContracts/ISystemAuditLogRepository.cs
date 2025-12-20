@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using NeoVoting.Domain.Entities;
-using System.Diagnostics.Metrics;
+﻿using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface ISystemAuditLogRepository
     {
         Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogByUserIdAsync(Guid UserId, CancellationToken cancellationToken);
+
         Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogsAsync(CancellationToken cancellationToken);
 
         Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsAsync(int skip, int take, CancellationToken cancellationToken);
@@ -14,6 +13,5 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<int> GetTotalSystemAuditLogsCountAsync(CancellationToken cancellationToken);
 
         Task<SystemAuditLog> AddSystemAuditLogAsync(SystemAuditLog log, CancellationToken cancellationToken);
-
     }
 }

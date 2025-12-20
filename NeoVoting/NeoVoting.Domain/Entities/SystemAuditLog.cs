@@ -1,14 +1,14 @@
-﻿using NeoVoting.Domain.Enums; 
+﻿using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.IdentityEntities;
 using System.Text;
 
 namespace NeoVoting.Domain.Entities
 {
     /// <summary>
-    /// Represents an immutable log entry for a significant action in the system. 
+    /// Represents an immutable log entry for a significant action in the system.
     /// This is crucial for security, auditing, and tracking changes.
     /// </summary>
-    public class SystemAuditLog 
+    public class SystemAuditLog
     {
         public long Id { get; private set; }
         public DateTime TimestampUTC { get; private set; }
@@ -26,8 +26,8 @@ namespace NeoVoting.Domain.Entities
         public Guid? ElectionId { get; private set; } // Optional FK to an Election, applicable for candidate profile registration.
         public Election? Election { get; private set; } // Navigation property to Election.
 
-        private SystemAuditLog() 
-        {}
+        private SystemAuditLog()
+        { }
 
         // --- Factory Method ---
 
@@ -39,11 +39,11 @@ namespace NeoVoting.Domain.Entities
         /// <param name="details">Optional, detailed information about the action (e.g., JSON of the changed data).</param>
         /// <returns>A new, valid SystemAuditLog object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details,Guid? electionId) 
+        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details, Guid? electionId)
         {
             Validate(userId, actionType);
-            
-            if(actionType == SystemActionTypesEnum.CANDIDATE_PROFILE_CREATED && electionId == null)
+
+            if (actionType == SystemActionTypesEnum.CANDIDATE_PROFILE_CREATED && electionId == null)
             {
                 throw new ArgumentException("ElectionId is required when logging a CANDIDATE_PROFILE_CREATED action.");
             }
@@ -60,8 +60,6 @@ namespace NeoVoting.Domain.Entities
 
             return logEntry;
         }
-
-        
 
         /// <summary>
         /// Private helper method to validate the required parameters.

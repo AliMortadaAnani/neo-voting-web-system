@@ -12,8 +12,6 @@
         public string Goals { get; set; } = string.Empty;
         public string NominationReasons { get; set; } = string.Empty;
 
-
-
         // Note: The mapping for an update is different. We don't create a new entity.
         // Instead, the service layer will fetch the existing entity and then
         // call a method like 'UpdateDetails' on it, passing in the values from this DTO.

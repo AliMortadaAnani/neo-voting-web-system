@@ -4,14 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.IdentityEntities;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Services
 {
@@ -31,9 +27,8 @@ namespace NeoVoting.Application.Services
 
    Keep this service without CancellationToken; it’s primarily token generation and a single quick Identity call.
    Make sure higher-level repos/services/controllers accept and pass a CancellationToken, since those layers talk to the database.
-   We can keep the cancellation token in signature in case we use it in future.   
+   We can keep the cancellation token in signature in case we use it in future.
      */
-
 
         public async Task<AuthenticationResponse> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default)
         {
@@ -81,23 +76,21 @@ namespace NeoVoting.Application.Services
                 claims.Add(new Claim("governorateId", user.GovernorateID.Value.ToString()));
             }
 
-
-
             // 3. Add Roles
             var roles = await _userManager.GetRolesAsync(user);
             var userRole = roles.Single(); // throws if not exactly one role
-           // foreach (var role in roles)
-           // {
-                // .NET requires "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" to recognize roles automatically
-                // using 'ClaimTypes.Role' ensures this mapping.
-                claims.Add(new Claim(ClaimTypes.Role, userRole));
-           // }
+                                           // foreach (var role in roles)
+                                           // {
+                                           // .NET requires "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" to recognize roles automatically
+                                           // using 'ClaimTypes.Role' ensures this mapping.
+            claims.Add(new Claim(ClaimTypes.Role, userRole));
+            // }
 
             // 4. Create Credentials & Token
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
-            
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
@@ -115,11 +108,6 @@ namespace NeoVoting.Application.Services
             var refreshToken = GenerateRefreshToken();
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
 
-
-            
-            
-
-
             return new AuthenticationResponse
             {
                 AccessToken = accessToken,
@@ -135,8 +123,8 @@ namespace NeoVoting.Application.Services
                 DateOfBirth = user.DateOfBirth,
                 Gender = user.Gender
             };
-
         }
+
         // This method extracts claims from an expired JWT token without validating its lifetime.
         public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default)
         {
@@ -181,7 +169,5 @@ namespace NeoVoting.Application.Services
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-
-        
     }
 }

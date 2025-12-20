@@ -5,7 +5,6 @@ namespace NeoVoting.Domain.Entities
 {
     public class CandidateProfile
     {
-       
         public Guid Id { get; private set; }
         public string Goals { get; private set; } = string.Empty;
         public string NominationReasons { get; private set; } = string.Empty;
@@ -17,19 +16,15 @@ namespace NeoVoting.Domain.Entities
         public ApplicationUser User { get; private set; }
 
         public Guid ElectionId { get; private set; } // The election they are running in
+
         //same user as candidate can have multiple profiles in different elections (one profile per election to be considered nominated for that election)
         public Election Election { get; private set; }
 
-
-        
         private CandidateProfile()
         {
             User = null!;
             Election = null!;
         }
-
-
-       
 
         // --- Factory Method ---
 
@@ -46,7 +41,7 @@ namespace NeoVoting.Domain.Entities
         public static CandidateProfile Create(Guid userId, Guid electionId, string goals, string nominationReasons, string? profilePhotoUrl = null)
         {
             // --- Centralized Validation Logic ---
-            ValidateCreation(userId,electionId,goals, nominationReasons);
+            ValidateCreation(userId, electionId, goals, nominationReasons);
 
             var profile = new CandidateProfile
             {
@@ -99,13 +94,12 @@ namespace NeoVoting.Domain.Entities
             ProfilePhotoFilename = null;
         }
 
-
         // --- Private Validation Helper ---
 
         /// <summary>
         /// Private helper method to contain all validation rules for profile text fields.
         /// </summary>
-        private static void ValidateCreation(Guid userId,Guid electionId,string goals, string nominationReasons)
+        private static void ValidateCreation(Guid userId, Guid electionId, string goals, string nominationReasons)
         {
             var errors = new StringBuilder();
 
@@ -132,6 +126,7 @@ namespace NeoVoting.Domain.Entities
                 throw new ArgumentException(errors.ToString());
             }
         }
+
         private static void ValidateUpdate(string goals, string nominationReasons)
         {
             var errors = new StringBuilder();
@@ -151,6 +146,5 @@ namespace NeoVoting.Domain.Entities
                 throw new ArgumentException(errors.ToString());
             }
         }
-
     }
 }

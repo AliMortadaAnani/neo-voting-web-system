@@ -12,7 +12,6 @@ namespace NeoVoting.Infrastructure.DbContext
             _context = context;
         }
 
-
         /// <summary>
         /// The implementation simply delegates the call to the underlying DbContext's SaveChangesAsync method.
         /// This is where the actual database transaction happens.

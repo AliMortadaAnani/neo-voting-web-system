@@ -1,12 +1,10 @@
 ﻿using NeoVoting.Domain.Enums;
 using System.Text;
 
-
 namespace NeoVoting.Domain.Entities
 {
     public class Election
     {
-        
         public Guid Id { get; private set; }
         public string Name { get; private set; } = string.Empty;
         public DateTime NominationStartDate { get; private set; }
@@ -19,17 +17,14 @@ namespace NeoVoting.Domain.Entities
 
         // --- Foreign Key & Navigation Property ---
 
-        public int ElectionStatusId { get; private set; } 
+        public int ElectionStatusId { get; private set; }
         public ElectionStatus ElectionStatus { get; private set; }
 
-        
         private Election()
         {
             ElectionStatus = null!;
         }
 
-
-       
         // --- Factory Method ---
 
         /// <summary>
@@ -46,7 +41,7 @@ namespace NeoVoting.Domain.Entities
         public static Election Create(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
         {
             // --- Centralized Validation Logic ---
-            Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate,isCreating:true);
+            Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate, isCreating: true);
 
             var election = new Election
             {
@@ -114,7 +109,6 @@ namespace NeoVoting.Domain.Entities
 
             SetNumberOfRegisteredVoters(count);
             ElectionStatusId = (int)ElectionStatusEnum.Completed;
-            
         }
 
         //Calculated just after completing the election
@@ -130,7 +124,6 @@ namespace NeoVoting.Domain.Entities
             {
                 throw new InvalidOperationException("Cannot update registered voter count before election is completed.");
             }
-
 
             FinalNumberOfRegisteredVoters = count;
         }

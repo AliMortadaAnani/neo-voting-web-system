@@ -4,8 +4,6 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-
-
     public class ElectionStatusConfiguration : IEntityTypeConfiguration<ElectionStatus>
     {
         public void Configure(EntityTypeBuilder<ElectionStatus> builder)
@@ -26,5 +24,4 @@ namespace NeoVoting.Infrastructure.DbContext
             );
         }
     }
-
 }

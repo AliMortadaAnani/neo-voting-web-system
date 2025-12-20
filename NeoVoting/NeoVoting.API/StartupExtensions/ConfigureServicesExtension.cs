@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,6 @@ using NeoVoting.Domain.IdentityEntities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 using NeoVoting.Infrastructure.Repositories;
-using System.Reflection;
 using System.Text;
 
 namespace NeoVoting.API.StartupExtensions
@@ -28,9 +26,6 @@ namespace NeoVoting.API.StartupExtensions
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
-            
-
-
 
             // =========================================================================
             // SWAGGER CONFIGURATION START
@@ -105,7 +100,6 @@ namespace NeoVoting.API.StartupExtensions
 
                 .AddDefaultTokenProviders()
 
-
                 ;
 
             // The two lines below are unnecessary. The `.AddEntityFrameworkStores<TContext>()`
@@ -120,8 +114,6 @@ namespace NeoVoting.API.StartupExtensions
                ;
             */
 
-
-
             // Get the connection string from appsettings.json
             var connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException
@@ -131,7 +123,6 @@ namespace NeoVoting.API.StartupExtensions
             {
                 options.UseSqlServer(connectionString);
             });
-
 
             // --- REGISTER THE UNIT OF WORK ---
             // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
@@ -149,7 +140,6 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
-          
 
             //  services.AddValidatorsFromAssembly(Assembly.Load("NeoVoting.Application.Validators"));
 
@@ -218,7 +208,6 @@ namespace NeoVoting.API.StartupExtensions
                     }
                 };
             });
-
 
             return services;
         }

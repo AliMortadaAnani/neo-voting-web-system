@@ -9,22 +9,20 @@ namespace NeoVoting.Domain.IdentityEntities
     {
         // For JWT Refresh Tokens
         public string? RefreshToken { get; private set; }
+
         public DateTime? RefreshTokenExpirationDateTime { get; private set; }
 
         // For personal details (nullable to support admin accounts)
-        // these properties will be populated only for Voter and Candidate accounts 
+        // these properties will be populated only for Voter and Candidate accounts
         // and only from the GovernmentSystem during registration.
         public string? FirstName { get; private set; }
-        public string? LastName { get;  private set; }
+
+        public string? LastName { get; private set; }
         public DateTime? DateOfBirth { get; private set; }
         public char? Gender { get; private set; }
         public int? GovernorateID { get; private set; }
 
         public Governorate? Governorate { get; private set; } // Navigation property
-
-
-        
-
 
         // --- Constructor ---
 
@@ -33,8 +31,8 @@ namespace NeoVoting.Domain.IdentityEntities
         /// This forces all object creation to go through the controlled factory methods.
         /// Entity Framework Core is smart enough to use this for materializing objects from the DB.
         /// </summary>
-        private ApplicationUser() { }
-
+        private ApplicationUser()
+        { }
 
         // --- Factory Methods ---
 
@@ -53,11 +51,9 @@ namespace NeoVoting.Domain.IdentityEntities
 
             var adminUser = new ApplicationUser
             {
-
                 // The Id is generated here, making the object complete.
                 Id = Guid.NewGuid(),
                 UserName = userName,
-                                  
             };
 
             return adminUser;
@@ -173,7 +169,7 @@ namespace NeoVoting.Domain.IdentityEntities
                 errors.AppendLine("Refresh token cannot be null or empty.");
             }
 
-            // Ensure the expiry is in the future. 
+            // Ensure the expiry is in the future.
             // Depending on your logic, you might want a buffer (e.g., > 1 minute from now),
             // but strict > UtcNow is the baseline requirement.
             if (expiryDateTime <= DateTime.UtcNow)
@@ -186,7 +182,5 @@ namespace NeoVoting.Domain.IdentityEntities
                 throw new ArgumentException(errors.ToString());
             }
         }
-
-
     }
 }

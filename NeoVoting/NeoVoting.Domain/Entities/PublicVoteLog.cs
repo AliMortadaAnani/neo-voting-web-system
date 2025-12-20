@@ -9,7 +9,6 @@ namespace NeoVoting.Domain.Entities
     /// </summary>
     public class PublicVoteLog
     {
-       
         public long Id { get; private set; }
         public DateTime TimestampUTC { get; private set; }
 
@@ -17,14 +16,11 @@ namespace NeoVoting.Domain.Entities
 
         // --- Foreign Keys & Navigation Properties ---
 
-       
-
         public Guid ElectionId { get; private set; }
         public Election Election { get; private set; }
 
         public int GovernorateId { get; private set; }
         public Governorate Governorate { get; private set; }
-
 
         // 1. Keep the ID Required (Guid, not Guid?)
         // This ensures the Database Column is NOT NULL.
@@ -42,7 +38,6 @@ namespace NeoVoting.Domain.Entities
             Governorate = null!;
         }
 
-
         // --- Factory Method ---
 
         /// <summary>
@@ -53,7 +48,7 @@ namespace NeoVoting.Domain.Entities
         /// <param name="governorateId">The ID of the governorate where the vote was cast.</param>
         /// <returns>A new, valid PublicVoteLog object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static PublicVoteLog Create(Guid voteId, Guid electionId, int governorateId,string? errorMessage)
+        public static PublicVoteLog Create(Guid voteId, Guid electionId, int governorateId, string? errorMessage)
         {
             Validate(voteId, electionId);
 

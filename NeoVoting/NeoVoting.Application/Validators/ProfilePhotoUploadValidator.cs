@@ -29,7 +29,6 @@ namespace NeoVoting.Application.DTOs.Validators
             RuleFor(x => x.FileName)
                 .Must(x => new[] { ".jpg", ".jpeg", ".png", ".gif" }.Contains(Path.GetExtension(x).ToLower()))
                 .WithMessage("Invalid file extension. Only JPG, PNG, and GIF are allowed.");
-
         }
     }
 }

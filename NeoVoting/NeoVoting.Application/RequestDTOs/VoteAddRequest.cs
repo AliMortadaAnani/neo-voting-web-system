@@ -12,8 +12,6 @@ namespace NeoVoting.Application.RequestDTOs
         public int VoterAge { get; set; }
         public char VoterGender { get; set; }
 
-
-
         /// <summary>
         /// Maps the core vote data to a new Vote domain entity.
         /// Note: The choices are handled separately by the service.

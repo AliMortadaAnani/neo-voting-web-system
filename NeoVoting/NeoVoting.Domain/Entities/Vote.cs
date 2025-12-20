@@ -25,18 +25,17 @@ namespace NeoVoting.Domain.Entities
         public int GovernorateId { get; private set; }
         public Governorate Governorate { get; private set; }
 
-
         // --- Soft Delete Implementation ---
         public bool IsDeleted { get; set; }
+
         public DateTimeOffset? DeletedAt { get; set; }
+
         private Vote()
         {
             Election = null!;
             Governorate = null!;
         }
 
-
-      
         // --- Factory Method ---
 
         /// <summary>

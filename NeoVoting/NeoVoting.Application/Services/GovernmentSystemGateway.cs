@@ -3,13 +3,8 @@ using Microsoft.Extensions.Logging;
 using NeoVoting.Application.NeoVotingDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.ErrorHandling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json; // Required for PostAsJsonAsync / PutAsJsonAsync
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Services
 {
@@ -34,7 +29,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsRegisteredAsync(NeoVoting_VoterIsRegisteredRequestDTO request, CancellationToken ct)
         {
-            // Registration is typically a POST (creation) or PUT (update). 
+            // Registration is typically a POST (creation) or PUT (update).
             // Currently set to POST based on your previous code, but easily changeable now:
             return await SendVoterRequestAsync(HttpMethod.Put, "api/external/voters/registered-in-neovoting", request, ct);
         }

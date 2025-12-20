@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using System.Security.Claims;
+
 namespace NeoVoting.API.Controllers
 {
     [Route("api/[controller]")]
-   // [AllowAnonymous]
     public class AuthController : ApiController
     {
         private readonly IAuthServices _authService;
+
         public AuthController(IAuthServices authService)
         {
             _authService = authService;
@@ -24,6 +25,7 @@ namespace NeoVoting.API.Controllers
             var result = await _authService.RegisterVoterAsync(request);
             return HandleResult(result);
         }
+
         [HttpPost("login")]
         [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -43,11 +45,12 @@ namespace NeoVoting.API.Controllers
         {
             var claimsUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-                          var dto = new LogoutDTO { Id = Guid.Parse(claimsUserId) }; // not client-supplied
-            
+            var dto = new LogoutDTO { Id = Guid.Parse(claimsUserId) }; // not client-supplied
+
             var result = await _authService.LogoutAsync(dto);
             return HandleResult(result);
         }
+
         [HttpPost("refresh")]
         [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -57,6 +60,5 @@ namespace NeoVoting.API.Controllers
             var result = await _authService.RefreshTokenAsync(request);
             return HandleResult(result);
         }
-
     }
 }

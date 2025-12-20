@@ -16,6 +16,7 @@ namespace NeoVoting.Infrastructure.DbContext
 
         // Domain Tables
         public DbSet<Election> Elections { get; set; }
+
         public DbSet<ElectionStatus> ElectionStatuses { get; set; }
         public DbSet<Governorate> Governorates { get; set; }
         public DbSet<CandidateProfile> CandidateProfiles { get; set; }
@@ -33,7 +34,7 @@ namespace NeoVoting.Infrastructure.DbContext
             // ---------------------------------------------------------
             // 1. GLOBAL QUERY FILTER (Soft Delete)
             // ---------------------------------------------------------
-            // Automatically appends "WHERE IsDeleted = false" to all queries 
+            // Automatically appends "WHERE IsDeleted = false" to all queries
             // for entities that implement ISoftDeletable.
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {

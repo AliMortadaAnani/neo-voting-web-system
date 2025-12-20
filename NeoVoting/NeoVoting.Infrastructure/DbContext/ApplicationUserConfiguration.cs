@@ -30,8 +30,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 .HasMaxLength(1)
                 .IsUnicode(false);
 
-
-
             //we wont add check constraint for date of birth here because it may cause issues with users who are creating accounts on their birthday. (dynamic not static)
 
             // Configure the RefreshToken property.
@@ -42,7 +40,6 @@ namespace NeoVoting.Infrastructure.DbContext
 
             builder.HasIndex(u => u.RefreshToken)
                 .IsUnique(); // A refresh token must be unique to a single user at any given time.
-
 
             // --- Configure Custom Relationships ---
 
@@ -55,11 +52,8 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired(false) // This makes the foreign key optional (nullable), matching the int? property.
                 .OnDelete(DeleteBehavior.Restrict); // Important! Prevents deleting a governorate if users are assigned to it.
 
-
-          
             builder.ToTable(tb =>
             tb.HasCheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F') OR [Gender] IS NULL"));
-
         }
     }
 }

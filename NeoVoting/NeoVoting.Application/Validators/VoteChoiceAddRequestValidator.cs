@@ -11,7 +11,6 @@ namespace NeoVoting.Application.RequestDTOs.Validators
 
             RuleFor(x => x.CandidateProfileId)
                 .NotEmpty().WithMessage("A candidate profile must be selected.");
-
         }
     }
 }

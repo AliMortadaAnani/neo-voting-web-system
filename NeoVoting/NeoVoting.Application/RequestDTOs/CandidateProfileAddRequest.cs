@@ -13,7 +13,6 @@ namespace NeoVoting.Application.RequestDTOs
         public string Goals { get; set; } = string.Empty;
         public string NominationReasons { get; set; } = string.Empty;
 
-
         //
 
         /// <summary>
@@ -28,4 +27,3 @@ namespace NeoVoting.Application.RequestDTOs
         }
     }
 }
-

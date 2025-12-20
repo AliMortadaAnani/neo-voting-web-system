@@ -4,7 +4,6 @@ using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-
     public class PublicVoteLogConfiguration : IEntityTypeConfiguration<PublicVoteLog>
     {
         public void Configure(EntityTypeBuilder<PublicVoteLog> builder)
@@ -35,11 +34,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
-
             builder.HasIndex(pv => new { pv.ElectionId, pv.VoteId }).IsUnique();
-
         }
     }
-
 }

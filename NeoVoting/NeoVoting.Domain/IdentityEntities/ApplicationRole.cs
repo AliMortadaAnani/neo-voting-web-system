@@ -18,7 +18,6 @@ namespace NeoVoting.Domain.IdentityEntities
         /// </summary>
         private ApplicationRole(string roleName) : base(roleName) { }
 
-
         // --- Factory Methods ---
 
         /// <summary>
@@ -70,9 +69,5 @@ namespace NeoVoting.Domain.IdentityEntities
 
             return candidateRole;
         }
-
-        
-
-
     }
 }

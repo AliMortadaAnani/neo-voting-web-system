@@ -1,11 +1,4 @@
-﻿using NeoVoting.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeoVoting.Application.NeoVotingDTOs
+﻿namespace NeoVoting.Application.NeoVotingDTOs
 {
     public class NeoVoting_VoterResponseDTO
     {
@@ -18,6 +11,5 @@ namespace NeoVoting.Application.NeoVotingDTOs
         public bool ValidToken { get; set; } // Boolean status only
         public bool IsRegistered { get; set; }
         public bool Voted { get; set; }
-
     }
 }

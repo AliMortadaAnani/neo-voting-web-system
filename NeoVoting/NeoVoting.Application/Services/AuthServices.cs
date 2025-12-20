@@ -1,10 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NeoVoting.Application.AuthDTOs;
@@ -16,16 +10,7 @@ using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.IdentityEntities;
 using NeoVoting.Domain.RepositoryContracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http.Json;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Services
 {
@@ -39,7 +24,8 @@ namespace NeoVoting.Application.Services
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly ISystemAuditLogRepository _systemAuditLogRepository;
         private readonly IUnitOfWork _unitOfWork;
-        public AuthServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ITokenServices tokenServices, IConfiguration configuration, IHttpClientFactory httpClientFactory,ILogger<AuthServices> logger, RoleManager<ApplicationRole> roleManager,ISystemAuditLogRepository systemAuditLogRepository,IUnitOfWork unitOfWork,IGovernmentSystemGateway governmentSystemGateway)
+
+        public AuthServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ITokenServices tokenServices, IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<AuthServices> logger, RoleManager<ApplicationRole> roleManager, ISystemAuditLogRepository systemAuditLogRepository, IUnitOfWork unitOfWork, IGovernmentSystemGateway governmentSystemGateway)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -91,7 +77,7 @@ namespace NeoVoting.Application.Services
 
         // CHANGED: We need the userId (or Principal) to know WHO to logout.
         // We cannot rely on SignOutAsync because that only kills Cookies.
-        public async Task<Result<bool>> LogoutAsync(LogoutDTO logoutDTO ,CancellationToken cancellationToken = default)
+        public async Task<Result<bool>> LogoutAsync(LogoutDTO logoutDTO, CancellationToken cancellationToken = default)
         {
             /*//in Controller we will pass the user id in logoutDTO
             // Read the user id from JWT claims
@@ -157,12 +143,11 @@ namespace NeoVoting.Application.Services
 
             return Result<bool>.Success(true);
         }
-      
 
         public async Task<Result<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO, CancellationToken cancellationToken = default)
         {
             // 1.Extract claims from the EXPIRED access token
-         var principal = _tokenServices.GetPrincipalFromExpiredToken(refreshTokenRequestDTO.AccessToken);
+            var principal = _tokenServices.GetPrincipalFromExpiredToken(refreshTokenRequestDTO.AccessToken);
 
             if (principal == null) return Result<AuthenticationResponse>.Failure(Error.Validation("Token.NotValid", "Invalid token, please login")); // Invalid token format
 
@@ -177,8 +162,6 @@ namespace NeoVoting.Application.Services
 
             // 3. Generate NEW tokens
             var newAuthResponse = await _tokenServices.CreateTokensAsync(user);
-
-            
 
             // 4. Update the DB with the NEW refresh token (Rotate them for security)
             user.UpdateRefreshToken(newAuthResponse.RefreshToken, newAuthResponse.RefreshTokenExpiration);
@@ -221,11 +204,9 @@ namespace NeoVoting.Application.Services
             // 3. Ensure "Voter" Role Exists
             if (await _roleManager.FindByNameAsync(RoleTypesEnum.Voter.ToString()) is null)
             {
-
                 ApplicationRole voterRole;
-                try 
+                try
                 {
-
                     voterRole = ApplicationRole.CreateVoterRole();
                 }
                 catch (Exception ex)
@@ -234,7 +215,6 @@ namespace NeoVoting.Application.Services
                         Error.Validation("Role.CreationFailed", $"Failed to create voter role instance: {ex.Message}"));
                 }
 
-
                 var roleResult = await _roleManager.CreateAsync(voterRole);
                 if (!roleResult.Succeeded)
                 {
@@ -242,7 +222,6 @@ namespace NeoVoting.Application.Services
                         Error.Validation("Role.CreateFailed", roleResult.Errors.First().Description));
                 }
             }
-
 
             // -----------------------------------------------------------------------
             // PHASE 2: GET THE TRUTH (The Gateway Call)
@@ -266,7 +245,6 @@ namespace NeoVoting.Application.Services
 
             var govData = verifyResult.Value; // This contains Name, DOB, Eligibility, etc.
 
-
             // -----------------------------------------------------------------------
             // PHASE 3: APPLY BUSINESS RULES
             // -----------------------------------------------------------------------
@@ -288,26 +266,23 @@ namespace NeoVoting.Application.Services
                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(
                     Error.Failure("Voter.HasVoted", "Voter has already cast a vote."));
 
-
             // -----------------------------------------------------------------------
             // PHASE 4: LOCAL COMMIT (Create the Account)
             // -----------------------------------------------------------------------
             // We instantiate the user using data from 'govData' (Verified), NOT 'dto' (User input).
             // This prevents a user from registering as "Batman" when their ID says "Bruce Wayne".
 
-            
-
             ApplicationUser newUser;
             try
             {
-                 newUser = ApplicationUser.CreateVoterOrCandidateAccount(
-                dto.UserName!,
-                govData.FirstName,
-                govData.LastName,
-                govData.DateOfBirth.ToDateTime(TimeOnly.MinValue), // DateOnly -> DateTime
-                govData.Gender,
-                (int)govData.GovernorateId
-            );
+                newUser = ApplicationUser.CreateVoterOrCandidateAccount(
+               dto.UserName!,
+               govData.FirstName,
+               govData.LastName,
+               govData.DateOfBirth.ToDateTime(TimeOnly.MinValue), // DateOnly -> DateTime
+               govData.Gender,
+               (int)govData.GovernorateId
+           );
             }
             catch (ArgumentException ex)
             {
@@ -332,8 +307,6 @@ namespace NeoVoting.Application.Services
                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.RoleFailed", "Failed to assign voter role."));
             }
 
-
-
             // -----------------------------------------------------------------------
             // PHASE 5: DISTRIBUTED COMMIT (The Sync)
             // -----------------------------------------------------------------------
@@ -346,7 +319,6 @@ namespace NeoVoting.Application.Services
             };
 
             var confirmResult = await _govGateway.MarkVoterAsRegisteredAsync(confirmRequest, ct);
-
 
             // -----------------------------------------------------------------------
             // PHASE 6: THE COMPENSATING TRANSACTION (The Rollback)
@@ -376,7 +348,6 @@ namespace NeoVoting.Application.Services
                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(errorToReturn);
             }
 
-
             // -----------------------------------------------------------------------
             // PHASE 7: SUCCESS & AUDIT
             // -----------------------------------------------------------------------
@@ -384,7 +355,6 @@ namespace NeoVoting.Application.Services
             // 1. User is in Identity DB.
             // 2. User is marked Registered in Gov DB.
             // Everything is consistent.
-            
 
             var log = SystemAuditLog.Create(
                 newUser.Id,
@@ -416,7 +386,7 @@ namespace NeoVoting.Application.Services
             return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(newUser, RoleTypesEnum.Voter.ToString()));
         }
 
-         //--- Helper Method ---
+        //--- Helper Method ---
         private static Registration_ResetPassword_ResponseDTO MapToResponseDTO(ApplicationUser user, string role)
         {
             return new Registration_ResetPassword_ResponseDTO
@@ -447,10 +417,8 @@ namespace NeoVoting.Application.Services
             throw new NotImplementedException();
         }
 
-
         /*public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterAsync(RegisterVoterDTO voterRegistrationDTO, CancellationToken cancellationToken = default)
         {
-
             // 1. Validate Passwords Match
             if (voterRegistrationDTO.NewPassword != voterRegistrationDTO.ConfirmPassword)
             {
@@ -464,15 +432,12 @@ namespace NeoVoting.Application.Services
                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Conflict("User.Exists", "This username is already taken."));
             }
 
-
             // 3. Ensure "Voter" Role Exists
             if (await _roleManager.FindByNameAsync(RoleTypesEnum.Voter.ToString()) is null)
             {
                 var voterRole = ApplicationRole.CreateVoterRole();
                 await _roleManager.CreateAsync(voterRole);
             }
-
-
 
             var verifyVoterClient = _httpClientFactory.CreateClient();
 
@@ -560,7 +525,6 @@ namespace NeoVoting.Application.Services
                             Error.Failure("Voter.AlreadyVoted", "Voter has already voted and cannot register with new NeoVoting voter account.(Unexpected Behaviour)"));
                     }
 
-
                     var registeredVoter = ApplicationUser.CreateVoterOrCandidateAccount(
                             voterRegistrationDTO.UserName!,
                             verifyVoterResponse.FirstName,
@@ -579,7 +543,6 @@ namespace NeoVoting.Application.Services
 
                     if (createVoterAccountResult.Succeeded)
                     {
-
                         // 6. Assign "Voter" Role
                         var assignVoterRoleResult = await _userManager.AddToRoleAsync(registeredVoter, RoleTypesEnum.Voter.ToString());
 
@@ -589,13 +552,6 @@ namespace NeoVoting.Application.Services
                             await _userManager.DeleteAsync(registeredVoter);
                             return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.RoleFailed", "Failed to assign voter role."));
                         }
-
-
-
-
-
-
-
 
                         var registerVoterClient = _httpClientFactory.CreateClient();
 
@@ -654,9 +610,6 @@ namespace NeoVoting.Application.Services
                                 return Result<Registration_ResetPassword_ResponseDTO>.Failure(
                                     Error.Failure("Error.GovernmentSystem", "GovernmentSystem did not register the voter."));
                             }
-
-
-
                         }
                         else
                         {
@@ -664,9 +617,6 @@ namespace NeoVoting.Application.Services
                                 registerVoterResponseStatusCode, Truncate(registerVoterResponseContent));
                             // Depending on requirements, you might want to rollback user creation here
                         }
-
-
-
 
                         var registerVoterLog = SystemAuditLog.Create(
                             registeredVoter.Id,
@@ -793,10 +743,10 @@ namespace NeoVoting.Application.Services
         //                return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Validation("User.Mismatch", "National ID does not match the username provided."));
         //            }
 
-        //            /* 
+        //            /*
         //             * NOTE ON VOTING TOKEN:
         //             * The DTO contains 'VotingToken', but there is no 'Voters' table to verify it against,
-        //             * and 'ApplicationUser' does not store it. 
+        //             * and 'ApplicationUser' does not store it.
         //             * Therefore, we cannot perform a token validation here in this isolated Identity context.
         //             * We proceed assuming the caller has been verified by other means or if we ignore the token.
         //             */
@@ -831,9 +781,6 @@ namespace NeoVoting.Application.Services
         //            // 6. Return Response
         //            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Voter.ToString()));
         //        }
-
-
-
 
         //public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterCandidateAsync(RegisterCandidateDTO registrationDTO, CancellationToken cancellationToken = default)
         //        {
@@ -970,7 +917,5 @@ namespace NeoVoting.Application.Services
 
         //            return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(user, RoleTypesEnum.Candidate.ToString()));
         //        }
-
-
     }
 }
