@@ -25,6 +25,7 @@ namespace NeoVoting.API.StartupExtensions
         public static IServiceCollection ConfigureServices(this IServiceCollection services,
             IConfiguration configuration, ConfigureHostBuilder configureHostBuilder)
         {
+            services.AddHttpContextAccessor();
 
             //CONNECTION STRING SETUP
             var connectionString = configuration.GetConnectionString("DefaultConnection")
@@ -244,7 +245,7 @@ namespace NeoVoting.API.StartupExtensions
 
             // --- REGISTER SERVICES --- 
 
-
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IAuthServices, AuthServices>();
             services.AddScoped<ITokenServices, TokenServices>();
 
