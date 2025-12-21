@@ -35,7 +35,7 @@ if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnore
 // =================================================================
 // CLI admin seeding logic
 // =================================================================
-if (args.Length > 0 && args[0].ToLower() == "seedAdmin") // we run dotnet with command line argument "seed" => dotnet run seed "YourStrongPassword!"
+if (args.Length > 0 && args[0].ToLower() == "seedadmin") // we run dotnet with command line argument "seedadmin" => dotnet run seed "YourStrongPassword!"
 {
     // Check if Password argument is provided
     if (args.Length < 2) //args[0] = seed and args[1] = password

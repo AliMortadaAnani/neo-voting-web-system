@@ -5,7 +5,7 @@ namespace NeoVoting.Domain.Entities
     public class Governorate
     {
         public int Id { get; private set; }
-        public string Name { get; init; }
+        public required string Name { get; init; }
         //we will use init to make it immutable after creation
 
         private Governorate()

@@ -5,7 +5,7 @@ namespace NeoVoting.Domain.Entities
     public class ElectionStatus
     {
         public int Id { get; private set; }
-        public string Name { get; init; }
+        public required string Name { get; init; }
 
         private ElectionStatus()
         { }

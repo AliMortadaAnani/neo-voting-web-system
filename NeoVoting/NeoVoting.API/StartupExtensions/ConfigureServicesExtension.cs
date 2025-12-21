@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NeoVoting.Application.Exceptions;
 using NeoVoting.Application.Services;
 using NeoVoting.Application.ServicesContracts;
+using NeoVoting.Application.Validators;
 using NeoVoting.Domain.Contracts;
 using NeoVoting.Domain.IdentityEntities;
 using NeoVoting.Domain.RepositoryContracts;
@@ -20,87 +25,38 @@ namespace NeoVoting.API.StartupExtensions
         public static IServiceCollection ConfigureServices(this IServiceCollection services,
             IConfiguration configuration, ConfigureHostBuilder configureHostBuilder)
         {
-            // Add services to the container.
 
-            services.AddControllers();
+            //CONNECTION STRING SETUP
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException
+                ("Connection string 'DefaultConnection' not found.");
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            services.AddEndpointsApiExplorer();
-
-            // =========================================================================
-            // SWAGGER CONFIGURATION START
-            // =========================================================================
-            services.AddSwaggerGen(options =>
+            services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "NeoVoting API",
-                    Version = "v1",
-                    Description = "API for the NeoVoting System"
-                });
-
-                // 1. Define the Security Scheme (The "Padlock" definition)
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Description = "Enter the JWT token directly. \r\n\r\nExample: `eyJhbGciOiJIUzI1Ni...`",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http, // Use Http for standard Bearer auth
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT"
-                });
-
-                // 2. Define the Security Requirement (Apply the lock to endpoints)
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer" // Must match the name defined above
-                }
-            },
-            Array.Empty<string>() // Scopes (leave empty for standard JWT)
-        }
-    });
-            });
-            // =========================================================================
-            // SWAGGER CONFIGURATION END
-            // =========================================================================
-
-            services.AddHttpClient<IGovernmentSystemGateway, GovernmentSystemGateway>(client =>
-            {
-                var baseUrl = configuration["GovernmentSystem:BaseUrl"]
-                              ?? throw new Exception("GovernmentSystem:BaseUrl is missing");
-
-                client.BaseAddress = new Uri(baseUrl);
-
-                var apiKey = configuration["GovernmentSystem:ApiKey"]
-                             ?? throw new Exception("GovernmentSystem:ApiKey is missing");
-
-                client.DefaultRequestHeaders.Add("X-Gov-Api-Key", apiKey);
+                options.UseSqlServer(connectionString);
             });
 
+
+
+            //IDENTITY SETUP
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false; // Set to false if you want to allow only letters and digits
-                options.Password.RequiredLength = 6;
+                options.Password.RequiredLength = 3;
                 options.Password.RequiredUniqueChars = 1; // You can increase for stricter policy
                 options.Lockout.AllowedForNewUsers = true;
                 options.Lockout.MaxFailedAccessAttempts = 5;        // ← how many times
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // lock duration
             })
 
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+               .AddEntityFrameworkStores<ApplicationDbContext>()
 
-                .AddDefaultTokenProviders()
+               .AddDefaultTokenProviders()
 
-                ;
+               ;
 
             // The two lines below are unnecessary. The `.AddEntityFrameworkStores<TContext>()`
             // call you made above ALREADY registers these for you.
@@ -114,39 +70,9 @@ namespace NeoVoting.API.StartupExtensions
                ;
             */
 
-            // Get the connection string from appsettings.json
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException
-                ("Connection string 'DefaultConnection' not found.");
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(connectionString);
-            });
-
-            // --- REGISTER THE UNIT OF WORK ---
-            // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
-            // (and therefore ApplicationDbContext) is created for each HTTP request. This is the standard.
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            // --- REGISTER REPOSITORIES ---
-
-            services.AddScoped<ICandidateProfileRepository, CandidateProfileRepository>();
-            services.AddScoped<IElectionRepository, ElectionRepository>();
-            services.AddScoped<IElectionStatusRepository, ElectionStatusRepository>();
-            services.AddScoped<IElectionWinnerRepository, ElectionWinnerRepository>();
-            services.AddScoped<IGovernorateRepository, GovernorateRepository>();
-            services.AddScoped<IPublicVoteLogRepository, PublicVoteLogRepository>();
-            services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
-            services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
-            services.AddScoped<IVoteRepository, VoteRepository>();
-
-            //  services.AddValidatorsFromAssembly(Assembly.Load("NeoVoting.Application.Validators"));
-
-            services.AddScoped<IAuthServices, AuthServices>();
-            services.AddScoped<ITokenServices, TokenServices>();
-
-            // 2. Configure Authentication
+            //JWT AUTHENTICATION SETUP
+            //Configure Authentication
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -208,6 +134,126 @@ namespace NeoVoting.API.StartupExtensions
                     }
                 };
             });
+
+            //CORS SETUP
+            //(Crucial if your frontend is on a different port, e.g., React/Angular)
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("FrontendPolicy", policy =>
+            //    {
+            //        policy.WithOrigins("http://localhost:3000") // Your Frontend URL
+            //              .AllowAnyMethod()
+            //              .AllowAnyHeader()
+            //              .AllowCredentials(); // <--- REQUIRED for Cookies to be sent/received
+            //    });
+            //});
+
+
+
+
+            //WEB API SERVICES SETUP
+            services.AddControllers();
+            services.AddEndpointsApiExplorer();
+
+            // Register your Custom Handler
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+
+            services.AddProblemDetails(); // Required for .NET 8 Exception Handler to work
+
+
+            // =========================================================================
+            // SWAGGER CONFIGURATION START
+            // =========================================================================
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "NeoVoting API",
+                    Version = "v1",
+                    Description = "API for the NeoVoting System"
+                });
+
+                // 1. Define the Security Scheme (The "Padlock" definition)
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Description = "Enter the JWT token directly. \r\n\r\nExample: `eyJhbGciOiJIUzI1Ni...`",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http, // Use Http for standard Bearer auth
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT"
+                });
+
+                // 2. Define the Security Requirement (Apply the lock to endpoints)
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer" // Must match the name defined above
+                }
+            },
+            Array.Empty<string>() // Scopes (leave empty for standard JWT)
+        }
+    });
+            });
+            // =========================================================================
+            // SWAGGER CONFIGURATION END
+            // =========================================================================
+
+
+
+            //HTTP CLIENT SETUP FOR EXTERNAL GOVERNMENT SYSTEM API
+
+            services.AddHttpClient<IGovernmentSystemGateway, GovernmentSystemGateway>(client =>
+            {
+                var baseUrl = configuration["GovernmentSystem:BaseUrl"]
+                              ?? throw new Exception("GovernmentSystem:BaseUrl is missing");
+
+                client.BaseAddress = new Uri(baseUrl);
+
+                var apiKey = configuration["GovernmentSystem:ApiKey"]
+                             ?? throw new Exception("GovernmentSystem:ApiKey is missing");
+
+                client.DefaultRequestHeaders.Add("X-Gov-Api-Key", apiKey);
+            });
+
+           
+            
+
+            // --- REGISTER THE UNIT OF WORK ---
+            // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
+            // (and therefore ApplicationDbContext) is created for each HTTP request. This is the standard.
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // --- REGISTER REPOSITORIES ---
+
+            services.AddScoped<ICandidateProfileRepository, CandidateProfileRepository>();
+            services.AddScoped<IElectionRepository, ElectionRepository>();
+            services.AddScoped<IElectionStatusRepository, ElectionStatusRepository>();
+            services.AddScoped<IElectionWinnerRepository, ElectionWinnerRepository>();
+            services.AddScoped<IGovernorateRepository, GovernorateRepository>();
+            services.AddScoped<IPublicVoteLogRepository, PublicVoteLogRepository>();
+            services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
+            services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
+            services.AddScoped<IVoteRepository, VoteRepository>();
+
+
+            // --- REGISTER SERVICES --- 
+
+
+            services.AddScoped<IAuthServices, AuthServices>();
+            services.AddScoped<ITokenServices, TokenServices>();
+
+
+            //FLUENT VALIDATION SETUP
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<CandidateProfileAddRequestValidator>();
+            services.AddFluentValidationRulesToSwagger();
+
 
             return services;
         }
