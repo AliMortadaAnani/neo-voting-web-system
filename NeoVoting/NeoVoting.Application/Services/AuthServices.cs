@@ -146,13 +146,28 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO, CancellationToken cancellationToken = default)
         {
-            // 1.Extract claims from the EXPIRED access token
-            var principal = _tokenServices.GetPrincipalFromExpiredToken(refreshTokenRequestDTO.AccessToken);
+            // 1. Validate the old Access Token
+            var principalResult = _tokenServices.GetPrincipalFromExpiredToken(refreshTokenRequestDTO.AccessToken);
 
-            if (principal == null) return Result<AuthenticationResponse>.Failure(Error.Validation("Token.NotValid", "Invalid token, please login")); // Invalid token format
+            // 2. CHECK FAILURE (Clean check, no try/catch needed)
+            if (principalResult.IsFailure)
+            {
+                // Pass the specific error up (e.g. "Token.Invalid")
+                return Result<AuthenticationResponse>.Failure(principalResult.Error);
+            }
 
-            // 2. Get the User ID from the claims
+            // 3. Extract User ID
+            var principal = principalResult.Value; // Safe access
             var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // SAFETY CHECK
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Result<AuthenticationResponse>.Failure(
+                    Error.Validation("Token.Invalid", "Token is missing user identity."));
+            }
+
+            // 2. Validate the Refresh Token (from DB)
             var user = await _userManager.FindByIdAsync(userId!);
 
             if (user == null || user.RefreshToken != refreshTokenRequestDTO.RefreshToken || user.RefreshTokenExpirationDateTime <= DateTime.UtcNow)

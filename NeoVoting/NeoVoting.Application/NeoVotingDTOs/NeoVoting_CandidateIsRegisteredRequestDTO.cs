@@ -4,5 +4,7 @@ namespace NeoVoting.Application.NeoVotingDTOs
     {
         public Guid? NationalId { get; set; }
         public Guid? NominationToken { get; set; }
+
+        public string? RegisteredUsername { get; set; }
     }
 }

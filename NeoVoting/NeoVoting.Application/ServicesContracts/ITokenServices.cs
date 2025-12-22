@@ -1,4 +1,5 @@
 ﻿using NeoVoting.Application.AuthDTOs;
+using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.IdentityEntities;
 using System.Security.Claims;
 
@@ -18,6 +19,6 @@ namespace NeoVoting.Application.ServicesContracts
         Task<AuthenticationResponse> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default);
 
         // Extracts the user principal (claims) from a token, even if it is expired
-        ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default);
+        Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default);
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
+using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.IdentityEntities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -126,7 +127,7 @@ namespace NeoVoting.Application.Services
         }
 
         // This method extracts claims from an expired JWT token without validating its lifetime.
-        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default)
+        public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -144,21 +145,26 @@ namespace NeoVoting.Application.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             try
             {
+                // This line throws an Exception if the token is garbage, modified, or has wrong key
+
                 var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
                 // Check if the token was actually signed with HmacSha256
                 if (securityToken is not JwtSecurityToken jwtSecurityToken ||
                     !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    throw new SecurityTokenException("Invalid token");
+                    return Result<ClaimsPrincipal>.Failure(
+                Error.Validation("Token.Invalid", "Invalid token security algorithm."));
                 }
 
-                return principal;
+                return Result<ClaimsPrincipal>.Success(principal);
             }
             catch
             {
-                // Return null if token is malformed or invalid
-                return null;
+                // We catch the library exception here and convert it to a Domain Result.
+                // This prevents the Controller from needing try/catch blocks.
+                return Result<ClaimsPrincipal>.Failure(
+                    Error.Validation("Token.Invalid", "Token is invalid or malformed."));
             }
         }
 

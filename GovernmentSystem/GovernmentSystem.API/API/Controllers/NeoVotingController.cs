@@ -35,7 +35,7 @@ namespace GovernmentSystem.API.Controllers
         /// - Requires valid API Key for authorization.
         /// - Requested from allowed IPs only
         /// </remarks>
-        [HttpPost("voters/verify")]
+        [HttpPost("voters/get")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -58,7 +58,7 @@ namespace GovernmentSystem.API.Controllers
         /// - Requires valid API Key for authorization.
         /// - Requested from allowed IPs only
         /// </remarks>
-        [HttpPut("voters/registered-in-neovoting")]
+        [HttpPut("voters/register")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -82,7 +82,7 @@ namespace GovernmentSystem.API.Controllers
         /// - Requires valid API Key for authorization.
         /// - Requested from allowed IPs only
         /// </remarks>
-        [HttpPut("voters/mark-as-voted")]
+        [HttpPut("voters/vote")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -107,7 +107,7 @@ namespace GovernmentSystem.API.Controllers
         /// - Requires valid API Key for authorization.
         /// - Requested from allowed IPs only
         /// </remarks>
-        [HttpPost("candidates/verify")]
+        [HttpPost("candidates/get")]
         [ProducesResponseType(typeof(NeoVoting_CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -130,7 +130,7 @@ namespace GovernmentSystem.API.Controllers
         /// - Requires valid API Key for authorization.
         /// - Requested from allowed IPs only
         /// </remarks>
-        [HttpPut("candidates/registered-in-neovoting")]
+        [HttpPut("candidates/register")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

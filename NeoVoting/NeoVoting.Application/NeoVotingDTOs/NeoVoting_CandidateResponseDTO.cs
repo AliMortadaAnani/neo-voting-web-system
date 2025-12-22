@@ -10,5 +10,6 @@ namespace NeoVoting.Application.NeoVotingDTOs
         public bool EligibleForElection { get; set; }
         public bool ValidToken { get; set; }
         public bool IsRegistered { get; set; }
+        public string? RegisteredUsername { get; set; }
     }
 }
