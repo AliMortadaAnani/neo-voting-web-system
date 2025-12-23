@@ -17,7 +17,6 @@ namespace GovernmentSystem.API.Domain.Entities
         public bool IsRegistered { get; private set; }
         public bool Voted { get; private set; }
 
-
         public string? RegisteredUsername { get; private set; }
 
         //Private Constructor (EF Core requires this or a binding constructor)

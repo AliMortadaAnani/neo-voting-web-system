@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using GovernmentSystem.API.Domain.Shared;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.Application.Exceptions
@@ -30,7 +31,7 @@ namespace GovernmentSystem.API.Application.Exceptions
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "Internal Server Error",
                 Detail = "An unexpected error occurred. Please contact support.",
-                Type = "Server.Error"
+                Type = nameof(ProblemDetails500ErrorTypes.Server_Error)
             };
 
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;

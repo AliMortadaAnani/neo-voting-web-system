@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GovernmentSystem.API.Domain.Shared;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Middlewares
 {
@@ -59,7 +60,7 @@ namespace GovernmentSystem.API.API.Middlewares
                         statusCode: StatusCodes.Status403Forbidden,
                         title: "Access denied",
                         detail: "Your IP is authorized only for External APIs.",
-                        type: "https://httpstatuses.com/403");
+                        type: nameof(ProblemDetails403ErrorTypes.IpWhitelist_RestrictedEndpoint));
 
                     return;
                 }
@@ -72,7 +73,7 @@ namespace GovernmentSystem.API.API.Middlewares
                 statusCode: StatusCodes.Status403Forbidden,
                 title: "Access denied",
                 detail: "IP not whitelisted.",
-                type: "https://httpstatuses.com/403");
+                type: nameof(ProblemDetails403ErrorTypes.IpWhitelist_ForbiddenIP));
         }
 
         private static async Task WriteProblemDetailsAsync(

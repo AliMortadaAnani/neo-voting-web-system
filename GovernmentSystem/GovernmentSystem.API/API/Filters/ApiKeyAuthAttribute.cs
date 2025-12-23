@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GovernmentSystem.API.Domain.Shared;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace GovernmentSystem.API.API.Filters
@@ -18,7 +19,7 @@ namespace GovernmentSystem.API.API.Filters
                     Status = StatusCodes.Status401Unauthorized,
                     Title = "Unauthorized",
                     Detail = "API Key is missing.",
-                    Type = "https://httpstatuses.com/401"
+                    Type = nameof(ProblemDetails401ErrorTypes.Auth_TokenMissing)
                 })
                 {
                     StatusCode = StatusCodes.Status401Unauthorized
@@ -37,7 +38,7 @@ namespace GovernmentSystem.API.API.Filters
                     Status = StatusCodes.Status500InternalServerError,
                     Title = "Server configuration error",
                     Detail = "Server security configuration is invalid (API Key not set).",
-                    Type = "about:blank"
+                    Type = nameof(ProblemDetails500ErrorTypes.Server_ConfigurationError)
                 })
                 {
                     StatusCode = StatusCodes.Status500InternalServerError
@@ -53,7 +54,7 @@ namespace GovernmentSystem.API.API.Filters
                     Status = StatusCodes.Status401Unauthorized,
                     Title = "Unauthorized",
                     Detail = "Invalid API Key.",
-                    Type = "https://httpstatuses.com/401"
+                    Type = nameof(ProblemDetails401ErrorTypes.Auth_InvalidApiKey)
                 })
                 {
                     StatusCode = StatusCodes.Status401Unauthorized

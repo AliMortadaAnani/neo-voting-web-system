@@ -3,6 +3,7 @@ using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
+using GovernmentSystem.API.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.Controllers
@@ -37,9 +38,9 @@ namespace GovernmentSystem.API.Controllers
         /// </remarks>
         [HttpPost("voters/get")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyVoter([FromBody] NeoVoting_GetVoterRequestDTO request)
         {
             var result = await _voterServices.GetVoterForNeoVotingAsync(request);
@@ -60,9 +61,11 @@ namespace GovernmentSystem.API.Controllers
         /// </remarks>
         [HttpPut("voters/register")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Conflict409ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> RegisterVoter([FromBody] NeoVoting_VoterIsRegisteredRequestDTO request)
         {
             var result = await _voterServices.UpdateVoterIsRegisteredToTrueAsync(request);
@@ -84,9 +87,10 @@ namespace GovernmentSystem.API.Controllers
         /// </remarks>
         [HttpPut("voters/vote")]
         [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Conflict409ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateVoteStatus([FromBody] NeoVoting_VoterHasVotedRequestDTO request)
         {
             var result = await _voterServices.UpdateHasVotedToTrueAsync(request);
@@ -109,9 +113,9 @@ namespace GovernmentSystem.API.Controllers
         /// </remarks>
         [HttpPost("candidates/get")]
         [ProducesResponseType(typeof(NeoVoting_CandidateResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyCandidate([FromBody] NeoVoting_GetCandidateRequestDTO request)
         {
             var result = await _candidateServices.GetCandidateForNeoVotingAsync(request);
@@ -131,10 +135,12 @@ namespace GovernmentSystem.API.Controllers
         /// - Requested from allowed IPs only
         /// </remarks>
         [HttpPut("candidates/register")]
-        [ProducesResponseType(typeof(NeoVoting_VoterResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(NeoVoting_CandidateResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Conflict409ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> RegisterCandidate([FromBody] NeoVoting_CandidateIsRegisteredRequestDTO request)
         {
             var result = await _candidateServices.UpdateCandidateIsRegisteredToTrueAsync(request);
@@ -155,7 +161,7 @@ namespace GovernmentSystem.API.Controllers
         /// </remarks>
         [HttpPost("reset-vote-status")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ResetElection()
         {
             var result = await _voterServices.ResetAllVotedAsFalseAsync();

@@ -12,8 +12,17 @@ namespace NeoVoting.Application.ServicesContracts
 
     public interface IGovernmentSystemGateway
     {
-        Task<Result<NeoVoting_VoterResponseDTO>> VerifyVoterAsync(NeoVoting_GetVoterRequestDTO request, CancellationToken ct);
+        Task<Result<NeoVoting_VoterResponseDTO>> GetVoterAsync(NeoVoting_GetVoterRequestDTO request, CancellationToken ct);
 
         Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsRegisteredAsync(NeoVoting_VoterIsRegisteredRequestDTO request, CancellationToken ct);
+
+        Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateAsync(NeoVoting_GetCandidateRequestDTO request, CancellationToken ct);
+
+        Task<Result<NeoVoting_CandidateResponseDTO>> MarkCandidateAsRegisteredAsync(NeoVoting_CandidateIsRegisteredRequestDTO request, CancellationToken ct);
+
+        Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsVotedAsync(NeoVoting_VoterHasVotedRequestDTO request, CancellationToken ct);
+
+
+        Task<Result<bool>> ResetAllVotersVoteStatusAsync(CancellationToken ct);
     }
 }

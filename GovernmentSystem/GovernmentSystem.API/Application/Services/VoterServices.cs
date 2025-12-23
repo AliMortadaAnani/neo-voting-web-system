@@ -27,7 +27,7 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voterAdded == null)
             {
-                return Result<VoterResponseDTO>.Failure(Error.Failure("Voter.AdditionFailed", "Voter could not be added."));
+                return Result<VoterResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Voter_OperationFailed), "Voter could not be added."));
             }
 
             await _unitOfWork.SaveChangesAsync();
@@ -41,7 +41,7 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<bool>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
             }
 
             _voterRepository.Delete(voter);
@@ -57,7 +57,7 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
             }
 
             // Domain logic
@@ -75,7 +75,7 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voters.Count == 0)
             {
-                return Result<List<VoterResponseDTO>>.Failure(Error.NotFound("Voters.Missing", "No voters found."));
+                return Result<List<VoterResponseDTO>>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "No voters found."));
             }
 
             var response = voters.Select(v => v.ToVoterResponse()).ToList();
@@ -88,13 +88,13 @@ namespace GovernmentSystem.API.Application.Services
             if (pageNumber < 1)
             {
                 return Result<List<VoterResponseDTO>>.Failure(
-                    Error.Validation("Paging.Invalid", "PageNumber must be greater than 0."));
+                    Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageNumber must be greater than 0."));
             }
             // 1. VALIDATION (Must be first)
             if (pageSize < 1)
             {
                 return Result<List<VoterResponseDTO>>.Failure(
-                    Error.Validation("Paging.Invalid", "PageSize must be greater than 0."));
+                    Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageSize must be greater than 0."));
             }
 
             // 2. SECURITY: Cap the PageSize
@@ -132,7 +132,7 @@ namespace GovernmentSystem.API.Application.Services
             if (votersFromPagedVoters.Count == 0 && totalCountOfVotersInDB > 0)
             {
                 return Result<List<VoterResponseDTO>>.Failure(
-                    Error.NotFound("Paging.OutOfBounds", "Page number exceeds total pages."));
+                    Error.NotFound(nameof(ProblemDetails404ErrorTypes.Paging_OutOfBounds), "Page number exceeds total pages."));
             }
 
             var response = votersFromPagedVoters.Select(v => v.ToVoterResponse()).ToList();
@@ -145,7 +145,7 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
             }
 
             // Update Entity State
@@ -174,7 +174,7 @@ namespace GovernmentSystem.API.Application.Services
             var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
             if (voter == null)
             {
-                return Result<VoterResponseDTO>.Failure(Error.NotFound("Voter.Missing", "Voter not found."));
+                return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
             }
             var response = voter.ToVoterResponse();
             return Result<VoterResponseDTO>.Success(response);
@@ -187,28 +187,28 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
             if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_NotEligible), "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
             if (voter.VotingToken != request.VotingToken!.Value)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_InvalidToken), "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
             }
             if (!voter.ValidToken)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_InvalidToken), "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
             }
 
             if (voter.IsRegistered)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict("Voter.AlreadyRegistered", "Voter with this nationalId and this voting token was already registered.You cannot register with a new account."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyRegistered), "Voter with this nationalId and this voting token was already registered.You cannot register with a new account."));
             }
             if (string.IsNullOrEmpty(request.RegisteredUsername))
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Validation("Voter.InvalidUsername", "Username cannot be null or empty when registering as voter in NeoVoting."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.Voter_InvalidUsername), "Username cannot be null or empty when registering as voter in NeoVoting."));
             }
             voter.MarkVoterAsRegisteredWithNewRegisteredUsername(request.RegisteredUsername);
             _voterRepository.Update(voter);
@@ -224,29 +224,29 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
             if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_NotEligible), "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
             if (voter.VotingToken != request.VotingToken!.Value)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_InvalidToken), "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
             }
             if (!voter.ValidToken)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_InvalidToken), "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
             }
 
             if (!voter.IsRegistered)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotRegistered", "Voter with this nationalId and this voting token was not registered.You cannot vote without registering an account."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_NotRegistered), "Voter with this nationalId and this voting token was not registered.You cannot vote without registering an account."));
             }
 
             if (voter.Voted)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict("Voter.AlreadyVoted", "Voter with this nationalId and this voting token had already casted a vote in this election.You cannot vote!"));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyVoted), "Voter with this nationalId and this voting token had already casted a vote in this election.You cannot vote!"));
             }
             voter.MarkVoterAsVoted();
             _voterRepository.Update(voter);
@@ -261,19 +261,19 @@ namespace GovernmentSystem.API.Application.Services
             var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
             if (voter == null)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound("Voter.NotFound", "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter with this nationalId was not found.Please enter your nationalId correctly or contact Government System for support."));
             }
             if (!voter.EligibleForElection)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.NotValid", "Voter with this nationalId was not authorized.Please contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_NotEligible), "Voter with this nationalId was not authorized.Please contact Government System for support."));
             }
             if (voter.VotingToken != request.VotingToken!.Value)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_InvalidToken), "Voter with this nationalId and this voting token was not authorized.Please enter your voting token correctly or contact Government System for support."));
             }
             if (!voter.ValidToken)
             {
-                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized("Voter.UnauthorizedToken", "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
+                return Result<NeoVoting_VoterResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_InvalidToken), "Voter with this nationalId and this voting token was not authorized.Please contact Government System for support."));
             }
 
             var response = voter.ToNeoVoting_VoterResponse();

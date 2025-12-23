@@ -86,8 +86,8 @@ namespace GovernmentSystem.API.Domain.Entities
         }
 
         public void MarkCandidateAsRegisteredWithNewRegisteredUsername(string registeredUsername)
-        {   
-            if(string.IsNullOrWhiteSpace(registeredUsername))
+        {
+            if (string.IsNullOrWhiteSpace(registeredUsername))
             {
                 throw new ArgumentException("Registered username must not be null, empty, or whitespace.", nameof(registeredUsername));
             }

@@ -22,7 +22,7 @@ namespace GovernmentSystem.API.Application.Services
             var user = await _userManager.FindByNameAsync(loginDTO.Username!);
             if (user == null)
             {
-                return Result<AuthResponse>.Failure(Error.Unauthorized("Admin.NotValid", "Invalid admin credentials."));
+                return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Invalid admin credentials."));
             }
             // This method creates the Set-Cookie header
             var result = await _signInManager.PasswordSignInAsync(
@@ -42,7 +42,7 @@ namespace GovernmentSystem.API.Application.Services
                 });
             }
 
-            return Result<AuthResponse>.Failure(Error.Unauthorized("Admin.NotValid", "Invalid admin credentials."));
+            return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Invalid admin credentials."));
         }
 
         public async Task<Result<string>> LogoutAsync()

@@ -250,7 +250,7 @@ namespace NeoVoting.Application.Services
             };
 
             // CALL GATEWAY: This handles the HTTP Post, Try/Catch, and JSON Parsing.
-            var verifyResult = await _govGateway.VerifyVoterAsync(verifyRequest, ct);
+            var verifyResult = await _govGateway.GetVoterAsync(verifyRequest, ct);
 
             // If the network failed, or the API returned 404/400/500, we stop here.
             if (verifyResult.IsFailure)

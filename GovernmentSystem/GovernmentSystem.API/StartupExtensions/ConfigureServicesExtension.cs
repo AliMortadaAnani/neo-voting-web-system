@@ -7,6 +7,7 @@ using GovernmentSystem.API.Application.Validators;
 using GovernmentSystem.API.Domain.Contracts;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.RepositoryContracts;
+using GovernmentSystem.API.Domain.Shared;
 using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
@@ -122,7 +123,7 @@ namespace GovernmentSystem.API.StartupExtensions
                             Status = StatusCodes.Status401Unauthorized,
                             Title = "Unauthorized",
                             Detail = "Authentication is required to access this resource.",
-                            Type = "https://httpstatuses.com/401"
+                            Type = nameof(ProblemDetails401ErrorTypes.Auth_UnauthorizedAccess)
                         };
 
                         return context.Response.WriteAsJsonAsync(problem);
@@ -145,7 +146,7 @@ namespace GovernmentSystem.API.StartupExtensions
                             Status = StatusCodes.Status403Forbidden,
                             Title = "Forbidden",
                             Detail = "You do not have permission to access this resource.",
-                            Type = "https://httpstatuses.com/403"
+                            Type = nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess)
                         };
 
                         return context.Response.WriteAsJsonAsync(problem);

@@ -2,6 +2,7 @@
 using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
+using GovernmentSystem.API.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +29,7 @@ namespace GovernmentSystem.API.Controllers
         /// </remarks>
         [HttpGet("all")]
         [ProducesResponseType(typeof(List<CandidateResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
         {
             var result = await _candidateServices.GetAllCandidatesAsync();
@@ -46,6 +47,8 @@ namespace GovernmentSystem.API.Controllers
         /// </remarks>
         [HttpGet("paged")]
         [ProducesResponseType(typeof(List<CandidateResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _candidateServices.GetPaginatedCandidatesAsync(pageNumber, pageSize);
@@ -63,7 +66,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpPost("details")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByNationalId([FromBody] GetCandidateRequestDTO request)
         {
             var result = await _candidateServices.GetByNationalIdAsync(request);
@@ -83,7 +86,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpPost("add")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ServerError500ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Add([FromBody] CreateCandidateRequestDTO request)
         {
             var result = await _candidateServices.AddCandidateAsync(request);
@@ -106,7 +109,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpPut("update")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update([FromBody] UpdateCandidateRequestDTO request)
         {
             var result = await _candidateServices.UpdateByNationalIdAsync(request);
@@ -124,8 +127,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpPost("delete")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromBody] DeleteCandidateRequestDTO request)
         {
             var result = await _candidateServices.DeleteByNationalIdAsync(request);
@@ -145,7 +147,7 @@ namespace GovernmentSystem.API.Controllers
         [HttpPost("generate-token")]
         [ProducesResponseType(typeof(CandidateResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GenerateToken([FromBody] GenerateNewTokenCandidateRequestDTO request)
         {
             var result = await _candidateServices.GenerateNewTokenByNationalIdAsync(request);
