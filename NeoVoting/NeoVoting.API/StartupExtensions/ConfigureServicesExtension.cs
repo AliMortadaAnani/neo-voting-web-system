@@ -241,7 +241,7 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
-
+            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
             // --- REGISTER SERVICES --- 
 

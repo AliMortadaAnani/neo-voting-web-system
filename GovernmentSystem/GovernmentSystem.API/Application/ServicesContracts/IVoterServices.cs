@@ -20,12 +20,6 @@ namespace GovernmentSystem.API.Application.ServicesContracts
 
         Task<Result<VoterResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenVoterRequestDTO request);
 
-        Task<Result<NeoVoting_VoterResponseDTO>> UpdateHasVotedToTrueAsync(NeoVoting_VoterHasVotedRequestDTO request);
-
-        Task<Result<NeoVoting_VoterResponseDTO>> UpdateVoterIsRegisteredToTrueAsync(NeoVoting_VoterIsRegisteredRequestDTO request);
-
-        Task<Result<NeoVoting_VoterResponseDTO>> GetVoterForNeoVotingAsync(NeoVoting_GetVoterRequestDTO request);
-
-        Task<Result<bool>> ResetAllVotedAsFalseAsync();
+        
     }
 }

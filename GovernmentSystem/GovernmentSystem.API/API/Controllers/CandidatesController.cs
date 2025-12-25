@@ -6,18 +6,13 @@ using GovernmentSystem.API.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovernmentSystem.API.Controllers
+namespace GovernmentSystem.API.API.Controllers
 {
     [Route("api/candidates")]
     [Authorize(Roles = "Admin")]
-    public class CandidatesController : ApiController
+    public class CandidatesController(ICandidateServices candidateServices) : ApiController
     {
-        private readonly ICandidateServices _candidateServices;
-
-        public CandidatesController(ICandidateServices candidateServices)
-        {
-            _candidateServices = candidateServices;
-        }
+        private readonly ICandidateServices _candidateServices = candidateServices;
 
         /// <summary>
         /// Retrieves a list of all candidates.

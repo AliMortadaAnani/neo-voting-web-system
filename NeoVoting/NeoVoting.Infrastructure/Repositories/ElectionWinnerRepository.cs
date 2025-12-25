@@ -5,14 +5,9 @@ using NeoVoting.Infrastructure.DbContext;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class ElectionWinnerRepository : IElectionWinnerRepository
+    public class ElectionWinnerRepository(ApplicationDbContext dbContext) : IElectionWinnerRepository
     {
-        private readonly ApplicationDbContext _dbContext;
-
-        public ElectionWinnerRepository(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        private readonly ApplicationDbContext _dbContext = dbContext;
 
         public async Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
         {

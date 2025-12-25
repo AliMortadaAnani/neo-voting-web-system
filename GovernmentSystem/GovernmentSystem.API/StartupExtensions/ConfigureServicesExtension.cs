@@ -247,6 +247,7 @@ namespace GovernmentSystem.API.StartupExtensions
             services.AddScoped<IAdminServices, AdminServices>();
             services.AddScoped<IVoterServices, VoterServices>();
             services.AddScoped<ICandidateServices, CandidateServices>();
+            services.AddScoped<INeoVotingServices, NeoVotingServices>();
 
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<LoginDTOValidator>();

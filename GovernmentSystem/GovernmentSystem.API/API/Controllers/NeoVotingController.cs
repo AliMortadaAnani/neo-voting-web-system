@@ -6,21 +6,14 @@ using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovernmentSystem.API.Controllers
+namespace GovernmentSystem.API.API.Controllers
 {
     // Route must match your IP Whitelist logic (/api/external)
     [Route("api/external")]
     [ApiKeyAuth] //  Secured by API Key
-    public class NeoVotingController : ApiController
+    public class NeoVotingController(INeoVotingServices neoVotingServices) : ApiController
     {
-        private readonly IVoterServices _voterServices;
-        private readonly ICandidateServices _candidateServices;
-
-        public NeoVotingController(IVoterServices voterServices, ICandidateServices candidateServices)
-        {
-            _voterServices = voterServices;
-            _candidateServices = candidateServices;
-        }
+        private readonly INeoVotingServices _neoVotingServices = neoVotingServices;
 
         // --- VOTER INTEGRATION ---
 
@@ -43,7 +36,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyVoter([FromBody] NeoVoting_GetVoterRequestDTO request)
         {
-            var result = await _voterServices.GetVoterForNeoVotingAsync(request);
+            var result = await _neoVotingServices.GetVoterForNeoVotingAsync(request);
             return HandleResult(result);
         }
 
@@ -68,7 +61,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(Conflict409ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> RegisterVoter([FromBody] NeoVoting_VoterIsRegisteredRequestDTO request)
         {
-            var result = await _voterServices.UpdateVoterIsRegisteredToTrueAsync(request);
+            var result = await _neoVotingServices.UpdateVoterIsRegisteredToTrueAsync(request);
             return HandleResult(result);
         }
 
@@ -93,7 +86,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(Conflict409ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateVoteStatus([FromBody] NeoVoting_VoterHasVotedRequestDTO request)
         {
-            var result = await _voterServices.UpdateHasVotedToTrueAsync(request);
+            var result = await _neoVotingServices.UpdateHasVotedToTrueAsync(request);
             return HandleResult(result);
         }
 
@@ -118,7 +111,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyCandidate([FromBody] NeoVoting_GetCandidateRequestDTO request)
         {
-            var result = await _candidateServices.GetCandidateForNeoVotingAsync(request);
+            var result = await _neoVotingServices.GetCandidateForNeoVotingAsync(request);
             return HandleResult(result);
         }
 
@@ -143,7 +136,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(Conflict409ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> RegisterCandidate([FromBody] NeoVoting_CandidateIsRegisteredRequestDTO request)
         {
-            var result = await _candidateServices.UpdateCandidateIsRegisteredToTrueAsync(request);
+            var result = await _neoVotingServices.UpdateCandidateIsRegisteredToTrueAsync(request);
             return HandleResult(result);
         }
 
@@ -164,7 +157,7 @@ namespace GovernmentSystem.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ResetElection()
         {
-            var result = await _voterServices.ResetAllVotedAsFalseAsync();
+            var result = await _neoVotingServices.ResetAllVotedAsFalseAsync();
             return HandleResult(result);
         }
     }

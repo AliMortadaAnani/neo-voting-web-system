@@ -5,14 +5,9 @@ using NeoVoting.Infrastructure.DbContext;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class CandidateProfileRepository : ICandidateProfileRepository
+    public class CandidateProfileRepository(ApplicationDbContext dbContext) : ICandidateProfileRepository
     {
-        private readonly ApplicationDbContext _dbContext;
-
-        public CandidateProfileRepository(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        private readonly ApplicationDbContext _dbContext = dbContext;
 
         public async Task<CandidateProfile> AddCandidateProfileAsync(CandidateProfile candidateProfile, CancellationToken cancellationToken)
         {
@@ -61,5 +56,17 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             _dbContext.CandidateProfiles.Update(candidateProfile);
         }
+
+        // --- NEW STATS METHODS ---
+
+        public async Task<int> GetCandidatesCountByElectionAndGovernorateAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        {
+            // CandidateProfile does not have GovernorateId directly, it's on the User.
+            return await _dbContext.CandidateProfiles
+                .Include(c => c.User)
+                .Where(c => c.ElectionId == electionId && c.User.GovernorateId == governorateId)
+                .CountAsync(cancellationToken);
+        }
+
     }
 }

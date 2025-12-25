@@ -15,5 +15,7 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<CandidateProfile> AddCandidateProfileAsync(CandidateProfile candidateProfile, CancellationToken cancellationToken);
 
         void Update(CandidateProfile candidateProfile);
+
+        Task<int> GetCandidatesCountByElectionAndGovernorateAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
     }
 }

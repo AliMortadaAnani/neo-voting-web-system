@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 
-namespace GovernmentSystem.API.Domain.Shared
+namespace NeoVoting.Domain.ErrorHandling
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails400ErrorTypes // Validation / Bad Request
     {
         Paging_InvalidInput,
-        Voter_InvalidUsername,//for double check (Fluent Validation should have deal with it before reaching Services)
-        Candidate_InvalidUsername//for double check (Fluent Validation should have deal with it before reaching Services)
+        Voter_InvalidUsername,//Government System
+        Candidate_InvalidUsername//Government System
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -17,54 +17,54 @@ namespace GovernmentSystem.API.Domain.Shared
         // Admin Auth
         Admin_InvalidCredentials,
 
-        // NeoVoting Logic (Voters)
-        Voter_NotEligible,
+        
+        Voter_NotEligible,//Government System
 
-        Voter_InvalidToken,
-        Voter_NotRegistered,// (Trying to vote without account)
+        Voter_InvalidToken,//Government System
+        Voter_NotRegistered,//Government System
 
-        // NeoVoting Logic (Candidates)
-        Candidate_NotEligible,
+        
+        Candidate_NotEligible,//Government System
 
-        Candidate_InvalidToken,
+        Candidate_InvalidToken,//Government System
 
-        // System / Middleware
-        Auth_UnauthorizedAccess,  // For Cookie Middleware (Missing Cookie)
+        
+        Auth_UnauthorizedAccess,
 
-        Auth_InvalidApiKey,       // For Filter (Missing/Wrong API Key)
-        Auth_TokenMissing         // For Filter
+        Auth_InvalidApiKey,//Government System
+        Auth_TokenMissing//Government System
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails403ErrorTypes // Forbidden
     {
-        Auth_ForbiddenAccess,      // For Cookie Middleware (Role mismatch)
-        IpWhitelist_ForbiddenIP,    // For IP Whitelist Middleware
-        IpWhitelist_RestrictedEndpoint // For IP Whitelist Middleware (External trying to access Admin)
+        Auth_ForbiddenAccess,
+        IpWhitelist_ForbiddenIP,//Government System
+        IpWhitelist_RestrictedEndpoint//Government System
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails404ErrorTypes // Not Found
     {
-        Voter_NotFound,           // Covers "Voter.Missing" and "Voters.Missing"
-        Candidate_NotFound,       // Covers "Candidate.Missing"
+        Voter_NotFound,//Government System
+        Candidate_NotFound,//Government System
         Paging_OutOfBounds
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails409ErrorTypes // Conflict
     {
-        Voter_AlreadyRegistered,
-        Voter_AlreadyVoted,
-        Candidate_AlreadyRegistered
+        Voter_AlreadyRegistered,//Government System
+        Voter_AlreadyVoted,//Government System
+        Candidate_AlreadyRegistered//Government System
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails500ErrorTypes // Server Failure
     {
-        Server_Error,             // Generic Global Handler
-        Server_ConfigurationError,// Missing API Key in Config
-        Voter_OperationFailed,    // Add in repos returned null
+        Server_Error,
+        Server_ConfigurationError,//Government System
+        Voter_OperationFailed,
         Candidate_OperationFailed
     }
 

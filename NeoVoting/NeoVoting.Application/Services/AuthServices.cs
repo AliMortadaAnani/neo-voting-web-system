@@ -412,7 +412,7 @@ namespace NeoVoting.Application.Services
                 LastName = user.LastName,
                 DateOfBirth = user.DateOfBirth,
                 Gender = user.Gender,
-                GovernorateId = user.GovernorateID,
+                GovernorateId = user.GovernorateId,
                 Role = role
             };
         }

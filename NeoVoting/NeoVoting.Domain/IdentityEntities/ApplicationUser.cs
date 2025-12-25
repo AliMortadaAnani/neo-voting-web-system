@@ -20,7 +20,7 @@ namespace NeoVoting.Domain.IdentityEntities
         public string? LastName { get; private set; }
         public DateTime? DateOfBirth { get; private set; }
         public char? Gender { get; private set; }
-        public int? GovernorateID { get; private set; }
+        public int? GovernorateId { get; private set; }
 
         public Governorate? Governorate { get; private set; } // Navigation property
 
@@ -81,7 +81,7 @@ namespace NeoVoting.Domain.IdentityEntities
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 Gender = genderUpper,
-                GovernorateID = governorateId
+                GovernorateId = governorateId
             };
 
             return participantUser;

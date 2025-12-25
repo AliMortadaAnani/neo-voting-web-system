@@ -48,7 +48,7 @@ namespace NeoVoting.Infrastructure.DbContext
             // A Governorate can have many ApplicationUsers.
             builder.HasOne(u => u.Governorate)
                 .WithMany() // We don't need a navigation property on Governorate pointing back to Users.
-                .HasForeignKey(u => u.GovernorateID)
+                .HasForeignKey(u => u.GovernorateId)
                 .IsRequired(false) // This makes the foreign key optional (nullable), matching the int? property.
                 .OnDelete(DeleteBehavior.Restrict); // Important! Prevents deleting a governorate if users are assigned to it.
 

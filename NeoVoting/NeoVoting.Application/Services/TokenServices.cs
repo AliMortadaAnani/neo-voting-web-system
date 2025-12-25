@@ -72,9 +72,9 @@ namespace NeoVoting.Application.Services
             }
 
             // Governorate -> Custom Claim "governorateId" (No standard JWT claim for this)
-            if (user.GovernorateID.HasValue)
+            if (user.GovernorateId.HasValue)
             {
-                claims.Add(new Claim("governorateId", user.GovernorateID.Value.ToString()));
+                claims.Add(new Claim("governorateId", user.GovernorateId.Value.ToString()));
             }
 
             // 3. Add Roles
@@ -120,7 +120,7 @@ namespace NeoVoting.Application.Services
                 UserName = user.UserName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                GovernorateId = user.GovernorateID,
+                GovernorateId = user.GovernorateId,
                 DateOfBirth = user.DateOfBirth,
                 Gender = user.Gender
             };

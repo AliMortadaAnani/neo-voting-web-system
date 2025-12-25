@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NeoVoting.Domain.ErrorHandling;
+using System.Runtime.CompilerServices;
 
 namespace NeoVoting.API.Controllers
 {
@@ -45,7 +46,7 @@ namespace NeoVoting.API.Controllers
             ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
             _ => StatusCodes.Status500InternalServerError
         };
-
+      
         private static string GetTitle(ErrorType errorType) => errorType switch
         {
             ErrorType.Validation => "Bad Request",
