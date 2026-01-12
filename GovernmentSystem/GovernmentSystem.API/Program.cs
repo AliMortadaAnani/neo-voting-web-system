@@ -12,7 +12,7 @@ if (builder.Environment.IsDevelopment())
 
 builder.Services.ConfigureServices(builder.Configuration, builder.Host);
 
-//builder.Configuration.AddEnvironmentVariables(); // called automatically by CreateBuilder
+
 
 // 2. Register Seeder
 builder.Services.AddTransient<DbSeeder>();
@@ -35,13 +35,13 @@ if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnore
 // =================================================================
 // CLI admin seeding logic
 // =================================================================
-if (args.Length > 0 && args[0].ToLower() == "seedadmin") // we run dotnet with command line argument "seedadmin" => dotnet run seed "YourStrongPassword!"
+if (args.Length > 0 && args[0].Equals("seedAdmin", StringComparison.OrdinalIgnoreCase)) // we run dotnet with command line argument "seedAdmin" => dotnet run seedAdmin "YourStrongPassword!"
 {
     // Check if Password argument is provided
-    if (args.Length < 2) //args[0] = seed and args[1] = password
+    if (args.Length < 2) //args[0] = seedAdmin and args[1] = password
     {
         Console.WriteLine("Error: Password argument missing.");
-        Console.WriteLine("Usage: dotnet run seed \"YourStrongPassword!\"");
+        Console.WriteLine("Usage: dotnet run seedAdmin \"YourStrongPassword!\"");
         return; // Exit
     }
 
@@ -70,7 +70,7 @@ if (args.Length > 0 && args[0].ToLower() == "seedadmin") // we run dotnet with c
 // =================================================================
 // CLI admin reset password logic
 // =================================================================
-if (args.Length > 0 && args[0].ToLower() == "updateadminpassword") // we run dotnet with command line argument "updateAdminPassword" => dotnet run updateAdminPassword "Yourusername" "NewStrongPassword!"
+if (args.Length > 0 && args[0].Equals("updateAdminPassword", StringComparison.OrdinalIgnoreCase)) // we run dotnet with command line argument "updateAdminPassword" => dotnet run updateAdminPassword "Yourusername" "NewStrongPassword!"
 {
     // Check if Username and password arguments are provided
     if (args.Length < 3) //args[0] = updateAdminPassword and args[1] = Username and args[2] = new password

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.Controllers
 {
-    [Route("api/voters")]
+
     [Authorize(Roles = "Admin")]
     public class VotersController : ApiController
     {
@@ -20,11 +20,10 @@ namespace GovernmentSystem.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves a list of all voters.
+        /// Retrieves a list of all voters(with all db fields).
         /// </summary>
         /// <remarks>
-        /// **Notes:**
-        /// - Returns a full list of voters in the system(with all db fields).
+        /// **Rules:**
         /// - Returns 404 if the database is empty.
         /// </remarks>
         [HttpGet("all")]
@@ -37,13 +36,14 @@ namespace GovernmentSystem.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves a paginated list of voters.
+        /// Retrieves a paginated list of voters(all db fields).
         /// </summary>
         /// <param name="pageNumber">The current page number (starting from 1).</param>
         /// <param name="pageSize">The maximum number of voters per page.</param>
         /// <remarks>
         /// **Notes:**
-        /// - Returns a paginated list of voters (all db fields).
+        /// - Returns 404 if the requested page has no voters.
+        /// - Return 400 for invalid page parameters.
         /// </remarks>
         [HttpGet("paged")]
         [ProducesResponseType(typeof(List<VoterResponseDTO>), StatusCodes.Status200OK)]

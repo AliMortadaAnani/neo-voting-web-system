@@ -8,18 +8,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-    [Route("api/candidates")]
+  
     [Authorize(Roles = "Admin")]
     public class CandidatesController(ICandidateServices candidateServices) : ApiController
     {
         private readonly ICandidateServices _candidateServices = candidateServices;
 
         /// <summary>
-        /// Retrieves a list of all candidates.
+        /// Retrieves a full list of candidates in the system(with all db fields).
         /// </summary>
         /// <remarks>
-        /// **Notes:**
-        /// - Returns a full list of candidates in the system(with all db fields).
+        /// **Rules:**
         /// - Returns 404 if the database is empty.
         /// </remarks>
         [HttpGet("all")]
@@ -32,13 +31,14 @@ namespace GovernmentSystem.API.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves a paginated list of candidates.
+        /// Retrieves a paginated list of candidates(all db fields)..
         /// </summary>
         /// <param name="pageNumber">The current page number (starting from 1).</param>
         /// <param name="pageSize">The maximum number of candidates per page.</param>
         /// <remarks>
-        /// **Notes:**
-        /// - Returns a paginated list of candidates (all db fields).
+        /// **Rules:**
+        /// - Returns 404 if the requested page has no candidates.
+        /// - Return 400 for invalid page parameters.
         /// </remarks>
         [HttpGet("paged")]
         [ProducesResponseType(typeof(List<CandidateResponseDTO>), StatusCodes.Status200OK)]

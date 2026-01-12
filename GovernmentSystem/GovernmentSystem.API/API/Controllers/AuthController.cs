@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-    [Route("api/[controller]")]
-    [AllowAnonymous]
+    
+    
     public class AuthController : ApiController
     {
         private readonly IAdminServices _adminServices;
@@ -25,7 +25,7 @@ namespace GovernmentSystem.API.API.Controllers
         /// - Correct Username and Password required
         /// - Requested from allowed IPs only
         /// </remarks>
-
+        [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -41,10 +41,13 @@ namespace GovernmentSystem.API.API.Controllers
         /// </summary>
         /// <remarks>
         /// **Rules:**
+        /// - Authentication required
         /// - Requested from allowed IPs only
         /// </remarks>
+        [Authorize(Roles = "Admin")]
         [HttpPost("logout")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Logout()
         {
             var result = await _adminServices.LogoutAsync();

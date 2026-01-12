@@ -107,7 +107,7 @@ namespace GovernmentSystem.API.Domain.Entities
             RegisteredUsername = registeredUsername;
         }
 
-        public void MarkVoterAsVoted() //Initially called by NeoVoting system when voter is casting his vote (casitng a vote is not related to a specific election)
+        public void MarkVoterAsVoted() //Initially called by NeoVoting system when voter is casting his vote (casting a vote is not related to a specific election)
                                        // we rely on Voted flag to determine if the voter has voted
                                        // in the current election or not
                                        // we always reset the Voted flag after each election
