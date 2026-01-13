@@ -29,11 +29,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.HasOne(sal => sal.Election)
-                .WithMany()
-                .HasForeignKey(sal => sal.ElectionId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
+            
 
             // Build dynamic check constraint from enum values
             var enumActionValues = string.Join(

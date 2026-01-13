@@ -18,7 +18,6 @@ namespace NeoVoting.Application.RequestDTOs
         public ElectionWinner ToElectionWinner()
         {
             return ElectionWinner.Create(
-                ElectionId,
                 CandidateProfileId,
                 VoteCount
             );

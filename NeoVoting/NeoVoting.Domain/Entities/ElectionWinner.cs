@@ -15,8 +15,7 @@ namespace NeoVoting.Domain.Entities
 
         // --- Foreign Keys & Navigation Properties ---
 
-        public Guid ElectionId { get; private set; }
-        public Election Election { get; private set; }
+       
 
         public Guid CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
@@ -25,7 +24,7 @@ namespace NeoVoting.Domain.Entities
         {
             // Initialize non-nullable navigation properties to satisfy the C# compiler.
             // EF Core will populate these from the database.
-            Election = null!;
+           
             CandidateProfile = null!;
         }
 
@@ -34,20 +33,17 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Creates a new, valid ElectionWinner instance.
         /// </summary>
-        /// <param name="electionId">The ID of the election that was won.</param>
         /// <param name="candidateProfileId">The ID of the winning candidate's profile.</param>
         /// <param name="voteCount">The final vote count for the winner, if available.</param>
         /// <returns>A new, valid ElectionWinner object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static ElectionWinner Create(Guid electionId, Guid candidateProfileId, int? voteCount)
+        public static ElectionWinner Create(Guid candidateProfileId, int? voteCount)
         {
-            Validate(electionId, candidateProfileId, voteCount);
+            Validate(candidateProfileId, voteCount);
 
             var winner = new ElectionWinner
             {
                 // The 'Id' is typically database-generated (identity column), so we don't set it here.
-
-                ElectionId = electionId,
                 CandidateProfileId = candidateProfileId,
                 VoteCount = voteCount
             };
@@ -74,14 +70,9 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Private helper method to contain all validation rules.
         /// </summary>
-        private static void Validate(Guid electionId, Guid candidateProfileId, int? voteCount)
+        private static void Validate(Guid candidateProfileId, int? voteCount)
         {
             var errors = new StringBuilder();
-
-            if (electionId == Guid.Empty)
-            {
-                errors.AppendLine("ElectionId is required.");
-            }
 
             if (candidateProfileId == Guid.Empty)
             {

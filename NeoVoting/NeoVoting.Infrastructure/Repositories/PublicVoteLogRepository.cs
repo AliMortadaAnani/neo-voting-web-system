@@ -23,10 +23,9 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<IReadOnlyList<PublicVoteLog>> GetAllPublicVoteLogsByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
         {
             return await _dbContext.PublicVoteLogs
-                .Include(l => l.Governorate)
                 .Include(l => l.Vote)
-                .Include(l => l.Election)
-                .Where(l => l.ElectionId == ElectionId)
+                .ThenInclude(v => v!.Election)
+                .Where(l => l.Vote!.Election.Id == ElectionId)
                 .OrderByDescending(l => l.TimestampUTC)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
@@ -35,10 +34,9 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<IReadOnlyList<PublicVoteLog>> GetPagedPublicVoteLogsByElectionIdAsync(Guid ElectionId, int skip, int take, CancellationToken cancellationToken)
         {
             return await _dbContext.PublicVoteLogs
-                .Include(l => l.Governorate)
                 .Include(l => l.Vote)
-                .Include(l => l.Election)
-                .Where(l => l.ElectionId == ElectionId)
+                .ThenInclude(v => v!.Election)
+                .Where(l => l.Vote!.Election.Id == ElectionId)
                 .OrderByDescending(l => l.TimestampUTC)
                 .Skip(skip)
                 .Take(take)
@@ -49,15 +47,15 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<PublicVoteLog?> GetPublicVoteLogByVoteIdAsync(Guid VoteId, CancellationToken cancellationToken)
         {
             return await _dbContext.PublicVoteLogs
-                .Include(l => l.Governorate)
                 .Include(l => l.Vote)
-                .Include(l => l.Election)
+                .ThenInclude(v => v!.Election)
                 .FirstOrDefaultAsync(l => l.VoteId == VoteId, cancellationToken);
         }
 
-        public async Task<int> GetTotalPublicVoteLogsCountByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+        public async Task<int> GetTotalPublicVoteLogsCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
         {
-            return await _dbContext.PublicVoteLogs.CountAsync(l => l.ElectionId == ElectionId, cancellationToken);
+            return await _dbContext.PublicVoteLogs
+                .CountAsync(l => l.Vote!.ElectionId == electionId, cancellationToken);
         }
     }
 }

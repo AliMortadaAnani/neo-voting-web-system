@@ -22,19 +22,8 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired(false)//because some votes might be soft deleted
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(e => e.Election)
-                .WithMany()
-                .HasForeignKey(e => e.ElectionId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(e => e.Governorate)
-                .WithMany()
-                .HasForeignKey(e => e.GovernorateId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasIndex(pv => new { pv.ElectionId, pv.VoteId }).IsUnique();
+            builder.HasIndex(pv => new { pv.VoteId }).IsUnique();
         }
     }
 }

@@ -20,11 +20,11 @@ namespace NeoVoting.Domain.Entities
 
         // --- Foreign Key & Navigation Property ---
 
-        public Guid? UserId { get; private set; } // The ID of the user who performed the action.
-        public ApplicationUser? User { get; private set; }
+        public Guid UserId { get; private set; } // The ID of the user who performed the action.
+        public ApplicationUser? User { get; private set; } // Nullable in case the user is deleted.
 
-        public Guid? ElectionId { get; private set; } // Optional FK to an Election, applicable for candidate profile registration.
-        public Election? Election { get; private set; } // Navigation property to Election.
+        public Guid? CandidateProfileId { get; private set; } // Optional FK to a CandidateProfile, applicable for candidate profile registration.
+        public CandidateProfile? CandidateProfile { get; private set; } // Navigation property to CandidateProfile.
 
         private SystemAuditLog()
         { }
@@ -39,13 +39,13 @@ namespace NeoVoting.Domain.Entities
         /// <param name="details">Optional, detailed information about the action (e.g., JSON of the changed data).</param>
         /// <returns>A new, valid SystemAuditLog object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details, Guid? electionId)
+        public static SystemAuditLog Create(Guid userId, SystemActionTypesEnum actionType, string? details, Guid? candidateProfileId)
         {
             Validate(userId, actionType);
 
-            if (actionType == SystemActionTypesEnum.CANDIDATE_PROFILE_CREATED && electionId == null)
+            if (actionType == SystemActionTypesEnum.CANDIDATE_PROFILE_CREATED && candidateProfileId == null)
             {
-                throw new ArgumentException("ElectionId is required when logging a CANDIDATE_PROFILE_CREATED action.");
+                throw new ArgumentException("candidateProfileId is required when logging a CANDIDATE_PROFILE_CREATED action.");
             }
 
             var logEntry = new SystemAuditLog
@@ -54,7 +54,7 @@ namespace NeoVoting.Domain.Entities
                 UserId = userId,
                 ActionType = actionType,
                 Details = details,
-                ElectionId = electionId,
+                CandidateProfileId = candidateProfileId,
                 TimestampUTC = DateTime.UtcNow
             };
 

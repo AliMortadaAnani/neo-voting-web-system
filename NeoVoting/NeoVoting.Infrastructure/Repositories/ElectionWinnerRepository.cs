@@ -12,12 +12,11 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
         {
             return await _dbContext.ElectionWinners
-                .Where(w => w.ElectionId == ElectionId)
-                .OrderByDescending(w => w.VoteCount)
-                .ThenBy(w => w.CandidateProfile.User.UserName)
                 .Include(w => w.CandidateProfile)
-                .ThenInclude(cp => cp.User)
-                .Include(w => w.Election)
+                    .ThenInclude(cp => cp.User)
+                .Where(w => w.CandidateProfile.ElectionId == ElectionId)
+                .OrderByDescending(w => w.VoteCount)
+                    .ThenBy(w => w.CandidateProfile.User.UserName)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }

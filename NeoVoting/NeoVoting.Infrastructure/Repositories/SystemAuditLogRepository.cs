@@ -24,7 +24,7 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _dbContext.SystemAuditLogs
                 .Include(l => l.User)
-                .Include(l => l.Election)
+                .Include(l => l.CandidateProfile)
                 .Where(l => l.UserId == UserId)
                 .OrderByDescending(l => l.TimestampUTC)
                 .AsNoTracking()
@@ -35,7 +35,7 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _dbContext.SystemAuditLogs
                 .Include(l => l.User)// user will be null when using stored proc
-                .Include(l => l.Election)// election will be null when using stored proc
+                .Include(l => l.CandidateProfile)// election will be null when using stored proc
                 .OrderByDescending(l => l.TimestampUTC)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
@@ -45,7 +45,7 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _dbContext.SystemAuditLogs
                 .Include(l => l.User)
-                .Include(l => l.Election)
+                .Include(l => l.CandidateProfile)
                 .OrderByDescending(l => l.TimestampUTC)
                 .Skip(skip)
                 .Take(take)

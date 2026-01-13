@@ -14,7 +14,7 @@ namespace NeoVoting.Domain.IdentityEntities
 
         // For personal details (nullable to support admin accounts)
         // these properties will be populated only for Voter and Candidate accounts
-        // and only from the GovernmentSystem during registration.
+        // and only from the GovernmentSystem api during account registration in NeoVoting.
         public string? FirstName { get; private set; }
 
         public string? LastName { get; private set; }
