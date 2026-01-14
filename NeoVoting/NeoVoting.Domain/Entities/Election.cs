@@ -119,12 +119,6 @@ namespace NeoVoting.Domain.Entities
             {
                 throw new ArgumentException("Number of registered voters cannot be negative.");
             }
-
-            if (ElectionStatusId != (int)ElectionStatusEnum.Completed)
-            {
-                throw new InvalidOperationException("Cannot update registered voter count before election is completed.");
-            }
-
             FinalNumberOfRegisteredVoters = count;
         }
 

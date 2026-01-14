@@ -9,42 +9,77 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<SystemAuditLog> builder)
         {
-            builder.HasKey(sal => sal.Id);
+            builder.ToTable("SystemAuditLogs");
 
+            // --- Primary Key ---
+            builder.HasKey(sal => sal.Id);
+            builder.Property(entity => entity.Id)
+                   .ValueGeneratedOnAdd();
+
+            // --- Properties ---
             builder.Property(sal => sal.TimestampUTC)
                 .IsRequired();
 
-            builder.Property(sal => sal.ActionType)
-                .HasConversion<string>()   // store enum as string
+            builder.Property(sal => sal.UserId)
+                .IsRequired();
+
+            builder.Property(sal => sal.Username)
                 .IsRequired()
-                .HasMaxLength(200);         // optional: cap string length
+                .HasMaxLength(100); // Standard Identity Username length
 
+            // Optional Links
+            builder.Property(sal => sal.CandidateProfileId).IsRequired(false);
+            builder.Property(sal => sal.ElectionId).IsRequired(false);
+            builder.Property(sal => sal.ElectionName).IsRequired(false).HasMaxLength(100);
+
+            // Details (JSON or Text)
             builder.Property(sal => sal.Details)
-                .HasMaxLength(2000);       // optional: cap details length
-
-            builder.HasOne(sal => sal.User)
-                .WithMany()
-                .HasForeignKey(sal => sal.UserId) // user might be deleted
-                                                  // so userId and navigation are optional
                 .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasMaxLength(4000); // Allow reasonable JSON payload
 
-            
+            // --- Enum Handling ---
+            builder.Property(sal => sal.ActionType)
+                .HasConversion<string>()   // Store as "USER_LOGIN", not "1"
+                .IsRequired()
+                .HasMaxLength(100);
 
-            // Build dynamic check constraint from enum values
+            // --- Constraints ---
+
+            // Dynamic Check Constraint: Ensures DB only accepts values defined in the Enum
             var enumActionValues = string.Join(
-                ",",
+                ", ",
                 Enum.GetNames(typeof(SystemActionTypesEnum))
                     .Select(v => $"'{v}'")
             );
 
-            builder.ToTable("SystemAuditLogs", tb =>
-            {
-                tb.HasCheckConstraint(
-                    "CK_SystemAuditLog_ActionType",
-                    $"[ActionType] IN ({enumActionValues})"
-                );
-            });
+            // Note: Syntax is SQL Server specific. Remove [ ] if using Postgres.
+            builder.ToTable(t => t.HasCheckConstraint(
+                "CK_SystemAuditLog_ActionType",
+                $"[ActionType] IN ({enumActionValues})"
+            ));
+
+            // --- Indexes ---
+
+            // 1. Security Auditing: "Show me everything User X did"
+            builder.HasIndex(sal => sal.UserId)
+                   .HasDatabaseName("IX_SystemAuditLogs_UserId");
+
+            builder.HasIndex(sal => sal.Username)
+                   .HasDatabaseName("IX_SystemAuditLogs_UserName");
+
+            builder.HasIndex(sal => sal.ElectionId)
+                   .HasDatabaseName("IX_SystemAuditLogs_ElectionId");
+
+            builder.HasIndex(sal => sal.ElectionName)
+                   .HasDatabaseName("IX_SystemAuditLogs_ElectionName");
+
+            // 2. Timeline: "Show me logs from yesterday"
+            builder.HasIndex(sal => sal.TimestampUTC)
+                   .HasDatabaseName("IX_SystemAuditLogs_Timestamp");
+
+            // 3. Action Filtering: "Show me all CANDIDATE_CREATED events"
+            builder.HasIndex(sal => sal.ActionType)
+                   .HasDatabaseName("IX_SystemAuditLogs_ActionType");
         }
     }
 }

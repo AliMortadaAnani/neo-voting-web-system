@@ -16,6 +16,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired();
 
             builder.Property(v => v.VoterGender)
+                .IsRequired()
                 .HasMaxLength(1)
                 .IsUnicode(false);
 

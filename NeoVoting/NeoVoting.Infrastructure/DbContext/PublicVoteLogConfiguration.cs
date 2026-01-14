@@ -8,22 +8,63 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<PublicVoteLog> builder)
         {
-            // Primary key
+            builder.ToTable("PublicVoteLogs");
+
+            // --- Primary Key ---
             builder.HasKey(e => e.Id);
-            builder.Property(entity => entity.Id).ValueGeneratedOnAdd();
-            // Properties
+            builder.Property(entity => entity.Id)
+                   .ValueGeneratedOnAdd(); // Identity Column
+
+            // --- Properties ---
             builder.Property(e => e.TimestampUTC)
                 .IsRequired();
 
-            // Relationships
-            builder.HasOne(e => e.Vote)
-                .WithMany()
-                .HasForeignKey(e => e.VoteId)//voteId is always present even if the vote is soft deleted
-                .IsRequired(false)//because some votes might be soft deleted
-                .OnDelete(DeleteBehavior.Restrict);
+            // Store just the Error Message string, capped at 1000 chars
+            builder.Property(e => e.ErrorMessage)
+                .IsRequired(false)
+                .HasMaxLength(1000);
 
+            // Foreign Key IDs (Stored as simple columns, NO constraints)
+            builder.Property(e => e.VoteId).IsRequired();
+            builder.Property(e => e.ElectionId).IsRequired();
+            builder.Property(e => e.GovernorateId).IsRequired();
 
-            builder.HasIndex(pv => new { pv.VoteId }).IsUnique();
+            // Snapshots (Required)
+            builder.Property(e => e.GovernorateName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(e => e.ElectionName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            // --- Indexes (Crucial for Log Performance) ---
+
+           
+
+            // Optimize queries like "Get all votes for Election X"
+            builder.HasIndex(pv => pv.ElectionId)
+                   .HasDatabaseName("IX_PublicVoteLogs_ElectionId");
+
+            // Optimize queries like "Get all votes for Governorate X"
+            builder.HasIndex(pv => pv.GovernorateId)
+                   .HasDatabaseName("IX_PublicVoteLogs_GovernorateId");
+
+            // Optimize queries like "Get all votes for Election X"
+            builder.HasIndex(pv => pv.ElectionName)
+                   .HasDatabaseName("IX_PublicVoteLogs_ElectionName");
+
+            // Optimize queries like "Get all votes for Governorate X"
+            builder.HasIndex(pv => pv.GovernorateName)
+                   .HasDatabaseName("IX_PublicVoteLogs_GovernorateName");
+
+            // 2. Timeline: "Show me logs from yesterday"
+            builder.HasIndex(sal => sal.TimestampUTC)
+                   .HasDatabaseName("IX_PublicVoteLogs_Timestamp");
+
+            builder.HasIndex(pv => new { pv.ElectionId, pv.TimestampUTC })
+    .HasDatabaseName("IX_PublicVoteLogs_ElectionId_Timestamp");
+
         }
     }
 }

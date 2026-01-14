@@ -64,8 +64,8 @@ namespace NeoVoting.Domain.ErrorHandling
     {
         Server_Error,
         Server_ConfigurationError,//Government System
-        Voter_OperationFailed,
-        Candidate_OperationFailed
+        Voter_OperationFailed,//Government System
+        Candidate_OperationFailed//Government System
     }
 
     // ==============================================================================

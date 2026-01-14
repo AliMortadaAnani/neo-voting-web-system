@@ -11,7 +11,7 @@ namespace NeoVoting.Domain.Entities
         // --- Properties ---
 
         public int Id { get; private set; }
-        public int? VoteCount { get; private set; } // Nullable to allow for recounts or non-applicable counts.
+        public int? VoteCount { get; private set; } 
 
         // --- Foreign Keys & Navigation Properties ---
 

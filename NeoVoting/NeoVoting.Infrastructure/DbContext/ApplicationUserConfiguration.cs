@@ -11,6 +11,19 @@ namespace NeoVoting.Infrastructure.DbContext
             // Note: We do NOT configure Id, UserName, Email, etc.
             // The base IdentityDbContext handles those. We only configure our custom properties.
 
+            builder.Property(u => u.Id).ValueGeneratedNever();
+
+            builder.Property(u => u.UserName).HasMaxLength(100);
+
+            // Optionally set length for NormalizedUserName as well (recommended)
+            builder.Property(u => u.NormalizedUserName).HasMaxLength(100);
+
+
+            builder.HasIndex(u => u.NormalizedUserName).IsUnique();
+
+            builder.HasIndex(u => u.UserName).IsUnique();
+
+
             // --- Configure Custom Properties ---
 
             // Configure the FirstName property.

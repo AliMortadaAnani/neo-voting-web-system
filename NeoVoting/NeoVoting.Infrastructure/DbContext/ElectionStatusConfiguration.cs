@@ -12,7 +12,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(entity => entity.Id).ValueGeneratedNever();
             builder.Property(es => es.Name)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(100);
 
             // Seed static lookup values
             builder.HasData(
