@@ -23,8 +23,8 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogByUserIdAsync(Guid UserId, CancellationToken cancellationToken)
         {
             return await _dbContext.SystemAuditLogs
-                .Include(l => l.User)
-                .Include(l => l.CandidateProfile)
+                
+                
                 .Where(l => l.UserId == UserId)
                 .OrderByDescending(l => l.TimestampUTC)
                 .AsNoTracking()
@@ -34,8 +34,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogsAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.SystemAuditLogs
-                .Include(l => l.User)// user will be null when using stored proc
-                .Include(l => l.CandidateProfile)// election will be null when using stored proc
+               
                 .OrderByDescending(l => l.TimestampUTC)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
@@ -44,8 +43,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsAsync(int skip, int take, CancellationToken cancellationToken)
         {
             return await _dbContext.SystemAuditLogs
-                .Include(l => l.User)
-                .Include(l => l.CandidateProfile)
+                
                 .OrderByDescending(l => l.TimestampUTC)
                 .Skip(skip)
                 .Take(take)

@@ -9,8 +9,7 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<SystemAuditLog> builder)
         {
-            builder.ToTable("SystemAuditLogs");
-
+           
             // --- Primary Key ---
             builder.HasKey(sal => sal.Id);
             builder.Property(entity => entity.Id)
@@ -64,14 +63,12 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasIndex(sal => sal.UserId)
                    .HasDatabaseName("IX_SystemAuditLogs_UserId");
 
-            builder.HasIndex(sal => sal.Username)
-                   .HasDatabaseName("IX_SystemAuditLogs_UserName");
+        
 
             builder.HasIndex(sal => sal.ElectionId)
                    .HasDatabaseName("IX_SystemAuditLogs_ElectionId");
 
-            builder.HasIndex(sal => sal.ElectionName)
-                   .HasDatabaseName("IX_SystemAuditLogs_ElectionName");
+          
 
             // 2. Timeline: "Show me logs from yesterday"
             builder.HasIndex(sal => sal.TimestampUTC)

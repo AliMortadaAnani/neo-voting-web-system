@@ -373,8 +373,11 @@ namespace NeoVoting.Application.Services
 
             var log = SystemAuditLog.Create(
                 newUser.Id,
+                newUser.UserName!,
                 SystemActionTypesEnum.VOTER_REGISTERED,
-                $"Voter registered successfully.",
+                $"Voter '{newUser.UserName}' registered successfully.",
+                null,
+                null,
                 null
             );
 

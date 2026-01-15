@@ -8,8 +8,7 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<PublicVoteLog> builder)
         {
-            builder.ToTable("PublicVoteLogs");
-
+        
             // --- Primary Key ---
             builder.HasKey(e => e.Id);
             builder.Property(entity => entity.Id)
@@ -50,13 +49,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasIndex(pv => pv.GovernorateId)
                    .HasDatabaseName("IX_PublicVoteLogs_GovernorateId");
 
-            // Optimize queries like "Get all votes for Election X"
-            builder.HasIndex(pv => pv.ElectionName)
-                   .HasDatabaseName("IX_PublicVoteLogs_ElectionName");
-
-            // Optimize queries like "Get all votes for Governorate X"
-            builder.HasIndex(pv => pv.GovernorateName)
-                   .HasDatabaseName("IX_PublicVoteLogs_GovernorateName");
+            
 
             // 2. Timeline: "Show me logs from yesterday"
             builder.HasIndex(sal => sal.TimestampUTC)

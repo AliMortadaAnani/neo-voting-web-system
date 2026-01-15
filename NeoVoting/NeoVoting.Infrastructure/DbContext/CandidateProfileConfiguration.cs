@@ -46,7 +46,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 tb.HasCheckConstraint("CK_CandidateProfile_NominationReasons", "LEN([NominationReasons]) > 0");
             });
 
-            builder.HasIndex(cp => new { cp.UserId, cp.ElectionId })
+            builder.HasIndex(cp => new { cp.ElectionId , cp.UserId })
               .IsUnique();
         }
     }

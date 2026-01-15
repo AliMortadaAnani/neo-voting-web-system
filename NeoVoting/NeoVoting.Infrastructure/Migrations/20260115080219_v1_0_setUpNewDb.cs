@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace NeoVoting.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class v1_0_SetupNewDbContext : Migration
+    public partial class v1_0_setUpNewDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +32,7 @@ namespace NeoVoting.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -48,6 +49,46 @@ namespace NeoVoting.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Governorates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PublicVoteLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TimestampUTC = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    VoteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ElectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GovernorateId = table.Column<int>(type: "int", nullable: false),
+                    GovernorateName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ElectionName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PublicVoteLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemAuditLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TimestampUTC = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ActionType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ElectionName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    CandidateProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ElectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemAuditLogs", x => x.Id);
+                    table.CheckConstraint("CK_SystemAuditLog_ActionType", "[ActionType] IN ('VOTER_REGISTERED', 'CANDIDATE_REGISTERED', 'ERROR_VOTER_NOT_REGISTERED', 'ERROR_CANDIDATE_NOT_REGISTERED', 'CANDIDATE_PROFILE_CREATED')");
                 });
 
             migrationBuilder.CreateTable(
@@ -110,9 +151,9 @@ namespace NeoVoting.Infrastructure.Migrations
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<string>(type: "varchar(1)", unicode: false, maxLength: 1, nullable: true),
-                    GovernorateID = table.Column<int>(type: "int", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    GovernorateId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
@@ -130,9 +171,10 @@ namespace NeoVoting.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.CheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F') OR [Gender] IS NULL");
+                    table.CheckConstraint("CK_User_GovernorateId", "([GovernorateId] IN (1, 2, 3, 4, 5) OR [GovernorateId] IS NULL)");
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Governorates_GovernorateID",
-                        column: x => x.GovernorateID,
+                        name: "FK_AspNetUsers_Governorates_GovernorateId",
+                        column: x => x.GovernorateId,
                         principalTable: "Governorates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -156,6 +198,7 @@ namespace NeoVoting.Infrastructure.Migrations
                     table.PrimaryKey("PK_Votes", x => x.Id);
                     table.CheckConstraint("CK_Vote_VoterAge", "[VoterAge] >= 18");
                     table.CheckConstraint("CK_Vote_VoterGender", "[VoterGender] IN ('M','F')");
+                    table.CheckConstraint("CK_Voter_GovernorateId", "([GovernorateId] IN (1, 2, 3, 4, 5) OR [GovernorateId] IS NULL)");
                     table.ForeignKey(
                         name: "FK_Votes_Elections_ElectionId",
                         column: x => x.ElectionId,
@@ -286,78 +329,12 @@ namespace NeoVoting.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SystemAuditLogs",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TimestampUTC = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ActionType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Details = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ElectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SystemAuditLogs", x => x.Id);
-                    table.CheckConstraint("CK_SystemAuditLog_ActionType", "[ActionType] IN ('VOTER_REGISTERED','CANDIDATE_REGISTERED','ERROR_VOTER_NOT_REGISTERED','ERROR_CANDIDATE_NOT_REGISTERED','CANDIDATE_PROFILE_CREATED')");
-                    table.ForeignKey(
-                        name: "FK_SystemAuditLogs_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_SystemAuditLogs_Elections_ElectionId",
-                        column: x => x.ElectionId,
-                        principalTable: "Elections",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PublicVoteLogs",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TimestampUTC = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VoteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ElectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GovernorateId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PublicVoteLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PublicVoteLogs_Elections_ElectionId",
-                        column: x => x.ElectionId,
-                        principalTable: "Elections",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PublicVoteLogs_Governorates_GovernorateId",
-                        column: x => x.GovernorateId,
-                        principalTable: "Governorates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PublicVoteLogs_Votes_VoteId",
-                        column: x => x.VoteId,
-                        principalTable: "Votes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ElectionWinners",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VoteCount = table.Column<int>(type: "int", nullable: true),
-                    ElectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CandidateProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -367,12 +344,6 @@ namespace NeoVoting.Infrastructure.Migrations
                         name: "FK_ElectionWinners_CandidateProfiles_CandidateProfileId",
                         column: x => x.CandidateProfileId,
                         principalTable: "CandidateProfiles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ElectionWinners_Elections_ElectionId",
-                        column: x => x.ElectionId,
-                        principalTable: "Elections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -461,9 +432,9 @@ namespace NeoVoting.Infrastructure.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_GovernorateID",
+                name: "IX_AspNetUsers_GovernorateId",
                 table: "AspNetUsers",
-                column: "GovernorateID");
+                column: "GovernorateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_RefreshToken",
@@ -473,6 +444,13 @@ namespace NeoVoting.Infrastructure.Migrations
                 filter: "[RefreshToken] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_UserName",
+                table: "AspNetUsers",
+                column: "UserName",
+                unique: true,
+                filter: "[UserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -480,15 +458,15 @@ namespace NeoVoting.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CandidateProfiles_ElectionId",
+                name: "IX_CandidateProfiles_ElectionId_UserId",
                 table: "CandidateProfiles",
-                column: "ElectionId");
+                columns: new[] { "ElectionId", "UserId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CandidateProfiles_UserId_ElectionId",
+                name: "IX_CandidateProfiles_UserId",
                 table: "CandidateProfiles",
-                columns: new[] { "UserId", "ElectionId" },
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Elections_ElectionStatusId",
@@ -504,19 +482,18 @@ namespace NeoVoting.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ElectionWinners_CandidateProfileId",
                 table: "ElectionWinners",
-                column: "CandidateProfileId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ElectionWinners_ElectionId_CandidateProfileId",
-                table: "ElectionWinners",
-                columns: new[] { "ElectionId", "CandidateProfileId" },
+                column: "CandidateProfileId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PublicVoteLogs_ElectionId_VoteId",
+                name: "IX_PublicVoteLogs_ElectionId",
                 table: "PublicVoteLogs",
-                columns: new[] { "ElectionId", "VoteId" },
-                unique: true);
+                column: "ElectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PublicVoteLogs_ElectionId_Timestamp",
+                table: "PublicVoteLogs",
+                columns: new[] { "ElectionId", "TimestampUTC" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_PublicVoteLogs_GovernorateId",
@@ -524,14 +501,24 @@ namespace NeoVoting.Infrastructure.Migrations
                 column: "GovernorateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PublicVoteLogs_VoteId",
+                name: "IX_PublicVoteLogs_Timestamp",
                 table: "PublicVoteLogs",
-                column: "VoteId");
+                column: "TimestampUTC");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SystemAuditLogs_ActionType",
+                table: "SystemAuditLogs",
+                column: "ActionType");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SystemAuditLogs_ElectionId",
                 table: "SystemAuditLogs",
                 column: "ElectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SystemAuditLogs_Timestamp",
+                table: "SystemAuditLogs",
+                column: "TimestampUTC");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SystemAuditLogs_UserId",

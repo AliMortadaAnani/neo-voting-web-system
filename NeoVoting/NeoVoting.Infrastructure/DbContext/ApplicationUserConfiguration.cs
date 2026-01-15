@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.IdentityEntities;
 
 namespace NeoVoting.Infrastructure.DbContext
@@ -67,6 +68,19 @@ namespace NeoVoting.Infrastructure.DbContext
 
             builder.ToTable(tb =>
             tb.HasCheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F') OR [Gender] IS NULL"));
+
+            // 1. Get all integer values from the Enum
+            var enumValues = Enum.GetValues(typeof(GovernoratesEnum))
+                                 .Cast<int>();
+
+            // 2. Create the SQL string: "1, 2, 3"
+            var sqlValues = string.Join(", ", enumValues);
+
+            // 3. Add the Check Constraint
+            // SQL: CHECK ([GovernorateId] IN (1, 2, 3) OR [GovernorateId] IS NULL)
+            builder.ToTable(t =>
+                t.HasCheckConstraint("CK_User_GovernorateId", $"([GovernorateId] IN ({sqlValues}) OR [GovernorateId] IS NULL)")
+            );
         }
     }
 }
