@@ -7,6 +7,8 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<Election> AddElectionAsync(Election election, CancellationToken cancellationToken);
 
+        Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken);
+
         Task<IReadOnlyList<Election>> GetAllElectionsAsync(CancellationToken cancellationToken);
 
         Task<Election?> GetElectionByIdAsync(Guid electionId, CancellationToken cancellationToken);

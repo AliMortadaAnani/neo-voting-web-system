@@ -68,7 +68,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .CountAsync(cancellationToken);
         }
 
-        public Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAndgovernorateIdAsync(Guid electionId, int governorateId, int skip, int take, CancellationToken cancellationToken)
+        public Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, int skip, int take, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

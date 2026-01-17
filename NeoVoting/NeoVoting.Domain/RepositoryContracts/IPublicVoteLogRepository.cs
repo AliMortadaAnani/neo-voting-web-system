@@ -15,10 +15,10 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<int> GetTotalPublicVoteLogsCountByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
 
-        Task<PublicVoteLog?> GetPublicVoteLogByVoteIdAsync(Guid VoteId, CancellationToken cancellationToken);
+        Task<PublicVoteLog?> GetPublicVoteLogByVoteIdAsync(Guid voteId, CancellationToken cancellationToken);
 
 
         //for testing and debugging purposes only
-        Task<IReadOnlyList<PublicVoteLog>> GetAllPublicVoteLogsByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken);
+        Task<IReadOnlyList<PublicVoteLog>> GetAllPublicVoteLogsByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
     }
 }
