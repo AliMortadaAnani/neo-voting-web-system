@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NeoVoting.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class v1_0_setUpNewDb : Migration
+    public partial class v1_0_SetUpDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -174,6 +174,41 @@ namespace NeoVoting.Infrastructure.Migrations
                     table.CheckConstraint("CK_User_GovernorateId", "([GovernorateId] IN (1, 2, 3, 4, 5) OR [GovernorateId] IS NULL)");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Governorates_GovernorateId",
+                        column: x => x.GovernorateId,
+                        principalTable: "Governorates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ElectionRegisteredVotersPerGovernorates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ElectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GovernorateId = table.Column<int>(type: "int", nullable: false),
+                    RegisteredVotersCount = table.Column<int>(type: "int", nullable: false),
+                    RegisteredMalesCount = table.Column<int>(type: "int", nullable: false),
+                    RegisteredFemalesCount = table.Column<int>(type: "int", nullable: false),
+                    RegisteredAge18To29Count = table.Column<int>(type: "int", nullable: false),
+                    RegisteredAge30To45Count = table.Column<int>(type: "int", nullable: false),
+                    RegisteredAge46To64Count = table.Column<int>(type: "int", nullable: false),
+                    RegisteredAge65AndOverCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ElectionRegisteredVotersPerGovernorates", x => x.Id);
+                    table.CheckConstraint("CK_ElectionStats_GovernorateId", "([GovernorateId] IN (1, 2, 3, 4, 5))");
+                    table.CheckConstraint("CK_Voters_NonNegative", "[RegisteredVotersCount] >= 0 AND [RegisteredMalesCount] >= 0 AND [RegisteredFemalesCount] >= 0 AND [RegisteredAge18To29Count] >= 0 AND [RegisteredAge30To45Count] >= 0 AND [RegisteredAge46To64Count] >= 0 AND [RegisteredAge65AndOverCount] >= 0");
+                    table.ForeignKey(
+                        name: "FK_ElectionRegisteredVotersPerGovernorates_Elections_ElectionId",
+                        column: x => x.ElectionId,
+                        principalTable: "Elections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ElectionRegisteredVotersPerGovernorates_Governorates_GovernorateId",
                         column: x => x.GovernorateId,
                         principalTable: "Governorates",
                         principalColumn: "Id",
@@ -469,6 +504,17 @@ namespace NeoVoting.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ElectionRegisteredVotersPerGovernorates_ElectionId_GovernorateId",
+                table: "ElectionRegisteredVotersPerGovernorates",
+                columns: new[] { "ElectionId", "GovernorateId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ElectionRegisteredVotersPerGovernorates_GovernorateId",
+                table: "ElectionRegisteredVotersPerGovernorates",
+                column: "GovernorateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Elections_ElectionStatusId",
                 table: "Elections",
                 column: "ElectionStatusId");
@@ -574,6 +620,9 @@ namespace NeoVoting.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "ElectionRegisteredVotersPerGovernorates");
 
             migrationBuilder.DropTable(
                 name: "ElectionWinners");

@@ -212,6 +212,56 @@ namespace NeoVoting.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NeoVoting.Domain.Entities.ElectionRegisteredVotersPerGovernorate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("ElectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("GovernorateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegisteredAge18To29Count")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegisteredAge30To45Count")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegisteredAge46To64Count")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegisteredAge65AndOverCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegisteredFemalesCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegisteredMalesCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegisteredVotersCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GovernorateId");
+
+                    b.HasIndex("ElectionId", "GovernorateId")
+                        .IsUnique();
+
+                    b.ToTable("ElectionRegisteredVotersPerGovernorates", t =>
+                        {
+                            t.HasCheckConstraint("CK_ElectionStats_GovernorateId", "([GovernorateId] IN (1, 2, 3, 4, 5))");
+
+                            t.HasCheckConstraint("CK_Voters_NonNegative", "[RegisteredVotersCount] >= 0 AND [RegisteredMalesCount] >= 0 AND [RegisteredFemalesCount] >= 0 AND [RegisteredAge18To29Count] >= 0 AND [RegisteredAge30To45Count] >= 0 AND [RegisteredAge46To64Count] >= 0 AND [RegisteredAge65AndOverCount] >= 0");
+                        });
+                });
+
             modelBuilder.Entity("NeoVoting.Domain.Entities.ElectionStatus", b =>
                 {
                     b.Property<int>("Id")
@@ -716,6 +766,25 @@ namespace NeoVoting.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ElectionStatus");
+                });
+
+            modelBuilder.Entity("NeoVoting.Domain.Entities.ElectionRegisteredVotersPerGovernorate", b =>
+                {
+                    b.HasOne("NeoVoting.Domain.Entities.Election", "Election")
+                        .WithMany()
+                        .HasForeignKey("ElectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NeoVoting.Domain.Entities.Governorate", "Governorate")
+                        .WithMany()
+                        .HasForeignKey("GovernorateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Election");
+
+                    b.Navigation("Governorate");
                 });
 
             modelBuilder.Entity("NeoVoting.Domain.Entities.ElectionWinner", b =>

@@ -30,6 +30,11 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public Task<IReadOnlyList<PublicVoteLog>> GetPagedPublicVoteLogsByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, int skip, int take, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IReadOnlyList<PublicVoteLog>> GetPagedPublicVoteLogsByElectionIdAsync(Guid ElectionId, int skip, int take, CancellationToken cancellationToken)
         {
             return await _dbContext.PublicVoteLogs
@@ -47,6 +52,11 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _dbContext.PublicVoteLogs
                
                 .FirstOrDefaultAsync(l => l.VoteId == VoteId, cancellationToken);
+        }
+
+        public Task<int> GetTotalPublicVoteLogsCountByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<int> GetTotalPublicVoteLogsCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)

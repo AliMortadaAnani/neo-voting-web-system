@@ -26,6 +26,8 @@ namespace NeoVoting.Infrastructure.DbContext
         public DbSet<PublicVoteLog> PublicVoteLogs { get; set; }
         public DbSet<SystemAuditLog> SystemAuditLogs { get; set; }
 
+        public DbSet<ElectionRegisteredVotersPerGovernorate> ElectionRegisteredVotersPerGovernorates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Essential for Identity framework keys and tables

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
@@ -54,6 +55,36 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<int> GetTotalSystemAuditLogsCountAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.SystemAuditLogs.CountAsync(cancellationToken);
+        }
+
+        public Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByActionTypeAsync(SystemActionTypesEnum systemAction, int skip, int take, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetTotalSystemAuditLogsCountByActionTypeAsync(SystemActionTypesEnum systemAction, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByUserIdAsync(Guid userId, int skip, int take, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetTotalSystemAuditLogsCountByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetTotalSystemAuditLogsCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }
