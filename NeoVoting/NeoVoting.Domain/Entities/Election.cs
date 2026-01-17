@@ -61,7 +61,7 @@ namespace NeoVoting.Domain.Entities
         /// Moves the election to the Nomination phase.
         /// Throws an exception if the election is not in the 'Upcoming' state.
         /// </summary>
-        public void StartNomination()
+        public void StartNominationPhase()
         {
             if (ElectionStatusId != (int)ElectionStatusEnum.Upcoming)
             {
@@ -87,7 +87,7 @@ namespace NeoVoting.Domain.Entities
         /// Moves the election to the Voting phase.
         /// Throws an exception if the election is not in the 'pre-Voting' state.
         /// </summary>
-        public void StartVoting()
+        public void StartVotingPhase()
         {
             if (ElectionStatusId != (int)ElectionStatusEnum.PreVotingPhase)
             {
@@ -100,14 +100,14 @@ namespace NeoVoting.Domain.Entities
         /// Moves the election to the Completed phase.
         /// Throws an exception if the election is not in the 'Voting' state.
         /// </summary>
-        public void CompleteElection(int count)
+        public void CompleteElection_With_NumberOfRegisteredVoters(int numberOfRegisteredVoters)
         {
             if (ElectionStatusId != (int)ElectionStatusEnum.Voting)
             {
                 throw new InvalidOperationException("Cannot complete the election unless it is in the 'Voting' state.");
             }
 
-            SetNumberOfRegisteredVoters(count);
+            SetNumberOfRegisteredVoters(numberOfRegisteredVoters);
             ElectionStatusId = (int)ElectionStatusEnum.Completed;
         }
 

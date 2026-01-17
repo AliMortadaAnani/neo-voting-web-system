@@ -20,7 +20,7 @@ namespace NeoVoting.Infrastructure.Repositories
             return log;
         }
 
-        public async Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogByUserIdAsync(Guid UserId, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogsByUserIdAsync(Guid UserId, CancellationToken cancellationToken)
         {
             return await _dbContext.SystemAuditLogs
                 

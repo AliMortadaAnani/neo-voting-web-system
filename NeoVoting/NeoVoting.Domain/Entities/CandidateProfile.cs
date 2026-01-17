@@ -76,7 +76,7 @@ namespace NeoVoting.Domain.Entities
         /// Sets or updates the profile photo URL for the candidate.
         /// </summary>
         /// <param name="photoUrl">The unique filename (e.g., "guid.jpg") of the uploaded photo.</param>
-        public void SetProfilePhoto(string photoUrl)
+        public void SetProfilePhotoURL(string photoUrl)
         {
             if (string.IsNullOrWhiteSpace(photoUrl))
             {
@@ -89,7 +89,7 @@ namespace NeoVoting.Domain.Entities
         /// Removes the profile photo URL from the candidate's profile.
         /// Note: This does not delete the physical file, which should be handled by the application layer.
         /// </summary>
-        public void RemoveProfilePhoto()
+        public void RemoveProfilePhotoURL()
         {
             ProfilePhotoFilename = null;
         }
