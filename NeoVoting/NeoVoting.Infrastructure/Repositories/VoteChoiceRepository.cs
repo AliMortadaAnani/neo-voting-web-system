@@ -49,6 +49,11 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public Task<IReadOnlyList<Guid>> GetTop5CandidatesIdsPerGovernorate(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<int> GetTotalVoteChoicesCountByCandidateProfileIdAsync(Guid CandidateProfileId, CancellationToken cancellationToken)
         {
             return await _dbContext.VoteChoices.CountAsync(vc => vc.CandidateProfileId == CandidateProfileId, cancellationToken);
@@ -64,6 +69,11 @@ namespace NeoVoting.Infrastructure.Repositories
                 .OrderBy(vc => vc.CandidateProfile.User.UserName)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
+        }
+
+        public Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(Guid voteId, Guid candidateProfileId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         #region Soft Delete Demonstration

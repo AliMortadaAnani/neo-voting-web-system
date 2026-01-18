@@ -70,6 +70,11 @@ namespace NeoVoting.Infrastructure.Repositories
             return election?.FinalNumberOfRegisteredVoters;
         }
 
+        public Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         //Task<int> IElectionRepository.GetRegisteredVotersCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
         //{
         //    throw new NotImplementedException();

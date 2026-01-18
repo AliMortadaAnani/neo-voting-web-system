@@ -31,5 +31,10 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             _dbContext.ElectionWinners.Update(winner);
         }
+
+        public Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -77,5 +77,10 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
