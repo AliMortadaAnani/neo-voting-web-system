@@ -13,6 +13,5 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<ElectionRegisteredVotersPerGovernorate> AddAsync(ElectionRegisteredVotersPerGovernorate entity, CancellationToken cancellationToken);
 
-        Task<IReadOnlyList<ElectionRegisteredVotersPerGovernorate>> GetByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
     }
 }

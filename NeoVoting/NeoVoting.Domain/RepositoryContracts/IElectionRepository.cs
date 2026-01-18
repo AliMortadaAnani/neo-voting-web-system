@@ -15,15 +15,9 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<Election?> GetLastUpcomingOrActiveElectionAsync(CancellationToken cancellationToken);
 
-        /*;
-         
-        Task<Election?> GetLastCompletedElectionAsync(CancellationToken cancellationToken);
-
-        Task<int> GetRegisteredVotersCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
-        
-         */
-
         void Update(Election election);
+
+
 
 
     }

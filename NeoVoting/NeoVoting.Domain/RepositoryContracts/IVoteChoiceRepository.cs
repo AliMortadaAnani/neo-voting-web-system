@@ -10,14 +10,13 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         void Delete(VoteChoice voteChoice);//in case Voted flag in Government System was not updated correctly to true we will soft delete the VoteChoice
 
-        /*Task<IReadOnlyList<VoteChoice>> GetAllVoteChoicesByCandidateProfileIdAsync(Guid CandidateProfileId, CancellationToken cancellationToken);
 
-        Task<IReadOnlyList<VoteChoice>> GetPagedVoteChoicesByCandidateProfileIdAsync(Guid CandidateProfileId, int skip, int take, CancellationToken cancellationToken);
+        //vote count by candidate profile id(which includes election id and governorate id info)
+        Task<int> GetTotalVoteChoicesCountByCandidateProfileIdAsync(Guid candidateProfileId, CancellationToken cancellationToken);
 
-        Task<int> GetTotalVoteChoicesCountByCandidateProfileIdAsync(Guid CandidateProfileId, CancellationToken cancellationToken);
+        // winners per governorate id per election id
+        Task<IReadOnlyList<Guid>> GetTop5CandidatesIdsPerGovernorate(Guid electionId,int governorateId,CancellationToken cancellationToken);
 
-        Task<IReadOnlyList<VoteChoice>> GetVoteChoicesByVoteIdAsync(Guid VoteId, CancellationToken cancellationToken);*/
 
-        
     }
 }
