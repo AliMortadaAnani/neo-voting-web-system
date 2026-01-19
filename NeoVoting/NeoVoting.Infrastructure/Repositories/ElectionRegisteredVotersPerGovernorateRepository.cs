@@ -1,5 +1,7 @@
-﻿using NeoVoting.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
+using NeoVoting.Infrastructure.DbContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +10,19 @@ using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class ElectionRegisteredVotersPerGovernorateRepository : IElectionRegisteredVotersPerGovernorateRepository
+    public class ElectionRegisteredVotersPerGovernorateRepository (ApplicationDbContext dbContext) : IElectionRegisteredVotersPerGovernorateRepository
     {
-        public Task<ElectionRegisteredVotersPerGovernorate> AddAsync(ElectionRegisteredVotersPerGovernorate entity, CancellationToken cancellationToken)
+        private readonly ApplicationDbContext _dbContext = dbContext;
+        public async Task<ElectionRegisteredVotersPerGovernorate> AddAsync(ElectionRegisteredVotersPerGovernorate entity, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+           await _dbContext.ElectionRegisteredVotersPerGovernorates.AddAsync(entity, cancellationToken);
+            return entity;
         }
 
-        public Task<ElectionRegisteredVotersPerGovernorate?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        public async Task<ElectionRegisteredVotersPerGovernorate?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _dbContext.ElectionRegisteredVotersPerGovernorates
+                .FirstOrDefaultAsync(erpg => erpg.ElectionId == electionId && erpg.GovernorateId == governorateId, cancellationToken);
         }
     }
 }

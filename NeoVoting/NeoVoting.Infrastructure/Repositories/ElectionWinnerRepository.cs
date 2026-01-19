@@ -32,9 +32,16 @@ namespace NeoVoting.Infrastructure.Repositories
             _dbContext.ElectionWinners.Update(winner);
         }
 
-        public Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _dbContext.ElectionWinners
+                .Include(w => w.CandidateProfile)
+                    .ThenInclude(cp => cp.User)
+                .Where(w => w.CandidateProfile.ElectionId == electionId && w.CandidateProfile.User.GovernorateId == governorateId)
+                .OrderByDescending(w => w.VoteCount)
+                    .ThenBy(w => w.CandidateProfile.User.UserName)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         }
     }
 }

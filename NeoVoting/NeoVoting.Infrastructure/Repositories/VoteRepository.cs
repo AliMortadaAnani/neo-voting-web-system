@@ -17,46 +17,53 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public void Delete(Vote vote)
         {
-            _dbContext.Votes.Remove(vote);
+            _dbContext.Votes.Remove(vote); // soft deleted
         }
 
-        public async Task<IReadOnlyList<Vote>> GetAllVotesByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
-        {
-            return await _dbContext.Votes
-                .Include(v => v.Election)
-                .Include(v => v.Governorate)
-                .Where(v => v.ElectionId == ElectionId)
-                .OrderByDescending(v => v.TimestampUTC)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<IReadOnlyList<Vote>> GetPagedVotesByElectionIdAsync(Guid ElectionId, int skip, int take, CancellationToken cancellationToken)
-        {
-            return await _dbContext.Votes
-                .Include(v => v.Election)
-                .Include(v => v.Governorate)
-                .Where(v => v.ElectionId == ElectionId)
-                .OrderByDescending(v => v.TimestampUTC)
-                .Skip(skip)
-                .Take(take)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<int> GetTotalVotesCountByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+      
+        public async Task<int> GetCountOfTotalVotesByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
         {
             return await _dbContext.Votes.CountAsync(v => v.ElectionId == ElectionId, cancellationToken);
         }
 
-        public async Task<Vote?> GetVoteByIdAsync(Guid id, CancellationToken cancellationToken)
+
+    
+
+
+        public async Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateIdAsync(Guid electionId, char gender, int governorateId, CancellationToken cancellationToken)
         {
+            char normalizedGender = char.ToUpper(gender);
             return await _dbContext.Votes
-                .Include(v => v.Election)
-                .Include(v => v.Governorate)
-                .FirstOrDefaultAsync(v => v.Id == id, cancellationToken);
+                .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender && v.GovernorateId == governorateId, cancellationToken);
         }
 
+        public async Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateIdAsync(Guid electionId, int minAge, int maxAge, int governorateId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Votes
+                .CountAsync(v => v.ElectionId == electionId &&
+                                 v.VoterAge >= minAge && v.VoterAge <= maxAge &&
+                                 v.GovernorateId == governorateId, cancellationToken);
+        }
+
+        public async Task<int> GetCountOfVotesByElectionIdAndGenderAsync(Guid electionId, char gender, CancellationToken cancellationToken)
+        {
+            char normalizedGender = char.ToUpper(gender);
+            return await _dbContext.Votes
+                .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender);
+        }
+
+        public async Task<int> GetCountOfVotesByElectionIdAndAgeRangeAsync(Guid electionId, int minAge, int maxAge, CancellationToken cancellationToken)
+        {
+          return await _dbContext.Votes
+                .CountAsync(v => v.ElectionId == electionId &&
+                                 v.VoterAge >= minAge && v.VoterAge <= maxAge, cancellationToken);
+        }
+
+        public async Task<int> GetCountOfVotesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Votes
+                .CountAsync(v => v.ElectionId == electionId && v.GovernorateId == governorateId, cancellationToken);
+        }
         #region Soft Delete Demonstration
 
         /*
@@ -101,58 +108,5 @@ namespace NeoVoting.Infrastructure.Repositories
          */
 
         #endregion Soft Delete Demonstration
-
-
-        // --- NEW STATS METHODS ---
-
-        public async Task<int> GetVotesCountByElectionAndGenderAsync(Guid electionId, char gender, CancellationToken cancellationToken)
-        {
-            char normalizedGender = char.ToUpper(gender);
-            return await _dbContext.Votes
-               .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender, cancellationToken);
-        }
-
-        public async Task<int> GetVotesCountByElectionAndAgeRangeAsync(Guid electionId, int minAge, int maxAge, CancellationToken cancellationToken)
-        {
-            // Note: Vote entity has 'VoterAge' stored as an int, so logic is simpler here than AppUser
-            return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId && v.VoterAge >= minAge && v.VoterAge <= maxAge, cancellationToken);
-        }
-
-        public async Task<int> GetVotesCountByElectionAndGovernorateAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
-        {
-            return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId && v.GovernorateId == governorateId, cancellationToken);
-        }
-
-        public async Task<int> GetVotesCountByElectionGenderAndGovernorateAsync(Guid electionId, char gender, int governorateId, CancellationToken cancellationToken)
-        {
-            char normalizedGender = char.ToUpper(gender);
-            return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender && v.GovernorateId == governorateId, cancellationToken);
-        }
-
-        public async Task<int> GetVotesCountByElectionAgeAndGovernorateAsync(Guid electionId, int minAge, int maxAge, int governorateId, CancellationToken cancellationToken)
-        {
-            return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId &&
-                                 v.VoterAge >= minAge && v.VoterAge <= maxAge &&
-                                 v.GovernorateId == governorateId, cancellationToken);
-        }
-
-        public Task<int> GetVotesCountByElectionIdAndGenderAsync(Guid electionId, char gender, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> GetVotesCountByElectionIdAndAgePhaseAsync(Guid electionId, int minAge, int maxAge, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> GetVotesCountByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

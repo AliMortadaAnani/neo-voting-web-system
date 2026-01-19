@@ -15,31 +15,31 @@ namespace NeoVoting.Infrastructure.Repositories
             return candidateProfile;
         }
 
-        public async Task<IReadOnlyList<CandidateProfile>> GetAllCandidatesProfilesByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<CandidateProfile>> GetAllCandidatesProfilesByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
         {
             return await _dbContext.CandidateProfiles
                 .Include(c => c.User)
                 .Include(c => c.Election)
-                .Where(c => c.ElectionId == ElectionId)
+                .Where(c => c.ElectionId == electionId)
                 .OrderBy(c => c.User.UserName)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<CandidateProfile?> GetCandidateProfileByUserIdAndElectionIdAsync(Guid UserId, Guid ElectionId, CancellationToken cancellationToken)
+        public async Task<CandidateProfile?> GetCandidateProfileByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken)
         {
             return await _dbContext.CandidateProfiles
                 .Include(c => c.User)
                 .Include(c => c.Election)
-                .FirstOrDefaultAsync(c => c.UserId == UserId && c.ElectionId == ElectionId, cancellationToken);
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.ElectionId == electionId, cancellationToken);
         }
 
-        public async Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAsync(Guid ElectionId, int skip, int take, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken)
         {
             return await _dbContext.CandidateProfiles
                 .Include(c => c.User)
                 .Include(c => c.Election)
-                .Where(c => c.ElectionId == ElectionId)
+                .Where(c => c.ElectionId == electionId)
                 .OrderBy(c => c.User.UserName)
                 .Skip(skip)
                 .Take(take)
@@ -47,9 +47,9 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<int> GetTotalCandidatesProfilesCountByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfTotalCandidatesProfilesByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
         {
-            return await _dbContext.CandidateProfiles.CountAsync(c => c.ElectionId == ElectionId, cancellationToken);
+            return await _dbContext.CandidateProfiles.CountAsync(c => c.ElectionId == electionId, cancellationToken);
         }
 
         public void Update(CandidateProfile candidateProfile)
@@ -57,30 +57,34 @@ namespace NeoVoting.Infrastructure.Repositories
             _dbContext.CandidateProfiles.Update(candidateProfile);
         }
 
-        // --- NEW STATS METHODS ---
+        
 
-        public async Task<int> GetCandidatesCountByElectionAndGovernorateAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, int skip, int take, CancellationToken cancellationToken)
+        {
+            return await _dbContext.CandidateProfiles
+                .Include(c => c.User)
+                .Include(c => c.Election)
+                .Where(c => c.ElectionId == electionId && c.User.GovernorateId == governorateId)
+                .OrderBy(c => c.User.UserName)
+                .Skip(skip)
+                .Take(take)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<int> GetCountOfTotalCandidatesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
         {
             // CandidateProfile does not have GovernorateId directly, it's on the User.
             return await _dbContext.CandidateProfiles
-                .Include(c => c.User)
+                //.Include(c => c.User)
                 .Where(c => c.ElectionId == electionId && c.User.GovernorateId == governorateId)
                 .CountAsync(cancellationToken);
         }
 
-        public Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, int skip, int take, CancellationToken cancellationToken)
+        public async Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> GetTotalCandidatesCountByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            return await _dbContext.CandidateProfiles
+        .AnyAsync(cp => cp.UserId == userId && cp.ElectionId == electionId, cancellationToken);
         }
     }
 }

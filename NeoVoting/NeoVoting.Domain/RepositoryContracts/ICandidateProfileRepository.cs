@@ -13,11 +13,11 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken);
 
-        Task<int> GetTotalCandidatesProfilesCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
+        Task<int> GetCountOfTotalCandidatesProfilesByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
 
         Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, int skip, int take, CancellationToken cancellationToken);
 
-        Task<int> GetTotalCandidatesCountByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
+        Task<int> GetCountOfTotalCandidatesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
 
         void Update(CandidateProfile candidateProfile);
 

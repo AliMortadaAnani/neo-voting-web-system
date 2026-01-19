@@ -25,30 +25,18 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Election?> GetElectionByIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+        public async Task<Election?> GetElectionByIdAsync(Guid electionId, CancellationToken cancellationToken)
         {
             return await _dbContext.Elections
                 .Include(e => e.ElectionStatus)
-                .FirstOrDefaultAsync(e => e.Id == ElectionId, cancellationToken);
+                .FirstOrDefaultAsync(e => e.Id == electionId, cancellationToken);
         }
 
         public void Update(Election election)
         {
             _dbContext.Elections.Update(election);
         }
-
-
-        // --- NEW STATS METHODS ---
-
-        public async Task<Election?> GetLastCompletedElectionAsync(CancellationToken cancellationToken)
-        {
-            return await _dbContext.Elections
-                .Include(e => e.ElectionStatus)
-                .Where(e => e.ElectionStatusId == (int)ElectionStatusEnum.Completed)
-                .OrderByDescending(e => e.VotingEndDate)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancellationToken);
-        }
+ 
 
         public async Task<Election?> GetLastUpcomingOrActiveElectionAsync(CancellationToken cancellationToken)
         {
@@ -56,28 +44,17 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Include(e => e.ElectionStatus)
                 .Where(e => e.ElectionStatusId != (int)ElectionStatusEnum.Completed)
                 .OrderByDescending(e => e.VotingEndDate)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<int?> GetRegisteredVotersCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
-        {
-            // Returns the frozen count stored in the entity if completed, otherwise null
-            var election = await _dbContext.Elections
-                .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Id == electionId, cancellationToken);
 
-            return election?.FinalNumberOfRegisteredVoters;
+        public async Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken)
+        {
+            return await _dbContext.Elections
+               .Include(e => e.ElectionStatus)
+               .AnyAsync(e => e.ElectionStatusId != (int)ElectionStatusEnum.Completed,cancellationToken);
         }
 
-        public Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        //Task<int> IElectionRepository.GetRegisteredVotersCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        
     }
 }

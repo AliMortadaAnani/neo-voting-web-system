@@ -9,11 +9,11 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<IReadOnlyList<PublicVoteLog>> GetPagedPublicVoteLogsByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken);
 
-        Task<int> GetTotalPublicVoteLogsCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
+        Task<int> GetCountOfTotalPublicVoteLogsByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
 
         Task<IReadOnlyList<PublicVoteLog>> GetPagedPublicVoteLogsByElectionIdAndGovernorateIdAsync(Guid electionId,int governorateId, int skip, int take, CancellationToken cancellationToken);
 
-        Task<int> GetTotalPublicVoteLogsCountByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
+        Task<int> GetCountOfTotalPublicVoteLogsByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
 
         Task<PublicVoteLog?> GetPublicVoteLogByVoteIdAsync(Guid voteId, CancellationToken cancellationToken);
 

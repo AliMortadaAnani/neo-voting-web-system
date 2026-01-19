@@ -1,13 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using NeoVoting.Domain.IdentityEntities;
+﻿using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
@@ -28,19 +21,19 @@ namespace NeoVoting.Infrastructure.Repositories
                    select user;
         }
 
-        public async Task<int> GetTotalVotersCountAsync(CancellationToken cancellationToken)
+        public async Task<int> GetCountOfTotalVotersAsync(CancellationToken cancellationToken)
         {
             return await GetVotersQuery().CountAsync(cancellationToken);
         }
 
-        public async Task<int> GetVotersCountByGovernorateIdAsync(int governorateId, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfVotersByGovernorateIdAsync(int governorateId, CancellationToken cancellationToken)
         {
             return await GetVotersQuery()
                 .Where(u => u.GovernorateId == governorateId)
                 .CountAsync(cancellationToken);
         }
 
-        public async Task<int> GetVotersCountByGenderAsync(char gender, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfVotersByGenderAsync(char gender, CancellationToken cancellationToken)
         {
             // char.ToUpper to ensure case insensitivity
             char normalizedGender = char.ToUpper(gender);
@@ -49,7 +42,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .CountAsync(cancellationToken);
         }
 
-        public async Task<int> GetVotersCountByAgeRangeAsync(int minAge, int maxAge, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfVotersByAgeRangeAsync(int minAge, int maxAge, CancellationToken cancellationToken)
         {
             
             var today = DateTime.UtcNow.Date;
@@ -61,7 +54,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .CountAsync(cancellationToken);
         }
 
-        public async Task<int> GetVotersCountByGovernorateAndGenderAsync(int governorateId, char gender, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfVotersByGovernorateAndGenderAsync(int governorateId, char gender, CancellationToken cancellationToken)
         {
             char normalizedGender = char.ToUpper(gender);
             return await GetVotersQuery()
@@ -69,7 +62,7 @@ namespace NeoVoting.Infrastructure.Repositories
                .CountAsync(cancellationToken);
         }
 
-        public async Task<int> GetVotersCountByGovernorateAndAgeRangeAsync(int governorateId, int minAge, int maxAge, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfVotersByGovernorateAndAgeRangeAsync(int governorateId, int minAge, int maxAge, CancellationToken cancellationToken)
         {
             var today = DateTime.UtcNow.Date;
             var maxDateOfBirth = today.AddYears(-minAge);
@@ -82,14 +75,8 @@ namespace NeoVoting.Infrastructure.Repositories
                 .CountAsync(cancellationToken);
         }
 
-        public Task<int> GetVotersCountByAgePhaseAsync(int minAge, int maxAge, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        public Task<int> GetVotersCountByGovernorateAndAgePhaseAsync(int governorateId, int minAge, int maxAge, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

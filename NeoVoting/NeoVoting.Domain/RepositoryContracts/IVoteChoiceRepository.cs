@@ -12,7 +12,7 @@ namespace NeoVoting.Domain.RepositoryContracts
 
 
         //vote count by candidate profile id(which includes election id and governorate id info)
-        Task<int> GetTotalVoteChoicesCountByCandidateProfileIdAsync(Guid candidateProfileId, CancellationToken cancellationToken);
+        Task<int> GetCountOfTotalVoteChoicesByCandidateProfileIdAsync(Guid candidateProfileId, CancellationToken cancellationToken);
 
         // winners per governorate id per election id
         Task<IReadOnlyList<Guid>> GetTop5CandidatesIdsPerGovernorate(Guid electionId,int governorateId,CancellationToken cancellationToken);

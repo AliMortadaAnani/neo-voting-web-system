@@ -52,39 +52,51 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<int> GetTotalSystemAuditLogsCountAsync(CancellationToken cancellationToken)
+        public async Task<int> GetCountOfTotalSystemAuditLogsAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.SystemAuditLogs.CountAsync(cancellationToken);
         }
 
-        public Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByActionTypeAsync(SystemActionTypesEnum systemAction, int skip, int take, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByActionTypeAsync(SystemActionTypesEnum systemAction, int skip, int take, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _dbContext.SystemAuditLogs
+               
+                .Where(l => l.ActionType == systemAction)
+                .OrderByDescending(l => l.TimestampUTC)
+                .Skip(skip)
+                .Take(take)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         }
 
-        public Task<int> GetTotalSystemAuditLogsCountByActionTypeAsync(SystemActionTypesEnum systemAction, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfTotalSystemAuditLogsByActionTypeAsync(SystemActionTypesEnum systemAction, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _dbContext.SystemAuditLogs
+               
+                .Where(l => l.ActionType == systemAction)
+                .CountAsync(cancellationToken);
         }
 
-        public Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByUserIdAsync(Guid userId, int skip, int take, CancellationToken cancellationToken)
+
+
+        public async Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _dbContext.SystemAuditLogs
+                
+                .Where(l => l.ElectionId == electionId)
+                .OrderByDescending(l => l.TimestampUTC)
+                .Skip(skip)
+                .Take(take)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         }
 
-        public Task<int> GetTotalSystemAuditLogsCountByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfTotalSystemAuditLogsByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> GetTotalSystemAuditLogsCountByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            return await _dbContext.SystemAuditLogs
+                
+                .Where(l => l.ElectionId == electionId)
+                .CountAsync(cancellationToken);
         }
     }
 }

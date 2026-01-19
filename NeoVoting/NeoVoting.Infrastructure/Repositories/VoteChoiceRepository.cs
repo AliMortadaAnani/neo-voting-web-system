@@ -22,58 +22,45 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public void Delete(VoteChoice voteChoice)
         {
-            _dbContext.VoteChoices.Remove(voteChoice);
+            _dbContext.VoteChoices.Remove(voteChoice); // soft deleted
         }
 
-        public async Task<IReadOnlyList<VoteChoice>> GetAllVoteChoicesByCandidateProfileIdAsync(Guid CandidateProfileId, CancellationToken cancellationToken)
+
+        public async Task<IReadOnlyList<Guid>> GetTop5CandidatesIdsPerGovernorate(
+    Guid electionId,
+    int governorateId,
+    CancellationToken cancellationToken)
         {
-            return await _dbContext.VoteChoices
-                .Include(vc => vc.Vote)
-                .Include(vc => vc.CandidateProfile)
-                .Where(vc => vc.CandidateProfileId == CandidateProfileId)
-                .OrderByDescending(vc => vc.Vote.TimestampUTC)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-        }
+            var query = _dbContext.VoteChoices
+                //.Include(vc => vc.Vote)
+                //.ThenInclude(v => v.Election)
+                //.Include(vc => vc.Vote)
+                //.ThenInclude(v => v.Governorate)
 
-        public async Task<IReadOnlyList<VoteChoice>> GetPagedVoteChoicesByCandidateProfileIdAsync(Guid CandidateProfileId, int skip, int take, CancellationToken cancellationToken)
-        {
-            return await _dbContext.VoteChoices
-                .Include(vc => vc.Vote)
-                .Include(vc => vc.CandidateProfile)
-                .Where(vc => vc.CandidateProfileId == CandidateProfileId)
-                .OrderByDescending(vc => vc.Vote.TimestampUTC)
-                .Skip(skip)
-                .Take(take)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .Where(vc =>
+                vc.Vote.ElectionId == electionId
+                &&
+                vc.Vote.GovernorateId == governorateId)
+                .GroupBy(vc => vc.CandidateProfileId)
+                .OrderByDescending(g => g.Count())
+                .ThenBy(u => Guid.NewGuid())
+                .Take(5)
+                .Select(g => g.Key)
+                ;
+            return await query.ToListAsync(cancellationToken);
         }
+   
 
-        public Task<IReadOnlyList<Guid>> GetTop5CandidatesIdsPerGovernorate(Guid electionId, int governorateId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<int> GetTotalVoteChoicesCountByCandidateProfileIdAsync(Guid CandidateProfileId, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfTotalVoteChoicesByCandidateProfileIdAsync(Guid CandidateProfileId, CancellationToken cancellationToken)
         {
             return await _dbContext.VoteChoices.CountAsync(vc => vc.CandidateProfileId == CandidateProfileId, cancellationToken);
         }
 
-        public async Task<IReadOnlyList<VoteChoice>> GetVoteChoicesByVoteIdAsync(Guid VoteId, CancellationToken cancellationToken)
+
+        public async Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(Guid voteId, Guid candidateProfileId, CancellationToken cancellationToken)
         {
             return await _dbContext.VoteChoices
-                .Include(vc => vc.Vote)
-                .Include(vc => vc.CandidateProfile)
-                .ThenInclude(cp => cp.User)
-                .Where(vc => vc.VoteId == VoteId)
-                .OrderBy(vc => vc.CandidateProfile.User.UserName)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-        }
-
-        public Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(Guid voteId, Guid candidateProfileId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+                .AnyAsync(vc => vc.VoteId == voteId && vc.CandidateProfileId == candidateProfileId, cancellationToken);
         }
 
         #region Soft Delete Demonstration
