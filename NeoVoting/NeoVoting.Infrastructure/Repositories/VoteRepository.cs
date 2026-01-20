@@ -49,7 +49,7 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             char normalizedGender = char.ToUpper(gender);
             return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender);
+                .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender, cancellationToken);
         }
 
         public async Task<int> GetCountOfVotesByElectionIdAndAgeRangeAsync(Guid electionId, int minAge, int maxAge, CancellationToken cancellationToken)

@@ -4,11 +4,13 @@ using System.Text.Json.Serialization;
 namespace NeoVoting.Domain.ErrorHandling
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
+    //Government System comments indicate enums specific to government-related functionalities.
     public enum ProblemDetails400ErrorTypes // Validation / Bad Request
     {
         Paging_InvalidInput,
         Voter_InvalidUsername,//Government System
-        Candidate_InvalidUsername//Government System
+        Candidate_InvalidUsername,//Government System
+        Password_Mismatch,
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -16,8 +18,9 @@ namespace NeoVoting.Domain.ErrorHandling
     {
         // Admin Auth
         Admin_InvalidCredentials,
+        User_InvalidCredentials,
 
-        
+
         Voter_NotEligible,//Government System
 
         Voter_InvalidToken,//Government System
@@ -32,7 +35,8 @@ namespace NeoVoting.Domain.ErrorHandling
         Auth_UnauthorizedAccess,
 
         Auth_InvalidApiKey,//Government System
-        Auth_TokenMissing//Government System
+        Auth_TokenMissing,//Government System
+        Auth_InvalidToken
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -40,7 +44,8 @@ namespace NeoVoting.Domain.ErrorHandling
     {
         Auth_ForbiddenAccess,
         IpWhitelist_ForbiddenIP,//Government System
-        IpWhitelist_RestrictedEndpoint//Government System
+        IpWhitelist_RestrictedEndpoint,//Government System
+        User_LockedOut
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -56,7 +61,8 @@ namespace NeoVoting.Domain.ErrorHandling
     {
         Voter_AlreadyRegistered,//Government System
         Voter_AlreadyVoted,//Government System
-        Candidate_AlreadyRegistered//Government System
+        Candidate_AlreadyRegistered,//Government System
+        User_DuplicateUsername
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -65,7 +71,15 @@ namespace NeoVoting.Domain.ErrorHandling
         Server_Error,
         Server_ConfigurationError,//Government System
         Voter_OperationFailed,//Government System
-        Candidate_OperationFailed//Government System
+        Candidate_OperationFailed,//Government System
+        Login_Failed,
+        Logout_Failed,
+        RefreshToken_Failed,
+        Role_CreationFailed,
+        UserCreation_Failed,
+        UserRoleAssignment_Failed,
+        GovernmentSystemGateway_Error,
+        PasswordReset_Failed
     }
 
     // ==============================================================================

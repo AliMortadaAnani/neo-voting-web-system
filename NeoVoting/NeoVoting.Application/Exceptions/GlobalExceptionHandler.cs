@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.Application.Exceptions
 {
@@ -32,7 +33,7 @@ namespace NeoVoting.Application.Exceptions
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "Internal Server Error",
                 Detail = "An unexpected error occurred. Please contact support.",
-                Type = "Server.Error"
+                Type = nameof(ProblemDetails500ErrorTypes.Server_Error)
             };
 
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;

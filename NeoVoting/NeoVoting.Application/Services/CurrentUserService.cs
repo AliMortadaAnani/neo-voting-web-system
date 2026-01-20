@@ -22,13 +22,21 @@ namespace NeoVoting.Application.Services
         {
             get
             {
-                var user = _httpContextAccessor.HttpContext?.User;
-
-                var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                return Guid.TryParse(userId, out var parsedId) ? parsedId : null;
-                
+                var userIdClaim = _httpContextAccessor.HttpContext?.User
+                    ?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                return Guid.TryParse(userIdClaim, out var id) ? id : null;
             }
         }
+
+        public Guid GetAuthenticatedUserId()
+        {
+            if (!UserId.HasValue || UserId.Value == Guid.Empty)
+            {
+                throw new UnauthorizedAccessException(
+                    "User must be authenticated to perform this operation.");
+            }
+            return UserId.Value;
+        }
+
     }
 }

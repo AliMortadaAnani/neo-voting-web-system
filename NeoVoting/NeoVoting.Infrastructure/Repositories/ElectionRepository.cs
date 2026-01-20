@@ -51,8 +51,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.Elections
-               .Include(e => e.ElectionStatus)
-               .AnyAsync(e => e.ElectionStatusId != (int)ElectionStatusEnum.Completed,cancellationToken);
+               .AnyAsync(e => e.ElectionStatusId != (int)ElectionStatusEnum.Completed, cancellationToken);
         }
 
         

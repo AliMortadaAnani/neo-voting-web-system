@@ -46,6 +46,7 @@ namespace NeoVoting.Application.Services
     };
 
             // 2. Add Personal Details (Only if they are not null)
+            // admin will have null personal details
 
             // First Name -> "given_name"
             if (!string.IsNullOrWhiteSpace(user.FirstName))
@@ -154,7 +155,9 @@ namespace NeoVoting.Application.Services
                     !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return Result<ClaimsPrincipal>.Failure(
-                Error.Validation("Token.Invalid", "Invalid token security algorithm."));
+                Error.Unauthorized
+                (nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
+                "Invalid token security algorithm."));
                 }
 
                 return Result<ClaimsPrincipal>.Success(principal);
@@ -164,7 +167,8 @@ namespace NeoVoting.Application.Services
                 // We catch the library exception here and convert it to a Domain Result.
                 // This prevents the Controller from needing try/catch blocks.
                 return Result<ClaimsPrincipal>.Failure(
-                    Error.Validation("Token.Invalid", "Token is invalid or malformed."));
+                    Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
+                    "Token is invalid or malformed."));
             }
         }
 

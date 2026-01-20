@@ -9,6 +9,7 @@ namespace NeoVoting.Application.ServicesContracts
     public interface ICurrentUserService
     {
         Guid? UserId { get; }
-        // int? UserId { get; } // Use int if your IDs are integers
+        Guid GetAuthenticatedUserId();
+      
     }
 }
