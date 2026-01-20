@@ -16,7 +16,7 @@ namespace NeoVoting.Application.ServicesContracts
       */
 
         // Generates the Access Token (JWT) and a raw Refresh Token
-        Task<AuthenticationResponse> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default);
+        Task<Authentication_ResponseDTO> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default);
 
         // Extracts the user principal (claims) from a token, even if it is expired
         Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default);

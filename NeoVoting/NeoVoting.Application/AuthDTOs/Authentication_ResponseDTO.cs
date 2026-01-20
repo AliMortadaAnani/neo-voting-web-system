@@ -1,6 +1,6 @@
 ﻿namespace NeoVoting.Application.AuthDTOs
 {
-    public class AuthenticationResponse
+    public class Authentication_ResponseDTO
     {
         public string AccessToken { get; set; } = string.Empty;
         public string RefreshToken { get; set; } = string.Empty;

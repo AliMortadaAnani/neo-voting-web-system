@@ -252,7 +252,7 @@ namespace NeoVoting.API.StartupExtensions
 
             //FLUENT VALIDATION SETUP
             services.AddFluentValidationAutoValidation();
-            services.AddValidatorsFromAssemblyContaining<CandidateProfileAddRequestValidator>();
+            services.AddValidatorsFromAssemblyContaining<Authentication_ResponseDTO_Validator>();
             services.AddFluentValidationRulesToSwagger();
 
 

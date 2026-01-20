@@ -20,14 +20,14 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Register([FromBody] RegisterVoterDTO request)
+        public async Task<IActionResult> Register([FromBody] Register_ResetPassword_VoterOrCandidate_DTO request)
         {
-            var result = await _authService.RegisterVoterAsync(request);
+            var result = await _authService.RegisterVoterOrCandidateAsync(request,Domain.Enums.RoleTypesEnum.Voter);
             return HandleResult(result);
         }
 
         [HttpPost("login")]
-        [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Authentication_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginDTO request)
@@ -49,7 +49,7 @@ namespace NeoVoting.API.Controllers
         }
 
         [HttpPost("refresh")]
-        [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Authentication_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDTO request)

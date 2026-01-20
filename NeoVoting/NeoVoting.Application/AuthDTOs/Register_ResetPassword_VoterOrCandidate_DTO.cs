@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeoVoting.Application.AuthDTOs
 {
-    public class ResetVoterOrCandidatePasswordDTO
+    public class Register_ResetPassword_VoterOrCandidate_DTO
     {
         public string? UserName { get; set; }
         public string? NewPassword { get; set; }

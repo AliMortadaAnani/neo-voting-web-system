@@ -31,7 +31,7 @@ namespace NeoVoting.Application.Services
    We can keep the cancellation token in signature in case we use it in future.
      */
 
-        public async Task<AuthenticationResponse> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default)
+        public async Task<Authentication_ResponseDTO> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default)
         {
             // 1. Define Basic Claims
             var claims = new List<Claim>
@@ -110,7 +110,7 @@ namespace NeoVoting.Application.Services
             var refreshToken = GenerateRefreshToken();
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
 
-            return new AuthenticationResponse
+            return new Authentication_ResponseDTO
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
