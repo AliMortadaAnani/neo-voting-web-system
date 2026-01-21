@@ -245,7 +245,7 @@ namespace NeoVoting.API.StartupExtensions
 
             // --- REGISTER SERVICES --- 
 
-            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<ICurrentUserServices, CurrentUserServices>();
             services.AddScoped<IAuthServices, AuthServices>();
             services.AddScoped<ITokenServices, TokenServices>();
 

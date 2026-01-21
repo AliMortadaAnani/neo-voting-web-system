@@ -23,14 +23,14 @@ namespace NeoVoting.Application.Services
         private readonly ITokenServices _tokenServices;
         private readonly ISystemAuditLogRepository _systemAuditLogRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly ICurrentUserServices _currentUserService;
         private readonly ILogger<AuthServices> _logger;
         
         
         
 
         public AuthServices
-            (SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ITokenServices tokenServices, ILogger<AuthServices> logger, RoleManager<ApplicationRole> roleManager, ISystemAuditLogRepository systemAuditLogRepository, IUnitOfWork unitOfWork, IGovernmentSystemGateway governmentSystemGateway,ICurrentUserService currentUserService)
+            (SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ITokenServices tokenServices, ILogger<AuthServices> logger, RoleManager<ApplicationRole> roleManager, ISystemAuditLogRepository systemAuditLogRepository, IUnitOfWork unitOfWork, IGovernmentSystemGateway governmentSystemGateway,ICurrentUserServices currentUserService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -44,7 +44,7 @@ namespace NeoVoting.Application.Services
         }
 
 
-        public async Task<Result<Authentication_ResponseDTO>> LoginAsync(LoginDTO loginDTO, CancellationToken cancellationToken = default)
+        public async Task<Result<Authentication_ResponseDTO>> LoginAsync(Login_RequestDTO loginDTO, CancellationToken cancellationToken = default)
         {
             var user = await _userManager.FindByNameAsync(loginDTO.UserName!);
 
@@ -130,7 +130,7 @@ namespace NeoVoting.Application.Services
             return Result<bool>.Success(true);
         }
 
-        public async Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO, CancellationToken cancellationToken = default)
+        public async Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO refreshTokenRequestDTO, CancellationToken cancellationToken = default)
         {
             // 1. Validate the old Access Token
             var principalResult = _tokenServices.GetPrincipalFromExpiredToken(refreshTokenRequestDTO.AccessToken);
@@ -194,7 +194,7 @@ namespace NeoVoting.Application.Services
 
 
         public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterOrCandidateAsync(
-    Register_ResetPassword_VoterOrCandidate_DTO dto,
+    Register_ResetPassword_VoterOrCandidate_RequestDTO dto,
     RoleTypesEnum role,
     CancellationToken ct = default)
         {
@@ -584,7 +584,7 @@ namespace NeoVoting.Application.Services
         }
 
         public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterOrCandidatePasswordAsync(
-            Register_ResetPassword_VoterOrCandidate_DTO dto,
+            Register_ResetPassword_VoterOrCandidate_RequestDTO dto,
             CancellationToken ct = default)
         {
             // -----------------------------------------------------------------------

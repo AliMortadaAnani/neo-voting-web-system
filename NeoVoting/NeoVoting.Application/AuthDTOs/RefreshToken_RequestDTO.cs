@@ -1,6 +1,6 @@
 ﻿namespace NeoVoting.Application.AuthDTOs
 {
-    public class RefreshTokenRequestDTO
+    public class RefreshToken_RequestDTO
     {
         public string? RefreshToken { get; set; }
 

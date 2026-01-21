@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeoVoting.Application.ServicesContracts
 {
-    public interface ICurrentUserService
+    public interface ICurrentUserServices
     {
         Guid? UserId { get; }
         Guid GetAuthenticatedUserId();

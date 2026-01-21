@@ -54,6 +54,14 @@ namespace NeoVoting.Infrastructure.Repositories
                .AnyAsync(e => e.ElectionStatusId != (int)ElectionStatusEnum.Completed, cancellationToken);
         }
 
-        
+        public async Task<IReadOnlyList<Election>> GetAllCompletedElectionsAsync(CancellationToken cancellationToken)
+        {
+            return await _dbContext.Elections
+                .Include(e => e.ElectionStatus)
+                .Where(e => e.ElectionStatusId == (int)ElectionStatusEnum.Completed)
+                .OrderByDescending(e => e.VotingEndDate)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
     }
 }

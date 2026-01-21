@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Services
 {
-    public class CurrentUserService : ICurrentUserService
+    public class CurrentUserServices : ICurrentUserServices
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+        public CurrentUserServices(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
