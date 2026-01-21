@@ -220,7 +220,8 @@ namespace NeoVoting.Infrastructure.Migrations
                     b.Property<Guid>("ElectionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("GovernorateId")
+                    b.Property<int?>("GovernorateId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int>("RegisteredAge18To29Count")

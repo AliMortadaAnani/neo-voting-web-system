@@ -22,11 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Filters\" />
-    <Folder Include="Middlewares\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\NeoVoting.Application\NeoVoting.Application.csproj" />
     <ProjectReference Include="..\NeoVoting.Domain\NeoVoting.Domain.csproj" />
     <ProjectReference Include="..\NeoVoting.Infrastructure\NeoVoting.Infrastructure.csproj" />

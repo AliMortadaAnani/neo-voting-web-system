@@ -12,10 +12,12 @@ using NeoVoting.Application.Services;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Application.Validators;
 using NeoVoting.Domain.Contracts;
+using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.IdentityEntities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 using NeoVoting.Infrastructure.Repositories;
+using System.Reflection;
 using System.Text;
 
 namespace NeoVoting.API.StartupExtensions
@@ -106,7 +108,7 @@ namespace NeoVoting.API.StartupExtensions
 
                         var problem = new ProblemDetails
                         {
-                            Type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                            Type = nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
                             Title = "Unauthorized",
                             Status = StatusCodes.Status401Unauthorized,
                             Detail = "Authentication failed. Token is missing, invalid, or expired.",
@@ -124,7 +126,7 @@ namespace NeoVoting.API.StartupExtensions
 
                         var problem = new ProblemDetails
                         {
-                            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
+                            Type = nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess),
                             Title = "Forbidden",
                             Status = StatusCodes.Status403Forbidden,
                             Detail = "You do not have permission to access this resource.",
@@ -200,6 +202,15 @@ namespace NeoVoting.API.StartupExtensions
             Array.Empty<string>() // Scopes (leave empty for standard JWT)
         }
     });
+
+                // 1. Get the name of the generated XML file (usually YourProjectName.xml)
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+                // 2. Combine with the base directory to get the full path
+                var fullPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+
+                // 3. Tell Swagger to use it
+                options.IncludeXmlComments(fullPath);
             });
             // =========================================================================
             // SWAGGER CONFIGURATION END
@@ -242,12 +253,18 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
             services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
-
+            services.AddScoped<IElectionRegisteredVotersPerGovernorateRepository, ElectionRegisteredVotersPerGovernorateRepository>();
             // --- REGISTER SERVICES --- 
 
             services.AddScoped<ICurrentUserServices, CurrentUserServices>();
             services.AddScoped<IAuthServices, AuthServices>();
             services.AddScoped<ITokenServices, TokenServices>();
+            services.AddScoped<IAdminServices, AdminServices>();
+            services.AddScoped<ICandidateServices, CandidateServices>();
+            services.AddScoped<IVoterServices, VoterServices>();
+            services.AddScoped<IGeneralServices, GeneralServices>();
+            services.AddScoped<IFileService , LocalFileService>();
+
 
 
             //FLUENT VALIDATION SETUP

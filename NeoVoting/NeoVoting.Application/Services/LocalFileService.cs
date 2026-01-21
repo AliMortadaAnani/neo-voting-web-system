@@ -33,7 +33,7 @@ namespace NeoVoting.Application.Services
             // 2. Create unique filename (Guid) to prevent overwriting and security issues
             var fileName = $"{Guid.NewGuid()}{ext}";
 
-            // 3. Define path (e.g., wwwroot/uploads/avatars)
+            // 3. Define path (e.g., wwwroot/uploads/profiles)
             var folderPath = Path.Combine(_environment.WebRootPath, "uploads", "profiles");
             if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 

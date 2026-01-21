@@ -16,10 +16,13 @@ namespace NeoVoting.Domain.Entities
         /// </summary>
         public Guid ElectionId { get; private set; }
 
+
+        // governorateId is nullable because it can represent the total registered voters across all governorates when null
+
         /// <summary>
         /// Governorate to which this statistical record belongs.
         /// </summary>
-        public int GovernorateId { get; private set; }
+        public int? GovernorateId { get; private set; }
 
         /// <summary>
         /// Total number of registered voters for this governorate at the snapshot moment.
@@ -58,18 +61,18 @@ namespace NeoVoting.Domain.Entities
 
         // Navigation properties (optional depending on design)
          public Election Election { get; private set; }
-         public Governorate Governorate { get; private set; }
+         public Governorate? Governorate { get; private set; }
 
         // Private constructor for EF Core
         private ElectionRegisteredVotersPerGovernorate() 
         {
         Election = null!;
-        Governorate = null!;
+        
         }
 
         public static ElectionRegisteredVotersPerGovernorate Create(
             Guid electionId,
-            int governorateId,
+            int? governorateId,
             int registeredVotersCount,
             int registeredMalesCount,
             int registeredFemalesCount,
@@ -95,9 +98,11 @@ namespace NeoVoting.Domain.Entities
             if(electionId == Guid.Empty)
                 throw new ArgumentException("ElectionId cannot be empty.", nameof(electionId));
 
-            // Validate GovernorateId
-            if (!Enum.IsDefined(typeof(GovernoratesEnum), governorateId))
-                throw new ArgumentException($"Invalid governorate id: {governorateId}", nameof(governorateId));
+            if (governorateId.HasValue)
+            {
+                if (!Enum.IsDefined(typeof(GovernoratesEnum), governorateId.Value))
+                    throw new ArgumentException($"Invalid governorate id: {governorateId}", nameof(governorateId));
+            }
 
 
             return new ElectionRegisteredVotersPerGovernorate

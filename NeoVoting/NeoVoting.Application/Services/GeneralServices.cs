@@ -26,6 +26,11 @@ namespace NeoVoting.Application.Services
             throw new NotImplementedException();
         }
 
+        public Task<Result<ElectionCompletedStatistics_ResponseDTO>> GetCompletedElectionStatsByIdPerGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Result<Election_ResponseDTO>> GetCurrentActiveElectionAsync(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();

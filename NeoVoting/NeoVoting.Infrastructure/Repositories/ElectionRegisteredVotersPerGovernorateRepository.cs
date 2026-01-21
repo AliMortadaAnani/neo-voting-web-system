@@ -18,8 +18,8 @@ namespace NeoVoting.Infrastructure.Repositories
            await _dbContext.ElectionRegisteredVotersPerGovernorates.AddAsync(entity, cancellationToken);
             return entity;
         }
-
-        public async Task<ElectionRegisteredVotersPerGovernorate?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        // governorateId is nullable because it can represent the total registered voters across all governorates when null
+        public async Task<ElectionRegisteredVotersPerGovernorate?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int? governorateId, CancellationToken cancellationToken)
         {
             return await _dbContext.ElectionRegisteredVotersPerGovernorates
                 .FirstOrDefaultAsync(erpg => erpg.ElectionId == electionId && erpg.GovernorateId == governorateId, cancellationToken);
