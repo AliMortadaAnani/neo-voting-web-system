@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 namespace NeoVoting.Application.RequestDTOs
 {
     public class CandidateProfileUploadImage_RequestDTO
-    {
-        
-        public required IFormFile File { get; set; }
+    {   
+        public IFormFile? File { get; set; }
+
     }
 }

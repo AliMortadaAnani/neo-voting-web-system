@@ -18,9 +18,4 @@
     <ProjectReference Include="..\NeoVoting.Domain\NeoVoting.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="RequestDTOs\" />
-    <Folder Include="ResponseDTOs\" />
-  </ItemGroup>
-
 </Project>

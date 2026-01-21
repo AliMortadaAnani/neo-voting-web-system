@@ -32,8 +32,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(e => e.VotingEndDate)
                 .IsRequired();
 
-            builder.Property(e => e.FinalNumberOfRegisteredVoters)
-                .IsRequired(false); // nullable, set when election complete
+            
             // Foreign key relationship
             builder.HasOne(e => e.ElectionStatus)
                 .WithMany() // no back navigation

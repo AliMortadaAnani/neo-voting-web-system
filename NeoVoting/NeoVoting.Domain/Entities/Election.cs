@@ -12,8 +12,7 @@ namespace NeoVoting.Domain.Entities
         public DateTime VotingStartDate { get; private set; }
         public DateTime VotingEndDate { get; private set; }
 
-        public int? FinalNumberOfRegisteredVoters { get; private set; }
-        // number of registered voters in the system just after this election is completed
+        
 
         // --- Foreign Key & Navigation Property ---
 
@@ -100,28 +99,18 @@ namespace NeoVoting.Domain.Entities
         /// Moves the election to the Completed phase.
         /// Throws an exception if the election is not in the 'Voting' state.
         /// </summary>
-        public void CompleteElection_With_NumberOfRegisteredVoters(int numberOfRegisteredVoters)
+        public void CompleteElection()
         {
             if (ElectionStatusId != (int)ElectionStatusEnum.Voting)
             {
                 throw new InvalidOperationException("Cannot complete the election unless it is in the 'Voting' state.");
             }
 
-            SetNumberOfRegisteredVoters(numberOfRegisteredVoters);
+           
             ElectionStatusId = (int)ElectionStatusEnum.Completed;
         }
 
-        //Calculated just after completing the election
-        //final calculated number of registered voters
-        private void SetNumberOfRegisteredVoters(int count)
-        {
-            if (count < 0)
-            {
-                throw new ArgumentException("Number of registered voters cannot be negative.");
-            }
-            FinalNumberOfRegisteredVoters = count;
-        }
-
+       
         /// <summary>
         /// Private helper method to contain all validation rules for creating an election.
         /// </summary>

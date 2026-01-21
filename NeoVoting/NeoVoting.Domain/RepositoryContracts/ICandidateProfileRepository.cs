@@ -7,6 +7,7 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<CandidateProfile> AddCandidateProfileAsync(CandidateProfile candidateProfile, CancellationToken cancellationToken);
 
+        Task<CandidateProfile?> GetCandidateProfileByIdAndElectionIdAsync(Guid candidateProfileId, Guid electionId, CancellationToken cancellationToken);
         Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken);
 
         Task<CandidateProfile?> GetCandidateProfileByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken);

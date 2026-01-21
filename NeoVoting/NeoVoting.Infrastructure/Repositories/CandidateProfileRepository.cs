@@ -34,6 +34,14 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.UserId == userId && c.ElectionId == electionId, cancellationToken);
         }
 
+        public async Task<CandidateProfile?> GetCandidateProfileByIdAndElectionIdAsync(Guid candidateProfileId, Guid electionId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.CandidateProfiles
+                .Include(c => c.User)
+                .Include(c => c.Election)
+                .FirstOrDefaultAsync(c => c.Id == candidateProfileId && c.ElectionId == electionId, cancellationToken);
+        }
+
         public async Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken)
         {
             return await _dbContext.CandidateProfiles
