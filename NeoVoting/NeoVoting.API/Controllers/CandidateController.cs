@@ -5,6 +5,7 @@ using NeoVoting.Application.RequestDTOs;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
+using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.API.Controllers
 {
@@ -37,11 +38,12 @@ namespace NeoVoting.API.Controllers
         [HttpPost("elections/{electionId:guid}/profile")]
         [ProducesResponseType(typeof(CandidateProfile_ResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> AddProfile(Guid electionId, [FromBody] CandidateProfileAdd_RequestDTO request, CancellationToken ct)
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddProfile([FromRoute] Guid electionId, [FromBody] CandidateProfileAdd_RequestDTO request, CancellationToken ct)
         {
             var result = await _candidateServices.AddCandidateProfileByElectionIdAsync(electionId, request, ct);
             return HandleResult(result, Created: true);
@@ -62,10 +64,12 @@ namespace NeoVoting.API.Controllers
         [HttpPut("elections/{electionId:guid}/profile")]
         [ProducesResponseType(typeof(CandidateProfile_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateProfile(Guid electionId, [FromBody] CandidateProfileUpdate_RequestDTO request, CancellationToken ct)
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateProfile([FromRoute] Guid electionId, [FromBody] CandidateProfileUpdate_RequestDTO request, CancellationToken ct)
         {
             var result = await _candidateServices.UpdateCandidateProfileByElectionIdAsync(electionId, request, ct);
             return HandleResult(result);
@@ -82,8 +86,12 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [HttpGet("elections/{electionId:guid}/profile/me")]
         [ProducesResponseType(typeof(CandidateProfile_ResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetMyProfile(Guid electionId, CancellationToken ct)
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetMyProfile([FromRoute] Guid electionId, CancellationToken ct)
         {
             var result = await _candidateServices.GetCandidateProfileByElectionIdAsync(electionId, ct);
             return HandleResult(result);
@@ -106,9 +114,12 @@ namespace NeoVoting.API.Controllers
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UploadProfilePhoto(Guid electionId, [FromForm] CandidateProfileUploadImage_RequestDTO request, CancellationToken ct)
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UploadProfilePhoto([FromRoute] Guid electionId, [FromForm] CandidateProfileUploadImage_RequestDTO request, CancellationToken ct)
         {
             var result = await _candidateServices.UpdateCandidateProfile_Photo_ByElectionIdAsync(electionId, request, ct);
             return HandleResult(result);

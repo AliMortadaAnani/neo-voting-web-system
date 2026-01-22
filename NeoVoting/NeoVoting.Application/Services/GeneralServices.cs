@@ -40,5 +40,10 @@ namespace NeoVoting.Application.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<Result<ElectionCurrentActiveStatistics_ResponseDTO>> GetCurrentActiveElectionStatsPerGovernorateIdAsync(int governorateId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

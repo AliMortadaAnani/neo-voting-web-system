@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
+using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.API.Controllers
 {
@@ -28,7 +29,7 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [HttpGet("elections/all")]
         [ProducesResponseType(typeof(IReadOnlyList<Election_ResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        
         public async Task<IActionResult> GetAllElections(CancellationToken ct)
         {
             var result = await _generalServices.GetAllElectionsAsync(ct);
@@ -45,7 +46,7 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [HttpGet("elections/completed")]
         [ProducesResponseType(typeof(IReadOnlyList<Election_ResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        
         public async Task<IActionResult> GetCompletedElections(CancellationToken ct)
         {
             var result = await _generalServices.GetAllCompletedElectionsAsync(ct);
@@ -81,10 +82,13 @@ namespace NeoVoting.API.Controllers
         /// - Election dates and parliamentary term dates.
         /// - Returns 404 if election does not exist or is not completed.
         /// </remarks>
-        [HttpGet("elections/{electionId:guid}/stats")]
+        // URL becomes: GET /api/elections/stats?electionId=d290f1ee-6c54-4b01-90e6-d701748f0851
+        [HttpGet("elections/completed/stats")]
         [ProducesResponseType(typeof(ElectionCompletedStatistics_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetCompletedElectionStats(Guid electionId, CancellationToken ct)
+        public async Task<IActionResult> GetCompletedElectionStats(
+            [FromQuery] Guid electionId, // Changed to FromQuery
+            CancellationToken ct)
         {
             var result = await _generalServices.GetCompletedElectionStatsByIdAsync(electionId, ct);
             return HandleResult(result);
@@ -103,11 +107,13 @@ namespace NeoVoting.API.Controllers
         /// - Returns 404 if election does not exist or is not completed.
         /// - Returns 400 for invalid governorate ID.
         /// </remarks>
-        [HttpGet("elections/{electionId:guid}/stats/by-governorate/{governorateId:int}")]
+        [HttpGet("elections/completed/stats/by-governorate")]
         [ProducesResponseType(typeof(ElectionCompletedStatistics_ResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetCompletedElectionStatsByGovernorate(Guid electionId, int governorateId, CancellationToken ct)
+        public async Task<IActionResult> GetCompletedElectionStatsByGovernorate(
+    [FromQuery] Guid electionId,
+    [FromQuery] int governorateId,
+    CancellationToken ct)
         {
             var result = await _generalServices.GetCompletedElectionStatsByIdPerGovernorateIdAsync(electionId, governorateId, ct);
             return HandleResult(result);
@@ -132,5 +138,17 @@ namespace NeoVoting.API.Controllers
             var result = await _generalServices.GetCurrentActiveElectionStatsAsync(ct);
             return HandleResult(result);
         }
+
+        [HttpGet("elections/active/stats/by-governorate")]
+        [ProducesResponseType(typeof(ElectionCurrentActiveStatistics_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCurrentActiveElectionStats(
+             [FromQuery] int governorateId,
+            CancellationToken ct)
+        {
+            var result = await _generalServices.GetCurrentActiveElectionStatsPerGovernorateIdAsync(governorateId,ct);
+            return HandleResult(result);
+        }
+
     }
 }

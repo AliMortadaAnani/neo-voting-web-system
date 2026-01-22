@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
+using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.API.Controllers
 {
@@ -31,8 +32,12 @@ namespace NeoVoting.API.Controllers
         [HttpPost("login")]
         [ProducesResponseType(typeof(Authentication_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails400ErrorTypes),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login([FromBody] Login_RequestDTO request, CancellationToken ct)
         {
             var result = await _authService.LoginAsync(request, ct);
@@ -50,14 +55,18 @@ namespace NeoVoting.API.Controllers
         /// - Returns 409 if voter is already registered or has already voted.
         /// </remarks>
         [HttpPost("register/voter")]
-        [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RegisterVoter([FromBody] Register_ResetPassword_VoterOrCandidate_RequestDTO request, CancellationToken ct)
         {
             var result = await _authService.RegisterVoterOrCandidateAsync(request, RoleTypesEnum.Voter, ct);
-            return HandleResult(result, Created: true);
+            return HandleResult(result);
         }
 
         /// <summary>
@@ -71,14 +80,18 @@ namespace NeoVoting.API.Controllers
         /// - Returns 409 if candidate is already registered.
         /// </remarks>
         [HttpPost("register/candidate")]
-        [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RegisterCandidate([FromBody] Register_ResetPassword_VoterOrCandidate_RequestDTO request, CancellationToken ct)
         {
             var result = await _authService.RegisterVoterOrCandidateAsync(request, RoleTypesEnum.Candidate, ct);
-            return HandleResult(result, Created: true);
+            return HandleResult(result);
         }
 
         /// <summary>
@@ -94,8 +107,12 @@ namespace NeoVoting.API.Controllers
         [HttpPost("reset-password")]
         [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ResetPassword([FromBody] Register_ResetPassword_VoterOrCandidate_RequestDTO request, CancellationToken ct)
         {
             var result = await _authService.ResetVoterOrCandidatePasswordAsync(request, ct);
@@ -112,9 +129,13 @@ namespace NeoVoting.API.Controllers
         /// - Returns 401 if tokens are invalid or expired.
         /// </remarks>
         [HttpPost("refresh")]
-        [ProducesResponseType(typeof(Authentication_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Refresh([FromBody] RefreshToken_RequestDTO request, CancellationToken ct)
         {
             var result = await _authService.RefreshTokenAsync(request, ct);
@@ -132,9 +153,12 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [Authorize]
         [HttpPost("logout")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+
+
+        [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Logout(CancellationToken ct)
         {
             var result = await _authService.LogoutAsync(ct);

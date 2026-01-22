@@ -18,6 +18,7 @@ namespace NeoVoting.Application.ServicesContracts
         Task<Result<ElectionCompletedStatistics_ResponseDTO>> GetCompletedElectionStatsByIdPerGovernorateIdAsync(Guid electionId,int governorateId, CancellationToken cancellationToken);
 
         Task<Result<ElectionCurrentActiveStatistics_ResponseDTO>> GetCurrentActiveElectionStatsAsync(CancellationToken cancellationToken);
+        Task<Result<ElectionCurrentActiveStatistics_ResponseDTO>> GetCurrentActiveElectionStatsPerGovernorateIdAsync(int governorateId,CancellationToken cancellationToken);
 
         Task<Result<Election_ResponseDTO>> GetCurrentActiveElectionAsync
             (CancellationToken cancellationToken);
