@@ -10,7 +10,7 @@ namespace NeoVoting.API.Controllers
     /// <summary>
     /// Handles authentication operations for voters and candidates.
     /// </summary>
-    [AllowAnonymous]
+   
     public class AuthController : ApiController
     {
         private readonly IAuthServices _authService;
@@ -29,6 +29,7 @@ namespace NeoVoting.API.Controllers
         /// - Returns 401 if credentials are invalid.
         /// - Returns 403 if account is locked due to multiple failed attempts.
         /// </remarks>
+        [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(typeof(Authentication_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -54,6 +55,7 @@ namespace NeoVoting.API.Controllers
         /// - Password and Confirm Password must match.
         /// - Returns 409 if voter is already registered or has already voted.
         /// </remarks>
+        [AllowAnonymous]
         [HttpPost("register/voter")]
         [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -79,6 +81,7 @@ namespace NeoVoting.API.Controllers
         /// - Password and Confirm Password must match.
         /// - Returns 409 if candidate is already registered.
         /// </remarks>
+        [AllowAnonymous]
         [HttpPost("register/candidate")]
         [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -104,6 +107,7 @@ namespace NeoVoting.API.Controllers
         /// - Password and Confirm Password must match.
         /// - Returns 403 if account type cannot be reset via this portal.
         /// </remarks>
+        [AllowAnonymous]
         [HttpPost("reset-password")]
         [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -128,6 +132,7 @@ namespace NeoVoting.API.Controllers
         /// - Requires the original access token (can be expired).
         /// - Returns 401 if tokens are invalid or expired.
         /// </remarks>
+        [AllowAnonymous]
         [HttpPost("refresh")]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         

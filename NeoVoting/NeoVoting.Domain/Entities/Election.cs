@@ -1,5 +1,8 @@
-﻿using NeoVoting.Domain.Enums;
+﻿using NeoVoting.Domain.Contracts;
+using NeoVoting.Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using static System.Collections.Specialized.BitVector32;
 
 namespace NeoVoting.Domain.Entities
 {
@@ -18,6 +21,68 @@ namespace NeoVoting.Domain.Entities
 
         public int ElectionStatusId { get; private set; }
         public ElectionStatus ElectionStatus { get; private set; }
+
+        // Computed property - what the status SHOULD be based on current time
+        [NotMapped]
+        public ElectionStatusEnum ExpectedStatus => GetExpectedStatus(DateTime.UtcNow);
+
+        // Computed property - is the stored status in sync with expected?
+        [NotMapped]
+        public bool IsStatusCurrent => ElectionStatusId == (int)ExpectedStatus;
+
+        /// <summary>
+        /// Determines what the election status should be based on the current UTC time.
+        /// This does NOT change the stored status - use transition methods for that.
+        /// </summary>
+        public ElectionStatusEnum GetExpectedStatus(DateTime currentUtc)
+        {
+            if (currentUtc < NominationStartDate)
+                return ElectionStatusEnum.Upcoming;
+
+            if (currentUtc >= NominationStartDate && currentUtc < NominationEndDate)
+                return ElectionStatusEnum.Nomination;
+
+            if (currentUtc >= NominationEndDate && currentUtc < VotingStartDate)
+                return ElectionStatusEnum.PreVotingPhase;
+
+            if (currentUtc >= VotingStartDate && currentUtc < VotingEndDate)
+                return ElectionStatusEnum.Voting;
+
+            if (currentUtc >= VotingEndDate)
+                return ElectionStatusEnum.Completed;
+
+            return ElectionStatusEnum.Upcoming; // fallback
+        }
+
+        /// <summary>
+        /// Auto-transitions the election to the expected status based on current time.
+        /// Returns true if status was updated, false if already current.
+        /// </summary>
+        public bool AutoTransitionIfNeeded()
+        {
+            var expected = GetExpectedStatus(DateTime.UtcNow);
+
+            if (ElectionStatusId == (int)expected)
+                return false; // Already correct
+
+            // Auto-transition to the expected status
+            ElectionStatusId = (int)expected;
+            return true;
+        }
+        /* 
+        THE LOGIC: Let the entity fix itself based on the current time
+        // We don't care what the old status was. We trust the Entity.
+        bool statusChanged = election.AutoTransitionIfNeeded();
+
+    if (statusChanged)
+    {
+        // 3. If the status changed (e.g., from Upcoming -> Nomination), persist it now.
+        _electionRepository.Update(election);
+        await _unitOfWork.SaveChangesAsync(ct);
+
+        // Optional: Log this automatic transition
+        _logger.LogInformation("Election {Id} auto-transitioned to {Status}", election.Id, election.ElectionStatus);
+    }*/
 
         private Election()
         {

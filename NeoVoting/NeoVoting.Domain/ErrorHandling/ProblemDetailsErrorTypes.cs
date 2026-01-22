@@ -11,6 +11,8 @@ namespace NeoVoting.Domain.ErrorHandling
         Voter_InvalidUsername,//Government System
         Candidate_InvalidUsername,//Government System
         Password_Mismatch,
+        Election_AlreadyInStatus,
+        Election_InvalidStatusTransition
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -45,7 +47,9 @@ namespace NeoVoting.Domain.ErrorHandling
         Auth_ForbiddenAccess,
         IpWhitelist_ForbiddenIP,//Government System
         IpWhitelist_RestrictedEndpoint,//Government System
-        User_LockedOut
+        User_LockedOut,
+        CandidateProfile_NotInNominationPhase,
+        Voter_NotInVotingPhase
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -53,7 +57,8 @@ namespace NeoVoting.Domain.ErrorHandling
     {
         Voter_NotFound,//Government System
         Candidate_NotFound,//Government System
-        Paging_OutOfBounds
+        Paging_OutOfBounds,
+        Election_NotFound
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -62,7 +67,9 @@ namespace NeoVoting.Domain.ErrorHandling
         Voter_AlreadyRegistered,//Government System
         Voter_AlreadyVoted,//Government System
         Candidate_AlreadyRegistered,//Government System
-        User_DuplicateUsername
+        User_DuplicateUsername,
+        Election_AlreadyActive,
+        CandidateProfile_AlreadyExisted
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -79,7 +86,9 @@ namespace NeoVoting.Domain.ErrorHandling
         UserCreation_Failed,
         UserRoleAssignment_Failed,
         GovernmentSystemGateway_Error,
-        PasswordReset_Failed
+        PasswordReset_Failed,
+        Election_CreationFailed,
+        CandidateProfile_CreationFailed
     }
 
     // ==============================================================================

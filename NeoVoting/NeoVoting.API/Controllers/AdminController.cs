@@ -47,6 +47,34 @@ namespace NeoVoting.API.Controllers
         }
 
         /// <summary>
+        /// Updates the status of an existing election.
+        /// </summary>
+        /// <param name="electionId">The unique identifier of the election to update.</param>
+        /// <param name="newStatus">The new status to transition the election to.</param>
+        /// <param name="ct"></param>
+        /// <remarks>
+        /// **Rules:**
+        /// - Status transitions must follow the valid sequence: Upcoming → Nomination → PreVotingPhase → Voting → Completed.
+        /// - Cannot transition backwards (e.g., from Voting to Nomination).
+        /// - Cannot transition to 'Upcoming' status.
+        /// </remarks>
+        [HttpPut("elections/{electionId}/status")]
+        [ProducesResponseType(typeof(Election_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateElectionStatus(
+            [FromRoute] Guid electionId,
+            [FromQuery] ElectionStatusEnum newStatus,
+            CancellationToken ct)
+        {
+            var result = await _adminServices.UpdateElectionStatusAsync(electionId, newStatus, ct);
+            return HandleResult(result);
+        }
+
+        /// <summary>
         /// Retrieves a paginated list of all system audit logs.
         /// </summary>
         /// <param name="pageNumber">The page number (starting from 1).</param>

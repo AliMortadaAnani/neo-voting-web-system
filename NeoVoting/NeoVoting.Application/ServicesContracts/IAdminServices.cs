@@ -14,14 +14,16 @@ namespace NeoVoting.Application.ServicesContracts
     {
         Task<Result<Election_ResponseDTO>> AddElectionAsync(ElectionAdd_RequestDTO requestDTO,CancellationToken cancellationToken);
 
+        Task<Result<Election_ResponseDTO>> UpdateElectionStatusAsync(Guid electionId, ElectionStatusEnum newStatus, CancellationToken cancellationToken);
+
         Task<Result<IReadOnlyList<SystemAuditLog_ResponseDTO>>> GetPagedSystemAuditLogsAsync
-            (int skip,int take,CancellationToken cancellationToken);
+            (int pageNumber, int pageSize, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<SystemAuditLog_ResponseDTO>>> GetPagedSystemAuditLogsByActionTypeAsync
-            (SystemActionTypesEnum systemActionTypesEnum,int skip, int take, CancellationToken cancellationToken);
+            (SystemActionTypesEnum systemActionTypesEnum,int pageNumber, int pageSize, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<SystemAuditLog_ResponseDTO>>> GetPagedSystemAuditLogsByElectionIdAsync
-            (Guid electionId,int skip, int take, CancellationToken cancellationToken);
+            (Guid electionId,int pageNumber, int pageSize, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<SystemAuditLog_ResponseDTO>>> GetSystemAuditLogsByUserIdAsync
             (Guid userID, CancellationToken cancellationToken);

@@ -2,6 +2,7 @@
 using NeoVoting.Application.ServicesContracts;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -28,6 +29,28 @@ namespace NeoVoting.Application.Services
             }
         }
 
+        public string? Username
+        {
+            get
+            {
+                var user = _httpContextAccessor.HttpContext?.User;
+                if (user == null) return null;
+
+                // PRIORITY 1: Check standard ASP.NET mapping (ClaimTypes.Name)
+                // ASP.NET Core automatically maps "unique_name" -> ClaimTypes.Name
+                var name = user.FindFirst(ClaimTypes.Name)?.Value;
+
+                // PRIORITY 2: Check raw JWT claim ("unique_name")
+                // In case automatic mapping is disabled in Program.cs
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = user.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
+                }
+
+                return name;
+            }
+        }
+
         public Guid GetAuthenticatedUserId()
         {
             if (!UserId.HasValue || UserId.Value == Guid.Empty)
@@ -38,5 +61,15 @@ namespace NeoVoting.Application.Services
             return UserId.Value;
         }
 
+        public string GetAuthenticatedUsername()
+        {
+            var username = Username;
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new UnauthorizedAccessException(
+                    "User must be authenticated with a username to perform this operation.");
+            }
+            return username;
+        }
     }
 }

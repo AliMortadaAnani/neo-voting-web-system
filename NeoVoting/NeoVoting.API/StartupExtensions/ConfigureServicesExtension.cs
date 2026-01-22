@@ -203,14 +203,14 @@ namespace NeoVoting.API.StartupExtensions
         }
     });
 
-                // 1. Get the name of the generated XML file (usually YourProjectName.xml)
+                /*// 1. Get the name of the generated XML file (usually YourProjectName.xml)
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 
                 // 2. Combine with the base directory to get the full path
                 var fullPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
 
                 // 3. Tell Swagger to use it
-                options.IncludeXmlComments(fullPath);
+                options.IncludeXmlComments(fullPath);*/
             });
             // =========================================================================
             // SWAGGER CONFIGURATION END
@@ -253,7 +253,7 @@ namespace NeoVoting.API.StartupExtensions
             services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
             services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
-            services.AddScoped<IElectionRegisteredVotersPerGovernorateRepository, ElectionRegisteredVotersPerGovernorateRepository>();
+            services.AddScoped<IElectionStatisticsRepository, ElectionStatisticsRepository>();
             // --- REGISTER SERVICES --- 
 
             services.AddScoped<ICurrentUserServices, CurrentUserServices>();
