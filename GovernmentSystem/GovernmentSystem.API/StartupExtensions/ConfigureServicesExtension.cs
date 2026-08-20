@@ -234,7 +234,15 @@ namespace GovernmentSystem.API.StartupExtensions
                 // 3. Tell Swagger to use it
                 c.IncludeXmlComments(fullPath);
             });
-
+            services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendPolicy", builder =>
+                {
+                    builder.AllowAnyOrigin() // Allow all origins (for development). Change to specific origins in production.
+                               .AllowAnyHeader()
+                               .AllowAnyMethod();
+                });
+            });
             // --- REGISTER THE UNIT OF WORK ---
             // We use AddScoped for the lifetime. This means a single instance of UnitOfWork
             // (and therefore ApplicationDbContext) is created for each HTTP request. This is the standard.

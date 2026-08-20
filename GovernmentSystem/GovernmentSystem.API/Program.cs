@@ -19,6 +19,9 @@ builder.Services.AddTransient<DbSeeder>();
 
 var app = builder.Build();
 
+
+
+
 //CLI data seeding logic
 if (args.Length > 0 && args[0].Equals("seedData", StringComparison.OrdinalIgnoreCase))
 {

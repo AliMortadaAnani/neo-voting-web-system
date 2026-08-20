@@ -70,7 +70,7 @@ namespace GovernmentSystem.API.Application.Services
             return Result<List<CandidateResponseDTO>>.Success(response);
         }
 
-        public async Task<Result<List<CandidateResponseDTO>>> GetPaginatedCandidatesAsync(int pageNumber, int pageSize)
+        public async Task<Result<List<CandidateResponseDTO>>>   GetPaginatedCandidatesAsync(int pageNumber, int pageSize)
         {
             // 1. VALIDATION (Must be first)
             if (pageNumber < 1)

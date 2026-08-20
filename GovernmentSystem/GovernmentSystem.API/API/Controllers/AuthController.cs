@@ -1,4 +1,5 @@
 ﻿using GovernmentSystem.API.Application.AdminDTOs;
+using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -11,10 +12,11 @@ namespace GovernmentSystem.API.API.Controllers
     public class AuthController : ApiController
     {
         private readonly IAdminServices _adminServices;
-
-        public AuthController(IAdminServices adminServices)
+        private readonly ICandidateServices _candidateServices;
+        public AuthController(IAdminServices adminServices, ICandidateServices candidateServices)
         {
             _adminServices = adminServices;
+            _candidateServices = candidateServices;
         }
 
         /// <summary>
@@ -51,6 +53,14 @@ namespace GovernmentSystem.API.API.Controllers
         public async Task<IActionResult> Logout()
         {
             var result = await _adminServices.LogoutAsync();
+            return HandleResult(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("test")]
+        public async Task<IActionResult> Test([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _candidateServices.GetPaginatedCandidatesAsync(pageNumber, pageSize);
             return HandleResult(result);
         }
     }
