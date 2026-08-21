@@ -52,7 +52,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
                 reader.GetGuid(reader.GetOrdinal("Id")),
                 reader.GetGuid(reader.GetOrdinal("NationalId")),
                 reader.GetGuid(reader.GetOrdinal("NominationToken")),
-                (GovernorateId)reader.GetInt32(reader.GetOrdinal("GovernorateId")),
+                (GovernorateIdEnum)reader.GetInt32(reader.GetOrdinal("GovernorateId")),
                 reader.GetString(reader.GetOrdinal("FirstName")),
                 reader.GetString(reader.GetOrdinal("LastName")),
                 DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("DateOfBirth"))),

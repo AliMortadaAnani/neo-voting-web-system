@@ -5,12 +5,12 @@ using GovernmentSystem.API.Domain.Shared;
 
 namespace GovernmentSystem.API.Infrastructure.DbContext
 {
-    public class DbSeeder
+    public class DataSeederCLI
     {
         private readonly IVoterServices _voterServices;
         private readonly ICandidateServices _candidateServices;
 
-        public DbSeeder(IVoterServices voterServices, ICandidateServices candidateServices)
+        public DataSeederCLI(IVoterServices voterServices, ICandidateServices candidateServices)
         {
             _voterServices = voterServices;
             _candidateServices = candidateServices;
@@ -42,7 +42,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 .RuleFor(v => v.LastName, f => f.PickRandom(LebaneseLastNames))
 
                 // 4. Other Rules
-                .RuleFor(v => v.GovernorateId, f => (GovernorateId)f.PickRandom(1, 2, 3, 4, 5))
+                .RuleFor(v => v.GovernorateId, f => (GovernorateIdEnum)f.PickRandom(1, 2, 3, 4, 5))
                 .RuleFor(v => v.DateOfBirth, f => DateOnly.FromDateTime(f.Date.Past(80, DateTime.Now.AddYears(-18))))
                 //.RuleFor(c => c.EligibleForElection, f => f.Random.Bool());
                 .RuleFor(c => c.EligibleForElection, f => /*f.Random.Bool()=*/true);
@@ -76,7 +76,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 .RuleFor(c => c.FirstName, (f, c) =>
                     c.Gender == 'M' ? f.PickRandom(LebaneseMaleNames) : f.PickRandom(LebaneseFemaleNames))
                 .RuleFor(c => c.LastName, f => f.PickRandom(LebaneseLastNames))
-                .RuleFor(c => c.GovernorateId, f => (GovernorateId)f.PickRandom(1, 2, 3, 4, 5))
+                .RuleFor(c => c.GovernorateId, f => (GovernorateIdEnum)f.PickRandom(1, 2, 3, 4, 5))
                 .RuleFor(c => c.DateOfBirth, f => DateOnly.FromDateTime(f.Date.Past(80, DateTime.Now.AddYears(-18))))
                 //.RuleFor(c => c.EligibleForElection, f => f.Random.Bool());
                 .RuleFor(c => c.EligibleForElection, f => /*f.Random.Bool()=*/true);

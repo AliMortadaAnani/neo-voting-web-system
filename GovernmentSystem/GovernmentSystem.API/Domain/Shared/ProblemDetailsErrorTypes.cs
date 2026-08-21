@@ -59,6 +59,11 @@ namespace GovernmentSystem.API.Domain.Shared
         Candidate_AlreadyRegistered
     }
 
+    public enum ProblemDetails429ErrorTypes // Too Many Requests
+    {
+        RateLimit_Exceeded
+    }
+
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails500ErrorTypes // Server Failure
     {
@@ -127,6 +132,15 @@ namespace GovernmentSystem.API.Domain.Shared
         [JsonPropertyName("type")]
         public new ProblemDetails409ErrorTypes Type { get; set; }
 
+        [JsonIgnore]
+        public new IDictionary<string, object>? Extensions { get; }
+    }
+
+
+    public class TooManyRequests429ProblemDetails : ProblemDetails
+    {
+        [JsonPropertyName("type")]
+        public new ProblemDetails429ErrorTypes Type { get; set; }
         [JsonIgnore]
         public new IDictionary<string, object>? Extensions { get; }
     }

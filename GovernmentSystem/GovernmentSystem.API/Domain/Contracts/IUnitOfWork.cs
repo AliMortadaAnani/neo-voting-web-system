@@ -33,6 +33,6 @@
         // - For success/failure: If no exception is thrown, the commit succeeded.
         //   If a DbUpdateException or DbUpdateConcurrencyException is thrown, the commit failed.
         // - The returned int is useful for diagnostics/logging, not workflow/business decisions.
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<int> SaveChangesAsync();
     }
 }

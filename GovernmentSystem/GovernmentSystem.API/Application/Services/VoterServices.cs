@@ -150,7 +150,7 @@ namespace GovernmentSystem.API.Application.Services
 
             // Update Entity State
             voter.UpdateDetails(
-               (GovernorateId)request.GovernorateId!.Value,
+               (GovernorateIdEnum)request.GovernorateId!.Value,
                request.FirstName!,
                request.LastName!,
                request.DateOfBirth!.Value,

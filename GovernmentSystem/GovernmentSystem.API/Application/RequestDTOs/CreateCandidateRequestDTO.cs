@@ -7,7 +7,7 @@ namespace GovernmentSystem.API.Application.RequestDTOs
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public GovernorateId? GovernorateId { get; set; }
+        public GovernorateIdEnum? GovernorateId { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public char? Gender { get; set; }
         public bool? EligibleForElection { get; set; }
@@ -17,7 +17,7 @@ namespace GovernmentSystem.API.Application.RequestDTOs
         {
             //we do not try catch here because DTOs should be dumb and any validation should be handled in the domain layer later or FluentValidation before reaching this point
             return Candidate.Create(
-                (GovernorateId)GovernorateId!.Value,
+                (GovernorateIdEnum)GovernorateId!.Value,
                 FirstName!,
                 LastName!,
                 DateOfBirth!.Value,

@@ -32,5 +32,8 @@
         public static Error Forbidden(string code, string description) =>
             new(code, description, ErrorType.Forbidden);
         //return an instance of Error with Forbidden type
+
+        public static Error TooManyRequests(string code, string description) =>
+            new(code, description, ErrorType.TooManyRequests);
     }
 }

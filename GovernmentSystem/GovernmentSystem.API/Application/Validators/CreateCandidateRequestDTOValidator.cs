@@ -13,7 +13,7 @@ namespace GovernmentSystem.API.Application.Validators
 
             RuleFor(x => x.GovernorateId)
                 .NotNull()
-                .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateId), id.Value))
+                .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateIdEnum), id.Value))
                 .WithMessage("A valid governorate must be selected.");
 
             RuleFor(x => x.DateOfBirth)

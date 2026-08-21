@@ -1,13 +1,14 @@
 ﻿using GovernmentSystem.API.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using GovernmentSystem.API.Domain.Shared;
 
 namespace GovernmentSystem.API.Infrastructure.DbContext
 {
-    public class DbInitializer
+    public class AdminOperationsCLI
     {
         // Note: We added 'adminPassword' as a parameter instead of fetching it from configuration
         // This allows passing the password securely from the CLI argument
-        public static async Task SeedAdminUser(IServiceProvider serviceProvider, string adminPassword)
+        public static async Task SeedAdminUser(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
@@ -26,15 +27,23 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 
             Console.WriteLine($"Attempting to seed Admin: {adminUsername}...");
 
-            // 2. Create Role
-            string adminRoleName = "Admin";
+            string adminPassword = configuration["Admin:Password"] ?? "none";
 
-            if (await roleManager.FindByNameAsync("Admin") is null)
+            if (string.IsNullOrEmpty(adminPassword) || adminPassword == "none")
             {
-                ApplicationRole applicationRole = new ApplicationRole
-                {
-                    Name = adminRoleName
-                };
+                Console.WriteLine("Error: Environment variable 'Admin:Password' is not set.");
+                return;
+            }
+
+            Console.WriteLine($"Attempting to seed Admin: {adminUsername}...");
+
+            // 2. Create Role
+            string adminRoleName = RoleTypesEnum.Admin.ToString();
+
+            if (await roleManager.FindByNameAsync(adminRoleName) is null)
+            {
+                ApplicationRole applicationRole = ApplicationRole.CreateAdminRole();
+
                 await roleManager.CreateAsync(applicationRole);
             }
 
@@ -43,10 +52,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 
             if (adminUser == null)
             {
-                adminUser = new ApplicationUser
-                {
-                    UserName = adminUsername,
-                };
+                adminUser = ApplicationUser.CreateAdminUser(adminUsername);
 
                 // Use the password passed from the CLI argument
                 var createResult = await userManager.CreateAsync(adminUser, adminPassword);

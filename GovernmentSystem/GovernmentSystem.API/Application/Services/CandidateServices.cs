@@ -150,7 +150,7 @@ namespace GovernmentSystem.API.Application.Services
                 return Result<CandidateResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
             }
             candidate.UpdateDetails(
-                (GovernorateId)request.GovernorateId!.Value,
+                (GovernorateIdEnum)request.GovernorateId!.Value,
                 request.FirstName!,
                 request.LastName!,
                 request.DateOfBirth!.Value,

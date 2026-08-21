@@ -4,7 +4,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
 {
     public class NeoVoting_CandidateResponseDTO
     {
-        public GovernorateId GovernorateId { get; set; }
+        public GovernorateIdEnum GovernorateId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public DateOnly DateOfBirth { get; set; }

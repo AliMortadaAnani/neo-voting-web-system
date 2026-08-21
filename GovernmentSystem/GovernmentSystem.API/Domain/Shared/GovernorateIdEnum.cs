@@ -1,6 +1,6 @@
 ﻿namespace GovernmentSystem.API.Domain.Shared
 {
-    public enum GovernorateId
+    public enum GovernorateIdEnum
     {
         Beirut = 1,
 

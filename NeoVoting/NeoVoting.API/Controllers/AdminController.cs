@@ -12,7 +12,7 @@ namespace NeoVoting.API.Controllers
     /// <summary>
     /// Administrative operations for managing elections and viewing system audit logs.
     /// </summary>
-    [Authorize(Roles = nameof(RoleTypesEnum.Admin))]
+    //[Authorize(Roles = nameof(RoleTypesEnum.Admin))]
     public class AdminController : ApiController
     {
         private readonly IAdminServices _adminServices;

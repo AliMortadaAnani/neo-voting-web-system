@@ -17,7 +17,7 @@ namespace GovernmentSystem.API.Application.Validators
             // 1. Governorate Validation
             RuleFor(x => x.GovernorateId)
                 .NotNull()
-                .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateId), id.Value))
+                .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateIdEnum), id.Value))
                 .WithMessage("A valid governorate must be selected (1-5).");
 
             // 2. Age Validation (>= 18)

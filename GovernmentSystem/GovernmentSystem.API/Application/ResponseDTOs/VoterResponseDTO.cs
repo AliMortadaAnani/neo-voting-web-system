@@ -7,7 +7,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
         public Guid Id { get; set; }
         public Guid NationalId { get; set; }
         public Guid VotingToken { get; set; }
-        public GovernorateId GovernorateId { get; set; }
+        public GovernorateIdEnum GovernorateId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public DateOnly DateOfBirth { get; set; }
