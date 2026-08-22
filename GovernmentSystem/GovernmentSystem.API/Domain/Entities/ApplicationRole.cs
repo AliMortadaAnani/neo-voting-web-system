@@ -1,4 +1,4 @@
-﻿using GovernmentSystem.API.Domain.Shared;
+﻿using GovernmentSystem.API.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace GovernmentSystem.API.Domain.Entities

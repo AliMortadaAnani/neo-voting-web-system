@@ -1,7 +1,8 @@
-﻿using GovernmentSystem.API.Application.AdminDTOs;
+﻿using GovernmentSystem.API.Application.RequestDTOs.Admin;
+using GovernmentSystem.API.Application.ResponseDTOs.Admin;
 using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
-using GovernmentSystem.API.Domain.Shared;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

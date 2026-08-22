@@ -1,4 +1,4 @@
-﻿using GovernmentSystem.API.Domain.Shared;
+﻿using GovernmentSystem.API.Domain.Enums;
 
 namespace GovernmentSystem.API.Domain.Entities
 {

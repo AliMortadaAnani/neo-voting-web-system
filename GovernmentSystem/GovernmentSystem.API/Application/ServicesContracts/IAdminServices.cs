@@ -1,5 +1,6 @@
-﻿using GovernmentSystem.API.Application.AdminDTOs;
-using GovernmentSystem.API.Domain.Shared;
+﻿using GovernmentSystem.API.Application.RequestDTOs.AdminDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.AdminDTOs;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 
 namespace GovernmentSystem.API.Application.ServicesContracts
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using GovernmentSystem.API.Infrastructure.DbContext;
+using GovernmentSystem.API.Application.CLI;
 
 namespace GovernmentSystem.API.StartupExtensions
 {

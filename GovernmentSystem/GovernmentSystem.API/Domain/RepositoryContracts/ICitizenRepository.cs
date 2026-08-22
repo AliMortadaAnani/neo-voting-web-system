@@ -8,7 +8,7 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 
         Task<int> GetCitizensTotalCountAsync();//needed for pagination UX
 
-        Task<Citizen?> GetCitizenByNationalIdAsync(int nationalId);
+        Task<Citizen?> GetCitizenByNationalIdAsync(string nationalId);
 
         void AddCitizen(Citizen citizen);
 

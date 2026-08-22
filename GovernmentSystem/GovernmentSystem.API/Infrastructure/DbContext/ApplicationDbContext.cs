@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using GovernmentSystem.API.Domain.Entities;
-using GovernmentSystem.API.Domain.Shared;
+using GovernmentSystem.API.Domain.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,10 +34,10 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 entity.Property(e => e.CitizenId).IsRequired();
                 entity.HasIndex(e => e.CitizenId).IsUnique(); // Enforce Uniqueness
 
-                entity.Property(e => e.VotingToken).IsRequired();
+                entity.Property(e => e.VotingToken).IsRequired().HasMaxLength(1000);
                 entity.HasIndex(e => e.VotingToken).IsUnique(); // Enforce Uniqueness
 
-                entity.Property(e => e.HashedData).IsRequired();
+                entity.Property(e => e.HashedData).IsRequired().HasMaxLength(2000);
                 entity.HasIndex(e => e.HashedData).IsUnique(); // Enforce Uniqueness
                 
 
@@ -55,10 +55,10 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 entity.Property(e => e.CitizenId).IsRequired();
                 entity.HasIndex(e => e.CitizenId).IsUnique(); // Enforce Uniqueness
 
-                entity.Property(e => e.NominationToken).IsRequired();
+                entity.Property(e => e.NominationToken).IsRequired().HasMaxLength(1000);
                 entity.HasIndex(e => e.NominationToken).IsUnique(); // Enforce Uniqueness
 
-                entity.Property(e => e.HashedData).IsRequired();
+                entity.Property(e => e.HashedData).IsRequired().HasMaxLength(2000);
                 entity.HasIndex(e => e.HashedData).IsUnique(); // Enforce Uniqueness
             });
 
@@ -71,7 +71,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 // Fields Configuration
-                entity.Property(e => e.NationalId).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.NationalId).IsRequired().HasMaxLength(1000);
                 entity.HasIndex(e => e.NationalId).IsUnique(); // Enforce Uniqueness
 
                 entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);

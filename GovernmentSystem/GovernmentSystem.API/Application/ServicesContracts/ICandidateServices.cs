@@ -1,27 +1,26 @@
-﻿using GovernmentSystem.API.Application.RequestDTOs;
-using GovernmentSystem.API.Application.ResponseDTOs;
-using GovernmentSystem.API.Domain.Shared;
+﻿using GovernmentSystem.API.Application.RequestDTOs.CandidateDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 
 namespace GovernmentSystem.API.Application.ServicesContracts
 {
     public interface ICandidateServices
     {
-        Task<Result<CandidateResponseDTO>> GetByNationalIdAsync
-            (GetCandidateRequestDTO request);
+        Task<Result<CandidateResponseDTO>> GetCandidateByNationalIdAsync(GetCandidateRequestDTO request);
 
-        Task<Result<List<CandidateResponseDTO>>> GetAllCandidatesAsync();
+        Task<Result<CandidateResponseDTO>> GetCandidateByHashedDataAsync(GetCandidateRequestDTO request);
 
-        Task<Result<List<CandidateResponseDTO>>> GetPaginatedCandidatesAsync(int PageNumber, int PageSize);
+        Task<Result<List<CandidateResponseDTO>>> GetCandidatesPagedAsync(int pageNumber, int pageSize);
 
-        Task<Result<CandidateResponseDTO>> AddCandidateAsync
-            (CreateCandidateRequestDTO request);
+        Task<Result<int>> GetCandidatesTotalCountAsync();
 
-        Task<Result<CandidateResponseDTO>> UpdateByNationalIdAsync
-            (UpdateCandidateRequestDTO request);
+        Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request);
 
-        Task<Result<bool>> DeleteByNationalIdAsync
-            (DeleteCandidateRequestDTO request);
+        Task<Result<bool>> DeleteCandidateByNationalIdAsync(DeleteCandidateRequestDTO request);
 
-        Task<Result<CandidateResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenCandidateRequestDTO request);
+        Task<Result<CandidateResponseDTO>> GenerateNewNominationTokenByNationalIdAsync(UpdateCandidateRequestDTO request);
+
+        Task <Result<CandidateVerifyResponseDTO>> VerifyCandidateCredentialsAsync(GetCandidateVerificationRequestDTO request);
+
     }
 }

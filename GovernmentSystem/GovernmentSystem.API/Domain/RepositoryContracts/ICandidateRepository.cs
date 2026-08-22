@@ -8,7 +8,9 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 
         Task<int> GetCandidatesTotalCountAsync();//needed for pagination UX
 
-        Task<Candidate?> GetCandidateByNationalIdAsync(Guid nationalId);
+        Task<Candidate?> GetCandidateByNationalIdAsync(string nationalId);
+
+        Task<Candidate?> GetCandidateByHashedDataAsync(string hashedData);
 
         void AddCandidate(Candidate candidate);
 

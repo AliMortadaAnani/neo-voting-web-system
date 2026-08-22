@@ -1,10 +1,11 @@
-﻿using GovernmentSystem.API.Application.RequestDTOs;
+﻿using GovernmentSystem.API.Application.RequestDTOs.Candidate;
 using GovernmentSystem.API.Application.ResponseDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.Candidate;
 using GovernmentSystem.API.Application.ServicesContracts;
-using GovernmentSystem.API.Domain.Contracts;
 using GovernmentSystem.API.Domain.Entities;
+using GovernmentSystem.API.Domain.Enums;
 using GovernmentSystem.API.Domain.RepositoryContracts;
-using GovernmentSystem.API.Domain.Shared;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 
 namespace GovernmentSystem.API.Application.Services
 {

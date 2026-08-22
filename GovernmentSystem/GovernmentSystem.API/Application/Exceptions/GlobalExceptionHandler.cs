@@ -1,4 +1,4 @@
-﻿using GovernmentSystem.API.Domain.Shared;
+﻿using GovernmentSystem.API.Domain.ResultErrorDomain;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,13 +16,9 @@ namespace GovernmentSystem.API.Application.Exceptions
         public async ValueTask<bool> TryHandleAsync(
             HttpContext httpContext,
             Exception exception,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default
+           )
 
-        // CancellationToken represents a cooperative way to stop work early when a request is aborted
-        // (e.g., client disconnect, timeout). In ASP.NET Core, you typically accept it as a parameter
-        // in controller actions or minimal APIs, then pass it down to async operations like EF Core
-        // queries, HttpClient calls, or Task.Delay. This lets the framework signal cancellation so
-        // long-running work can exit promptly, freeing resources and improving scalability.
         {
             _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
@@ -36,9 +32,10 @@ namespace GovernmentSystem.API.Application.Exceptions
 
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            await httpContext.Response.WriteAsJsonAsync(problemDetails);
 
             return true; // We handled it
         }
+
     }
 }

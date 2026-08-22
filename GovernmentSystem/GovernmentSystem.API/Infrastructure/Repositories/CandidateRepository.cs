@@ -1,92 +1,22 @@
 ﻿using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.RepositoryContracts;
-using GovernmentSystem.API.Domain.Shared;
 using GovernmentSystem.API.Infrastructure.DbContext;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace GovernmentSystem.API.Infrastructure.Repositories
 {
     public class CandidateRepository : ICandidateRepository
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString;
 
-        public CandidateRepository(ApplicationDbContext dbContext, IConfiguration configuration)
+        public CandidateRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-            _connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        public async Task<List<Candidate>> GetPagedCandidatesStoredProcAsync(int skip, int take)
+        public void AddCandidate(Candidate candidate)
         {
-            var result = new List<Candidate>();
-
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-
-                using (var command = new SqlCommand("GetPagedCandidates", connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@Skip", skip);
-                    command.Parameters.AddWithValue("@Take", take);
-
-                    using (var reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            result.Add(MapCandidateFromReader(reader));
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-
-        // Helper method for mapping
-        private static Candidate MapCandidateFromReader(SqlDataReader reader)
-        {
-            return Candidate.FromAdoNet(
-                reader.GetGuid(reader.GetOrdinal("Id")),
-                reader.GetGuid(reader.GetOrdinal("NationalId")),
-                reader.GetGuid(reader.GetOrdinal("NominationToken")),
-                (GovernorateIdEnum)reader.GetInt32(reader.GetOrdinal("GovernorateId")),
-                reader.GetString(reader.GetOrdinal("FirstName")),
-                reader.GetString(reader.GetOrdinal("LastName")),
-                DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("DateOfBirth"))),
-                reader.GetString(reader.GetOrdinal("Gender"))[0],
-                reader.GetBoolean(reader.GetOrdinal("EligibleForElection")),
-                reader.GetBoolean(reader.GetOrdinal("ValidToken")),
-                reader.GetBoolean(reader.GetOrdinal("IsRegistered")),
-                reader.IsDBNull(reader.GetOrdinal("RegisteredUsername"))
-        ? null
-        : reader.GetString(reader.GetOrdinal("RegisteredUsername"))
-            );
-        }
-
-        public async Task<int> GetTotalCandidatesCountAsync()
-        {
-            return await _dbContext.Candidates.CountAsync();
-        }
-
-        public async Task<Candidate> AddCandidateAsync(Candidate candidate)
-        {
-            await _dbContext.Candidates.AddAsync(candidate);
-            return candidate;
-        }
-
-        public async Task<List<Candidate>> GetAllCandidatesAsync()
-        {
-            return await _dbContext.Candidates.AsNoTracking().ToListAsync();
-        }
-
-        public async Task<Candidate?> GetCandidateByNationalIdAsync(Guid nationalId)
-        {
-            // FindAsync only works for Primary Keys. For other columns, use FirstOrDefault.
-            return await _dbContext.Candidates
-                .FirstOrDefaultAsync(v => v.NationalId == nationalId);
+            _dbContext.Candidates.Add(candidate);
         }
 
         public void Delete(Candidate candidate)
@@ -94,9 +24,35 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext.Candidates.Remove(candidate);
         }
 
-        public void Update(Candidate candidate)
+        public Task<Candidate?> GetCandidateByNationalIdAsync(string nationalId)
         {
-            _dbContext.Candidates.Update(candidate);
+            var candidate = _dbContext.Candidates
+                .Include(c => c.Citizen)
+                .SingleOrDefaultAsync(c => c.Citizen.NationalId == nationalId);
+            return candidate;
+        }
+
+        public Task<Candidate?> GetCandidateByHashedDataAsync(string hashedData)
+        {
+            var candidate = _dbContext.Candidates
+                .Include(c => c.Citizen)
+                .SingleOrDefaultAsync(c => c.HashedData == hashedData);
+            return candidate;
+        }
+
+        public Task<List<Candidate>> GetCandidatesPagedAsync(int pageNumber, int pageSize)
+        {
+            var candidates = _dbContext.Candidates
+                 .Include(v => v.Citizen)
+                 .Skip((pageNumber - 1) * pageSize)
+                 .Take(pageSize)
+                 .ToListAsync();
+            return candidates;
+        }
+
+        public Task<int> GetCandidatesTotalCountAsync()
+        {
+            return _dbContext.Candidates.CountAsync();
         }
     }
 }

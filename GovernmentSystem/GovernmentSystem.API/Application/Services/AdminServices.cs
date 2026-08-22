@@ -1,10 +1,11 @@
-﻿using GovernmentSystem.API.Application.AdminDTOs;
+﻿using GovernmentSystem.API.Application.RequestDTOs.AdminDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.AdminDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
-using GovernmentSystem.API.Domain.Shared;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 using Microsoft.AspNetCore.Identity;
 
-namespace GovernmentSystem.API.Application.Services
+namespace GovernmentSystem.API.Application.ResponseDTOs.Admin
 {
     public class AdminServices : IAdminServices
     {
@@ -28,8 +29,8 @@ namespace GovernmentSystem.API.Application.Services
             var result = await _signInManager.PasswordSignInAsync(
                 user,
                 loginDTO.Password!,
-                isPersistent: true, //better be false for secutity reasons
-                lockoutOnFailure: false);
+                isPersistent: true, //better be false for secutity reasons - not current scope
+                lockoutOnFailure: false); // not current scope
 
             if (result.Succeeded)
             {

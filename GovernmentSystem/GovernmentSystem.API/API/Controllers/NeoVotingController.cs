@@ -3,7 +3,7 @@ using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.RequestDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
-using GovernmentSystem.API.Domain.Shared;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers

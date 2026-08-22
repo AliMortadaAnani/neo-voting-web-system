@@ -1,4 +1,7 @@
 ﻿using GovernmentSystem.API.Domain.Entities;
+using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.CitizenDTOs;
 
 namespace GovernmentSystem.API.Application.ResponseDTOs
 {
@@ -9,35 +12,28 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
             return new VoterResponseDTO
             {
                 Id = voter.Id,
-                NationalId = voter.NationalId,
+                CitizenId = voter.CitizenId,
                 VotingToken = voter.VotingToken,
-                GovernorateId = voter.GovernorateId,
-                FirstName = voter.FirstName,
-                LastName = voter.LastName,
-                DateOfBirth = voter.DateOfBirth,
-                Gender = voter.Gender,
-                EligibleForElection = voter.EligibleForElection,
-                ValidToken = voter.ValidToken,
-                IsRegistered = voter.IsRegistered,
-                Voted = voter.Voted,
-                RegisteredUsername = voter.RegisteredUsername
+                HashedData = voter.HashedData,
+                NationalId = voter.Citizen.NationalId,
+                GovernorateId = voter.Citizen.GovernorateId,
+                FirstName = voter.Citizen.FirstName,
+                LastName = voter.Citizen.LastName,
+                DateOfBirth = voter.Citizen.DateOfBirth,
+                Gender = voter.Citizen.Gender
             };
         }
 
-        public static NeoVoting_VoterResponseDTO ToNeoVoting_VoterResponse(this Voter voter)
+        public static VoterVerifyResponseDTO ToNeoVoting_VoterResponse(this Voter voter)
         {
-            return new NeoVoting_VoterResponseDTO
+            return new VoterVerifyResponseDTO
             {
-                GovernorateId = voter.GovernorateId,
-                FirstName = voter.FirstName,
-                LastName = voter.LastName,
-                DateOfBirth = voter.DateOfBirth,
-                Gender = voter.Gender,
-                EligibleForElection = voter.EligibleForElection,
-                ValidToken = voter.ValidToken,
-                IsRegistered = voter.IsRegistered,
-                Voted = voter.Voted,
-                RegisteredUsername = voter.RegisteredUsername
+                HashedData = voter.HashedData,
+                GovernorateId = voter.Citizen.GovernorateId,
+                FirstName = voter.Citizen.FirstName,
+                LastName = voter.Citizen.LastName,
+                DateOfBirth = voter.Citizen.DateOfBirth,
+                Gender = voter.Citizen.Gender
             };
         }
 
@@ -48,34 +44,31 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
             return new CandidateResponseDTO
             {
                 Id = candidate.Id,
-                NationalId = candidate.NationalId,
+                CitizenId = candidate.CitizenId,
                 NominationToken = candidate.NominationToken,
-                GovernorateId = candidate.GovernorateId,
-                FirstName = candidate.FirstName,
-                LastName = candidate.LastName,
-                DateOfBirth = candidate.DateOfBirth,
-                Gender = candidate.Gender,
-                EligibleForElection = candidate.EligibleForElection,
-                ValidToken = candidate.ValidToken,
-                IsRegistered = candidate.IsRegistered,
-                RegisteredUsername = candidate.RegisteredUsername
+                HashedData = candidate.HashedData,
+                NationalId = candidate.Citizen.NationalId,
+                GovernorateId = candidate.Citizen.GovernorateId,
+                FirstName = candidate.Citizen.FirstName,
+                LastName = candidate.Citizen.LastName,
+                DateOfBirth = candidate.Citizen.DateOfBirth,
+                Gender = candidate.Citizen.Gender
             };
         }
 
-        public static NeoVoting_CandidateResponseDTO ToNeoVoting_CandidateResponse(this Candidate candidate)
+        public static CandidateVerifyResponseDTO ToNeoVoting_CandidateResponse(this Candidate candidate)
         {
-            return new NeoVoting_CandidateResponseDTO
+            return new CandidateVerifyResponseDTO
             {
-                GovernorateId = candidate.GovernorateId,
-                FirstName = candidate.FirstName,
-                LastName = candidate.LastName,
-                DateOfBirth = candidate.DateOfBirth,
-                Gender = candidate.Gender,
-                EligibleForElection = candidate.EligibleForElection,
-                ValidToken = candidate.ValidToken,
-                IsRegistered = candidate.IsRegistered,
-                RegisteredUsername = candidate.RegisteredUsername
+                HashedData = candidate.HashedData,
+                GovernorateId = candidate.Citizen.GovernorateId,
+                FirstName = candidate.Citizen.FirstName,
+                LastName = candidate.Citizen.LastName,
+                DateOfBirth = candidate.Citizen.DateOfBirth,
+                Gender = candidate.Citizen.Gender
             };
         }
+    
+        
     }
 }

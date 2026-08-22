@@ -1,25 +1,27 @@
-﻿using GovernmentSystem.API.Application.RequestDTOs;
-using GovernmentSystem.API.Application.ResponseDTOs;
-using GovernmentSystem.API.Domain.Shared;
+﻿using GovernmentSystem.API.Application.RequestDTOs.CandidateDTOs;
+using GovernmentSystem.API.Application.RequestDTOs.VoterDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 
 namespace GovernmentSystem.API.Application.ServicesContracts
 {
     public interface IVoterServices
     {
-        Task<Result<VoterResponseDTO>> GetByNationalIdAsync(GetVoterRequestDTO request);
+        Task<Result<VoterResponseDTO>> GetVoterByNationalIdAsync(GetVoterRequestDTO request);
 
-        Task<Result<List<VoterResponseDTO>>> GetAllVotersAsync();
+        Task<Result<VoterResponseDTO>> GetVoterByHashedDataAsync(GetVoterRequestDTO request);
 
-        Task<Result<List<VoterResponseDTO>>> GetPaginatedVotersAsync(int PageNumber, int PageSize);
+        Task<Result<List<VoterResponseDTO>>> GetVotersPagedAsync(int pageNumber, int pageSize);
+
+        Task<Result<int>> GetVotersTotalCountAsync();
 
         Task<Result<VoterResponseDTO>> AddVoterAsync(CreateVoterRequestDTO request);
 
-        Task<Result<VoterResponseDTO>> UpdateByNationalIdAsync(UpdateVoterRequestDTO request);
+        Task<Result<bool>> DeleteVoterByNationalIdAsync(DeleteVoterRequestDTO request);
 
-        Task<Result<bool>> DeleteByNationalIdAsync(DeleteVoterRequestDTO request);
+        Task<Result<VoterResponseDTO>> GenerateNewVotingTokenByNationalIdAsync(UpdateVoterRequestDTO request);
 
-        Task<Result<VoterResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenVoterRequestDTO request);
-
-        
+        Task<Result<VoterVerifyResponseDTO>> VerifyVoterCredentialsAsync(GetVoterVerificationRequestDTO request);
     }
 }

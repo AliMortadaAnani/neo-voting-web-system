@@ -10,7 +10,9 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
 
         Task<int> GetVotersTotalCountAsync();//needed for pagination UX
 
-        Task<Voter?> GetVoterByNationalIdAsync(int nationalId);
+        Task<Voter?> GetVoterByNationalIdAsync(string nationalId);
+
+        Task<Voter?> GetVoterByHashedDataAsync(string hashedData);
 
         void AddVoter(Voter voter);
 

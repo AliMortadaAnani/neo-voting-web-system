@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
+using GovernmentSystem.API.Application.CLI;
 using GovernmentSystem.API.Application.Exceptions;
 using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Application.Validators;
-using GovernmentSystem.API.Domain.Contracts;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.RepositoryContracts;
-using GovernmentSystem.API.Domain.Shared;
+using GovernmentSystem.API.Domain.ResultErrorDomain;
 using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
