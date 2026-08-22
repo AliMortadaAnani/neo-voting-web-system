@@ -16,7 +16,7 @@ namespace GovernmentSystem.API.Domain.Entities
         private Voter()
         { }
 
-        public static Voter CreateVoter(
+        public static Voter Create(
             string votingToken,
             string hashedData,
             int citizenId

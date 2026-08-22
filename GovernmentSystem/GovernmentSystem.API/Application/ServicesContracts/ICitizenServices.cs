@@ -9,9 +9,9 @@ namespace GovernmentSystem.API.Application.ServicesContracts
     {
         Task<Result<CitizenResponseDTO>> GetCitizenByNationalIdAsync(GetCitizenRequestDTO request);
 
-        Task<Result<List<CitizenResponseDTO>>> GetCitizensPagedAsync(int pageNumber, int pageSize);
+        Task<Result<PagedResult<CitizenResponseDTO>>> GetCitizensPagedAsync(int pageNumber, int pageSize);
 
-        Task<Result<int>> GetCitizensTotalCountAsync();
+        
 
         Task<Result<CitizenResponseDTO>> AddCitizenAsync(CreateCitizenRequestDTO request);
 

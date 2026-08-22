@@ -15,7 +15,7 @@ namespace GovernmentSystem.API.Domain.Entities
         private Citizen()
         { }
 
-        public static Citizen CreateCitizen(
+        public static Citizen Create(
             string nationalId,
             string firstName,
             string lastName,

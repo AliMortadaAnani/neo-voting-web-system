@@ -14,7 +14,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public void AddCitizen(Citizen citizen)
+        public void Add(Citizen citizen)
         {
            _dbContext.Citizens.Add(citizen);
         }
@@ -29,15 +29,17 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             return _dbContext.Citizens.SingleOrDefaultAsync(c => c.NationalId == nationalId);
         }
 
-        public Task<List<Citizen>> GetCitizensPagedAsync(int pageNumber, int pageSize)
+        public Task<List<Citizen>> GetPagedAsync(int pageNumber, int pageSize)
         {
             return _dbContext.Citizens
+                .OrderBy(c => c.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
-        public Task<int> GetCitizensTotalCountAsync()
+        public Task<int> CountAsync()
         {
             return _dbContext.Citizens.CountAsync();
         }

@@ -6,32 +6,21 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails400ErrorTypes // Validation / Bad Request
     {
-        Paging_InvalidInput,
-        Voter_InvalidUsername,//for double check (Fluent Validation should have deal with it before reaching Services)
-        Candidate_InvalidUsername//for double check (Fluent Validation should have deal with it before reaching Services)
+        Paging_InvalidInput
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails401ErrorTypes // Unauthorized (Auth & Credentials)
     {
-        // Admin Auth
+        
         Admin_InvalidCredentials,
+        Voter_InvalidCredentials,
+        Candidate_InvalidCredentials,
 
-        // NeoVoting Logic (Voters)
-        Voter_NotEligible,
-
-        Voter_InvalidToken,
-        Voter_NotRegistered,// (Trying to vote without account)
-
-        // NeoVoting Logic (Candidates)
-        Candidate_NotEligible,
-
-        Candidate_InvalidToken,
-
-        // System / Middleware
+        // System - Middleware
         Auth_UnauthorizedAccess,  // For Cookie Middleware (Missing Cookie)
 
-        Auth_InvalidApiKey,       // For Filter (Missing/Wrong API Key)
+        Auth_InvalidApiKey,       // For Filter (Wrong API Key)
         Auth_TokenMissing         // For Filter
     }
 
@@ -46,17 +35,18 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails404ErrorTypes // Not Found
     {
-        Voter_NotFound,           // Covers "Voter.Missing" and "Voters.Missing"
-        Candidate_NotFound,       // Covers "Candidate.Missing"
+        Voter_NotFound,           
+        Candidate_NotFound,
+        Citizen_NotFound,
         Paging_OutOfBounds
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails409ErrorTypes // Conflict
     {
-        Voter_AlreadyRegistered,
-        Voter_AlreadyVoted,
-        Candidate_AlreadyRegistered
+        Citizen_AlreadyRegistered,  // For Voter / Candidate / Citizen
+        Candidate_AlreadyRegistered,
+        Voter_AlreadyRegistered
     }
 
     public enum ProblemDetails429ErrorTypes // Too Many Requests
@@ -69,8 +59,9 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
     {
         Server_Error,             // Generic Global Handler
         Server_ConfigurationError,// Missing API Key in Config
-        Voter_OperationFailed,    // Add in repos returned null
-        Candidate_OperationFailed
+        Voter_OperationFailed,    // Add/Delete in repos returned unexpected output
+        Candidate_OperationFailed,
+        Citizen_OperationFailed
     }
 
     // ==============================================================================

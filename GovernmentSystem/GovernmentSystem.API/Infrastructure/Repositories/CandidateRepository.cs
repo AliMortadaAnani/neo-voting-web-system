@@ -14,7 +14,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public void AddCandidate(Candidate candidate)
+        public void Add(Candidate candidate)
         {
             _dbContext.Candidates.Add(candidate);
         }
@@ -40,17 +40,19 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             return candidate;
         }
 
-        public Task<List<Candidate>> GetCandidatesPagedAsync(int pageNumber, int pageSize)
+        public Task<List<Candidate>> GetPagedAsync(int pageNumber, int pageSize)
         {
             var candidates = _dbContext.Candidates
                  .Include(v => v.Citizen)
+                 .OrderBy(v => v.Id)
                  .Skip((pageNumber - 1) * pageSize)
                  .Take(pageSize)
+                 .AsNoTracking()
                  .ToListAsync();
             return candidates;
         }
 
-        public Task<int> GetCandidatesTotalCountAsync()
+        public Task<int> CountAsync()
         {
             return _dbContext.Candidates.CountAsync();
         }

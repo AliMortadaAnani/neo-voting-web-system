@@ -16,7 +16,7 @@ namespace GovernmentSystem.API.Domain.Entities
         private Candidate()
         { }
 
-        public static Candidate CreateCandidate(
+        public static Candidate Create(
             string nominationToken,
             string hashedData,
             int citizenId

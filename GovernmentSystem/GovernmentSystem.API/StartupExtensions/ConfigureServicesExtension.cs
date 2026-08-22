@@ -2,6 +2,7 @@
 using FluentValidation.AspNetCore;
 using GovernmentSystem.API.Application.CLI;
 using GovernmentSystem.API.Application.Exceptions;
+using GovernmentSystem.API.Application.Helpers;
 using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Application.Validators;
@@ -279,17 +280,6 @@ namespace GovernmentSystem.API.StartupExtensions
         public static WebApplicationBuilder ConfigureSensitiveDataServices(this WebApplicationBuilder builder)
         {
             
-            // 1. Get the path from configuration or fallback to a local folder in the project root
-            string keyFolderPath = builder.Configuration["SecuritySettings:KeyFolderPath"] ?? "DataProtectionKeys";
-
-            // 2. Combine it with the ContentRootPath (the root folder of your API project)
-            var absoluteKeyPath = Path.Combine(builder.Environment.ContentRootPath, keyFolderPath);
-
-            // 3. Register Data Protection pointing to that folder inside the project
-            builder.Services.AddDataProtection()
-                .SetApplicationName("GovernmentSystem")
-                .PersistKeysToFileSystem(new DirectoryInfo(absoluteKeyPath));
-
             builder.Services.AddSingleton<SensitiveDataHelper>();
 
             return builder;

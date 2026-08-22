@@ -10,9 +10,9 @@ namespace GovernmentSystem.API.Application.ServicesContracts
 
         Task<Result<CandidateResponseDTO>> GetCandidateByHashedDataAsync(GetCandidateRequestDTO request);
 
-        Task<Result<List<CandidateResponseDTO>>> GetCandidatesPagedAsync(int pageNumber, int pageSize);
+        Task<Result<PagedResult<CandidateResponseDTO>>> GetCandidatesPagedAsync(int pageNumber, int pageSize);
 
-        Task<Result<int>> GetCandidatesTotalCountAsync();
+      
 
         Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request);
 

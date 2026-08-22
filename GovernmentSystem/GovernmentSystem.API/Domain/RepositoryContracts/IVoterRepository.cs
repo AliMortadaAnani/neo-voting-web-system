@@ -6,15 +6,15 @@ namespace GovernmentSystem.API.Domain.RepositoryContracts
     {
         
 
-        Task<List<Voter>> GetVotersPagedAsync(int pageNumber, int pageSize);
+        Task<List<Voter>> GetPagedAsync(int pageNumber, int pageSize);
 
-        Task<int> GetVotersTotalCountAsync();//needed for pagination UX
+        Task<int> CountAsync();//needed for pagination UX
 
         Task<Voter?> GetVoterByNationalIdAsync(string nationalId);
 
         Task<Voter?> GetVoterByHashedDataAsync(string hashedData);
 
-        void AddVoter(Voter voter);
+        void Add(Voter voter);
 
         void Delete(Voter voter);
 

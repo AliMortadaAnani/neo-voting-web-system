@@ -1,21 +1,36 @@
-﻿using GovernmentSystem.API.Domain.Entities;
-using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
+﻿using GovernmentSystem.API.Application.Helpers;
 using GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs.CitizenDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
+using GovernmentSystem.API.Domain.Entities;
 
 namespace GovernmentSystem.API.Application.ResponseDTOs
 {
     public static class ResponseMappingExtensions
     {
-        public static VoterResponseDTO ToVoterResponse(this Voter voter)
+        public static CitizenResponseDTO ToCitizenResponse(this Citizen citizen, SensitiveDataHelper? sensitiveDataHelper = null)
+        {
+            return new CitizenResponseDTO
+            {
+                Id = citizen.Id,
+                NationalId = sensitiveDataHelper?.Decrypt(citizen.NationalId) ?? citizen.NationalId,
+                GovernorateId = citizen.GovernorateId,
+                FirstName = citizen.FirstName,
+                LastName = citizen.LastName,
+                DateOfBirth = citizen.DateOfBirth,
+                Gender = citizen.Gender
+            };
+        }
+
+        public static VoterResponseDTO ToVoterResponse(this Voter voter, SensitiveDataHelper? sensitiveDataHelper = null)
         {
             return new VoterResponseDTO
             {
                 Id = voter.Id,
                 CitizenId = voter.CitizenId,
-                VotingToken = voter.VotingToken,
+                VotingToken = sensitiveDataHelper?.Decrypt(voter.VotingToken) ?? voter.VotingToken,
                 HashedData = voter.HashedData,
-                NationalId = voter.Citizen.NationalId,
+                NationalId = sensitiveDataHelper?.Decrypt(voter.Citizen.NationalId) ?? voter.Citizen.NationalId,
                 GovernorateId = voter.Citizen.GovernorateId,
                 FirstName = voter.Citizen.FirstName,
                 LastName = voter.Citizen.LastName,
@@ -39,15 +54,15 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
 
         // --- Candidate Mappings ---
 
-        public static CandidateResponseDTO ToCandidateResponse(this Candidate candidate)
+        public static CandidateResponseDTO ToCandidateResponse(this Candidate candidate, SensitiveDataHelper? sensitiveDataHelper = null)
         {
             return new CandidateResponseDTO
             {
                 Id = candidate.Id,
                 CitizenId = candidate.CitizenId,
-                NominationToken = candidate.NominationToken,
+                NominationToken = sensitiveDataHelper?.Decrypt(candidate.NominationToken) ?? candidate.NominationToken,
                 HashedData = candidate.HashedData,
-                NationalId = candidate.Citizen.NationalId,
+                NationalId = sensitiveDataHelper?.Decrypt(candidate.Citizen.NationalId) ?? candidate.Citizen.NationalId,
                 GovernorateId = candidate.Citizen.GovernorateId,
                 FirstName = candidate.Citizen.FirstName,
                 LastName = candidate.Citizen.LastName,

@@ -1,9 +1,11 @@
-﻿using GovernmentSystem.API.Domain.Enums;
+﻿using GovernmentSystem.API.Application.Helpers;
+using GovernmentSystem.API.Domain.Enums;
 
 namespace GovernmentSystem.API.Application.ResponseDTOs.CitizenDTOs
 {
     public class CitizenResponseDTO
-    {
+    {   
+
         public int Id { get; set; }
         public string NationalId { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;

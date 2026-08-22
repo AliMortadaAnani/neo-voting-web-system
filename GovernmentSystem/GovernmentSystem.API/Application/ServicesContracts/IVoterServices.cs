@@ -12,9 +12,9 @@ namespace GovernmentSystem.API.Application.ServicesContracts
 
         Task<Result<VoterResponseDTO>> GetVoterByHashedDataAsync(GetVoterRequestDTO request);
 
-        Task<Result<List<VoterResponseDTO>>> GetVotersPagedAsync(int pageNumber, int pageSize);
+        Task<Result<PagedResult<VoterResponseDTO>>> GetVotersPagedAsync(int pageNumber, int pageSize);
 
-        Task<Result<int>> GetVotersTotalCountAsync();
+      
 
         Task<Result<VoterResponseDTO>> AddVoterAsync(CreateVoterRequestDTO request);
 

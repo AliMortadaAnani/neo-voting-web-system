@@ -1,12 +1,11 @@
-﻿using GovernmentSystem.API.Application.RequestDTOs;
-using GovernmentSystem.API.Application.RequestDTOs.Voter;
-using GovernmentSystem.API.Application.ResponseDTOs;
-using GovernmentSystem.API.Application.ResponseDTOs.Voter;
+﻿using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.Enums;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
+using GovernmentSystem.API.Application.RequestDTOs.VoterDTOs;
+
 
 namespace GovernmentSystem.API.Application.Services
 {
@@ -182,6 +181,39 @@ namespace GovernmentSystem.API.Application.Services
             return Result<VoterResponseDTO>.Success(response);
         }
 
-        
+        public Task<Result<VoterResponseDTO>> GetVoterByNationalIdAsync(GetVoterRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<VoterResponseDTO>> GetVoterByHashedDataAsync(GetVoterRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<List<VoterResponseDTO>>> GetVotersPagedAsync(int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<int>> GetVotersTotalCountAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> DeleteVoterByNationalIdAsync(DeleteVoterRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<VoterResponseDTO>> GenerateNewVotingTokenByNationalIdAsync(UpdateVoterRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<VoterVerifyResponseDTO>> VerifyVoterCredentialsAsync(GetVoterVerificationRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
