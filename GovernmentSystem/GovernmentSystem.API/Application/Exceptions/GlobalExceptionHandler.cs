@@ -20,7 +20,7 @@ namespace GovernmentSystem.API.Application.Exceptions
            )
 
         {
-            _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
+            _logger.LogError(exception, "GlobalExceptionHandler: Exception occurred - Message: {Message}, Type: {ExceptionType}", exception.Message, exception.GetType().Name);
 
             var problemDetails = new ProblemDetails
             {
@@ -32,6 +32,7 @@ namespace GovernmentSystem.API.Application.Exceptions
 
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
+            _logger.LogError("GlobalExceptionHandler: Returning 500 error response to client at path {Path}", httpContext.Request.Path);
             await httpContext.Response.WriteAsJsonAsync(problemDetails);
 
             return true; // We handled it

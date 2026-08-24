@@ -11,18 +11,22 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.Admin
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<AdminServices> _logger;
 
-        public AdminServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        public AdminServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AdminServices> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<Result<AuthResponse>> LoginAsync(LoginDTO loginDTO)
         {
+            _logger.LogInformation("Admin login attempt initiated");
             var user = await _userManager.FindByNameAsync(loginDTO.Username!);
             if (user == null)
             {
+                _logger.LogWarning("Admin login failed - user not found");
                 return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Invalid admin credentials."));
             }
             // This method creates the Set-Cookie header
@@ -34,6 +38,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.Admin
 
             if (result.Succeeded)
             {
+                _logger.LogInformation("Admin login successful for user: {Username}", user.UserName);
                 return Result<AuthResponse>.Success(new AuthResponse
                 {
                     IsSuccess = true,
@@ -43,13 +48,16 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.Admin
                 });
             }
 
+            _logger.LogWarning("Admin login failed - password sign in unsuccessful");
             return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Invalid admin credentials."));
         }
 
         public async Task<Result<string>> LogoutAsync()
         {
+            _logger.LogInformation("Admin logout initiated");
             // This tells the browser to delete the cookie
             await _signInManager.SignOutAsync();
+            _logger.LogInformation("Admin logout successful");
             return Result<string>.Success("Logout Successful");
         }
     }

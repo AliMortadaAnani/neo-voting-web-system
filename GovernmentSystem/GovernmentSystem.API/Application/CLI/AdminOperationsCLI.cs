@@ -13,6 +13,9 @@ namespace GovernmentSystem.API.Application.CLI
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var logger = serviceProvider.GetRequiredService<ILogger<AdminOperationsCLI>>();
+
+            logger.LogInformation("AdminOperationsCLI: Starting admin user seeding process");
 
             // 1. Get Username from Environment Variable
             // We look for a variable from environment configuration
@@ -21,6 +24,7 @@ namespace GovernmentSystem.API.Application.CLI
 
             if (string.IsNullOrEmpty(adminUsername) || adminUsername == "none")
             {
+                logger.LogError("AdminOperationsCLI: Admin seeding failed - Admin:Username not configured");
                 Console.WriteLine("Error: Environment variable 'Admin:Username' is not set.");
                 return;
             }
@@ -29,10 +33,12 @@ namespace GovernmentSystem.API.Application.CLI
 
             if (string.IsNullOrEmpty(adminPassword) || adminPassword == "none")
             {
+                logger.LogError("AdminOperationsCLI: Admin seeding failed - Admin:Password not configured");
                 Console.WriteLine("Error: Environment variable 'Admin:Password' is not set.");
                 return;
             }
 
+            logger.LogInformation("AdminOperationsCLI: Attempting to seed admin user: {AdminUsername}", adminUsername);
             Console.WriteLine($"Attempting to seed Admin: {adminUsername}...");
 
             // 2. Create Role
@@ -40,6 +46,7 @@ namespace GovernmentSystem.API.Application.CLI
 
             if (await roleManager.FindByNameAsync(adminRoleName) is null)
             {
+                logger.LogInformation("AdminOperationsCLI: Creating admin role");
                 ApplicationRole applicationRole = ApplicationRole.CreateAdminRole();
 
                 await roleManager.CreateAsync(applicationRole);
@@ -50,6 +57,7 @@ namespace GovernmentSystem.API.Application.CLI
 
             if (adminUser == null)
             {
+                logger.LogInformation("AdminOperationsCLI: Creating new admin user: {AdminUsername}", adminUsername);
                 adminUser = ApplicationUser.CreateAdminUser(adminUsername);
 
                 // Use the password passed from the CLI argument
@@ -58,16 +66,19 @@ namespace GovernmentSystem.API.Application.CLI
                 if (createResult.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, adminRoleName);
+                    logger.LogInformation("AdminOperationsCLI: Admin user created successfully: {AdminUsername}", adminUsername);
                     Console.WriteLine("Admin user created successfully.");
                 }
                 else
                 {
                     var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    logger.LogError("AdminOperationsCLI: Failed to create admin user - Errors: {Errors}", errors);
                     Console.WriteLine($"Error creating Admin user: {errors}");
                 }
             }
             else
             {
+                logger.LogInformation("AdminOperationsCLI: Admin user already exists: {AdminUsername}", adminUsername);
                 Console.WriteLine("Admin user already exists.");
             }
         }

@@ -12,10 +12,12 @@ namespace GovernmentSystem.API.API.Controllers
     public class AuthController : ApiController
     {
         private readonly IAdminServices _adminServices;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAdminServices adminServices)
+        public AuthController(IAdminServices adminServices, ILogger<AuthController> logger)
         {
             _adminServices = adminServices;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -25,7 +27,12 @@ namespace GovernmentSystem.API.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginDTO request)
         {
+            _logger.LogInformation("Login attempt initiated for user");
             var result = await _adminServices.LoginAsync(request);
+            if (result.IsSuccess)
+                _logger.LogInformation("User login successful");
+            else
+                _logger.LogWarning("User login failed: {Error}", result.Error.Description);
             return HandleResult(result);
         }
 
@@ -35,7 +42,12 @@ namespace GovernmentSystem.API.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Logout()
         {
+            _logger.LogInformation("Logout initiated");
             var result = await _adminServices.LogoutAsync();
+            if (result.IsSuccess)
+                _logger.LogInformation("User logout successful");
+            else
+                _logger.LogWarning("User logout failed: {Error}", result.Error.Description);
             return HandleResult(result);
         }
     }

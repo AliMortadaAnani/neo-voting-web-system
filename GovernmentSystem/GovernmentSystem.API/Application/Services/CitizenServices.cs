@@ -14,46 +14,59 @@ namespace GovernmentSystem.API.Application.Services
         private readonly ICitizenRepository _citizenRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly SensitiveDataHelper _sensitiveDataHelper;
+        private readonly ILogger<CitizenServices> _logger;
 
-        public CitizenServices(ICitizenRepository citizenRepository, IUnitOfWork unitOfWork, SensitiveDataHelper sensitiveDataHelper)
+        public CitizenServices(ICitizenRepository citizenRepository, IUnitOfWork unitOfWork, SensitiveDataHelper sensitiveDataHelper, ILogger<CitizenServices> logger)
         {
             _citizenRepository = citizenRepository;
             _unitOfWork = unitOfWork;
             _sensitiveDataHelper = sensitiveDataHelper;
+            _logger = logger;
         }
 
         public async Task<Result<CitizenResponseDTO>> GetCitizenByNationalIdAsync(GetCitizenRequestDTO request)
         {
+            _logger.LogInformation("GetCitizenByNationalId operation initiated");
             string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
 
             var citizen = await _citizenRepository.GetCitizenByNationalIdAsync(encryptedNationalId);
 
             if (citizen == null)
             {
+                _logger.LogWarning("Citizen not found for GetCitizenByNationalId operation");
                 return Result<CitizenResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Citizen_NotFound), "Citizen not found."));
             }
 
+            _logger.LogInformation("Citizen retrieved successfully for GetCitizenByNationalId operation");
             var response = citizen.ToCitizenResponse(_sensitiveDataHelper);
             return Result<CitizenResponseDTO>.Success(response);
         }
 
         public async Task<Result<PagedResult<CitizenResponseDTO>>> GetCitizensPagedAsync(int pageNumber, int pageSize)
-        {   // 1. VALIDATION (Must be first)
+        {
+            _logger.LogInformation("GetCitizensPaged operation initiated - PageNumber: {PageNumber}, PageSize: {PageSize}", pageNumber, pageSize);
+            // 1. VALIDATION (Must be first)
             if (pageNumber < 1)
             {
+                _logger.LogWarning("GetCitizensPaged validation failed - invalid PageNumber: {PageNumber}", pageNumber);
                 return Result<PagedResult<CitizenResponseDTO>>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageNumber must be greater than 0."));
             }
             // 1. VALIDATION (Must be first)
             if (pageSize < 1)
             {
+                _logger.LogWarning("GetCitizensPaged validation failed - invalid PageSize: {PageSize}", pageSize);
                 return Result<PagedResult<CitizenResponseDTO>>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageSize must be greater than 0."));
             }
 
             // 2. SECURITY: Cap the PageSize
             // If they ask for 5000, force it down to 100 to protect RAM/Network.
-            if (pageSize > 100) pageSize = 100;
+            if (pageSize > 100)
+            {
+                pageSize = 100;
+                _logger.LogInformation("PageSize capped to 100");
+            }
 
             // 3. Get total count
             int totalCount = await _citizenRepository.CountAsync();
@@ -69,11 +82,13 @@ namespace GovernmentSystem.API.Application.Services
                 TotalCount = totalCount
             };
 
+            _logger.LogInformation("GetCitizensPaged operation successful - Retrieved {Count} records out of {TotalCount} total", response.Count, totalCount);
             return Result<PagedResult<CitizenResponseDTO>>.Success(pagedResult);
         }
 
         public async Task<Result<CitizenResponseDTO>> AddCitizenAsync(CreateCitizenRequestDTO request)
         {
+            _logger.LogInformation("AddCitizen operation initiated");
             string rawNationalId = _sensitiveDataHelper.GenerateNationalId
                 (request.FirstName!,
                 request.LastName!,
@@ -96,6 +111,7 @@ namespace GovernmentSystem.API.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("AddCitizen operation successful");
             var response = citizen.ToCitizenResponse(_sensitiveDataHelper);
 
             return Result<CitizenResponseDTO>.Success(response);
@@ -103,29 +119,34 @@ namespace GovernmentSystem.API.Application.Services
 
         public async Task<Result<bool>> DeleteCitizenByNationalIdAsync(DeleteCitizenRequestDTO request)
         {
+            _logger.LogInformation("DeleteCitizen operation initiated");
             string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
 
             var citizen = await _citizenRepository.GetCitizenByNationalIdAsync(encryptedNationalId);
 
             if (citizen == null)
             {
+                _logger.LogWarning("DeleteCitizen failed - citizen not found");
                 return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Citizen_NotFound), "Citizen not found."));
             }
 
             _citizenRepository.Delete(citizen);
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("DeleteCitizen operation successful");
             return Result<bool>.Success(true);
         }
 
         public async Task<Result<CitizenResponseDTO>> UpdateCitizenByNationalIdAsync(UpdateCitizenRequestDTO request)
         {
+            _logger.LogInformation("UpdateCitizen operation initiated");
             string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
 
             var citizen = await _citizenRepository.GetCitizenByNationalIdAsync(encryptedNationalId);
 
             if (citizen == null)
             {
+                _logger.LogWarning("UpdateCitizen failed - citizen not found");
                 return Result<CitizenResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Citizen_NotFound), "Citizen not found."));
             }
 
@@ -140,13 +161,16 @@ namespace GovernmentSystem.API.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("UpdateCitizen operation successful");
             var response = citizen.ToCitizenResponse(_sensitiveDataHelper);
             return Result<CitizenResponseDTO>.Success(response);
         }
 
         public async Task<Result<int>> GetCitizensTotalCountAsync()
         {
+            _logger.LogInformation("GetCitizensTotalCount operation initiated");
             var totalCount = await _citizenRepository.CountAsync();
+            _logger.LogInformation("GetCitizensTotalCount operation successful - Total: {TotalCount}", totalCount);
             return Result<int>.Success(totalCount);
         }
     }

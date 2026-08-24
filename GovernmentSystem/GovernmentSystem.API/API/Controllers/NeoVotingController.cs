@@ -18,11 +18,13 @@ namespace GovernmentSystem.API.API.Controllers
     {
         private readonly IVoterServices _voterServices;
         private readonly ICandidateServices _candidateServices;
+        private readonly ILogger<NeoVotingController> _logger;
 
-        public NeoVotingController(IVoterServices voterServices, ICandidateServices candidateServices)
+        public NeoVotingController(IVoterServices voterServices, ICandidateServices candidateServices, ILogger<NeoVotingController> logger)
         {
             _voterServices = voterServices;
             _candidateServices = candidateServices;
+            _logger = logger;
         }
 
         [HttpPost("voter/verify")]
@@ -31,7 +33,12 @@ namespace GovernmentSystem.API.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyVoter([FromBody] GetVoterVerificationRequestDTO request)
         {
+            _logger.LogInformation("Voter verification requested");
             var result = await _voterServices.VerifyVoterCredentialsAsync(request);
+            if (result.IsSuccess)
+                _logger.LogInformation("Voter verification successful");
+            else
+                _logger.LogWarning("Voter verification failed: {Error}", result.Error.Description);
             return HandleResult(result);
         }
 
@@ -41,7 +48,12 @@ namespace GovernmentSystem.API.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyCandidate([FromBody] GetCandidateVerificationRequestDTO request)
         {
+            _logger.LogInformation("Candidate verification requested");
             var result = await _candidateServices.VerifyCandidateCredentialsAsync(request);
+            if (result.IsSuccess)
+                _logger.LogInformation("Candidate verification successful");
+            else
+                _logger.LogWarning("Candidate verification failed: {Error}", result.Error.Description);
             return HandleResult(result);
         }
     }

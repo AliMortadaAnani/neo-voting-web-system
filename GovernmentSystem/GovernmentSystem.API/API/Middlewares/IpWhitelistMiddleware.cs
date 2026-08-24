@@ -23,12 +23,15 @@ namespace GovernmentSystem.API.API.Middlewares
             // Only filter API endpoints. Allow Swagger UI or static files to pass through.
             if (!path.StartsWith("/api", StringComparison.OrdinalIgnoreCase))
             {
+                _logger.LogDebug("IpWhitelistMiddleware: Non-API path accessed - Path: {Path}", path);
                 await _next(context);
                 return;
             }
 
             var remoteIp = context.Connection.RemoteIpAddress;
             string incomingIp = remoteIp?.ToString() ?? "";
+
+            _logger.LogInformation("IpWhitelistMiddleware: Incoming request from IP: {IncomingIp}, Path: {Path}", incomingIp, path);
 
             // 1. Load IP Lists
 
@@ -42,6 +45,7 @@ namespace GovernmentSystem.API.API.Middlewares
             // Admins can access EVERYTHING (/api/admin and /api/public)
             if (adminIps.Contains(incomingIp))
             {
+                _logger.LogInformation("IpWhitelistMiddleware: Admin IP {IncomingIp} granted access to {Path}", incomingIp, path);
                 await _next(context);
                 return;
             }
@@ -52,13 +56,14 @@ namespace GovernmentSystem.API.API.Middlewares
                 // They are only allowed to touch /api/public
                 if (path.StartsWith("/api/public", StringComparison.OrdinalIgnoreCase))
                 {
+                    _logger.LogInformation("IpWhitelistMiddleware: External System IP {IncomingIp} granted access to public endpoint {Path}", incomingIp, path);
                     await _next(context);
                     return;
                 }
                 else
                 {
                     // External IP tried to access /api/admin or other protected routes
-                    _logger.LogWarning($"Security Alert: External System IP {incomingIp} tried to access restricted path {path}");
+                    _logger.LogWarning("IpWhitelistMiddleware: Security Alert - External System IP {IncomingIp} attempted restricted path {Path}", incomingIp, path);
                     await WriteProblemDetailsAsync(
                         context,
                         statusCode: StatusCodes.Status403Forbidden,
@@ -71,7 +76,7 @@ namespace GovernmentSystem.API.API.Middlewares
             }
 
             // 4. Unknown IP
-            _logger.LogWarning($"Security Alert: Unauthorized access attempt from IP {incomingIp} to {path}");
+            _logger.LogWarning("IpWhitelistMiddleware: Security Alert - Unauthorized access attempt from IP {IncomingIp} to {Path}", incomingIp, path);
             await WriteProblemDetailsAsync(
                 context,
                 statusCode: StatusCodes.Status403Forbidden,
