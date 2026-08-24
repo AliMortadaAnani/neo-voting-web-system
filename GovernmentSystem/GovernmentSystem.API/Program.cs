@@ -1,4 +1,3 @@
-using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,14 +13,11 @@ if (await SeedingWithCLI.HandleCliCommandsAsync(app, args))
     return;
 }
 
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
 app.UseExceptionHandler(); // Custom Exception Handler Middleware : Global Exception Handling
 //in Application layer , registered in StartupExtensions/ServiceExtensions.cs
-
 
 //app.UseHttpsRedirection();
 

@@ -24,8 +24,8 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://0.0.0.0:5000;https://localhost:7042;", 
-      //0000.5000 is to test listening on all local network 
+      "applicationUrl": "https://0.0.0.0:5000;https://localhost:7042;",
+      //0000.5000 is to test listening on all local network
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

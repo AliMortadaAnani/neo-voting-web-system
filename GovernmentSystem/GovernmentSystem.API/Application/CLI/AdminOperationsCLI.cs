@@ -1,6 +1,6 @@
 ﻿using GovernmentSystem.API.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using GovernmentSystem.API.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace GovernmentSystem.API.Application.CLI
 {

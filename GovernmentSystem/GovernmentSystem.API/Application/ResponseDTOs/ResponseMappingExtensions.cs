@@ -83,7 +83,5 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
                 Gender = candidate.Citizen.Gender
             };
         }
-    
-        
     }
 }

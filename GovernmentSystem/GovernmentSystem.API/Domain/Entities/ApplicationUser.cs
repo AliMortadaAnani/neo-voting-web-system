@@ -19,6 +19,5 @@ namespace GovernmentSystem.API.Domain.Entities
                 UserName = userName
             };
         }
-
     }
 }

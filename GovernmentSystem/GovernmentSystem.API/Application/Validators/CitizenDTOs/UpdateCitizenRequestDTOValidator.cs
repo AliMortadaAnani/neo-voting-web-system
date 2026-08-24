@@ -32,8 +32,6 @@ namespace GovernmentSystem.API.Application.Validators.CitizenDTOs
             RuleFor(x => x.Gender)
                 .NotNull()
                 .Must(g => g.HasValue && (char.ToUpperInvariant(g.Value) == 'M' || char.ToUpperInvariant(g.Value) == 'F'));
-
-            
         }
 
         private bool BeAtLeast18YearsOld(DateOnly dob)
@@ -49,5 +47,5 @@ namespace GovernmentSystem.API.Application.Validators.CitizenDTOs
             return age >= 18;
         }
     }
-    }
+}
 }

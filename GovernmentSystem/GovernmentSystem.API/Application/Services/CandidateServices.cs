@@ -1,172 +1,198 @@
-﻿using GovernmentSystem.API.Application.RequestDTOs.Candidate;
+﻿using GovernmentSystem.API.Application.Helpers;
+using GovernmentSystem.API.Application.RequestDTOs.CandidateDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
-using GovernmentSystem.API.Application.ResponseDTOs.Candidate;
+using GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.Enums;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
+using GovernmentSystem.API.Infrastructure.Repositories;
 
 namespace GovernmentSystem.API.Application.Services
 {
-    public class CandidateServices(ICandidateRepository candidateRepository, IUnitOfWork unitOfWork) : ICandidateServices
+    public class CandidateServices : ICandidateServices
     {
-        private readonly ICandidateRepository _candidateRepository = candidateRepository;
-        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly ICandidateRepository _candidateRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly SensitiveDataHelper _sensitiveDataHelper;
+        private readonly ICitizenRepository _citizenRepository;
 
-        public async Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request)
+
+        public CandidateServices(ICandidateRepository candidateRepository, ICitizenRepository citizenRepository, IUnitOfWork unitOfWork, SensitiveDataHelper sensitiveDataHelper)
         {
-            Candidate candidate = request.ToCandidate();
-
-            var candidateAdded = await _candidateRepository.AddCandidateAsync(candidate);
-
-            if (candidateAdded == null)
-            {
-                return Result<CandidateResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Candidate_OperationFailed), "Candidate could not be added."));
-            }
-
-            await _unitOfWork.SaveChangesAsync();
-
-            var response = candidate.ToCandidateResponse();
-
-            return Result<CandidateResponseDTO>.Success(response);
+            _candidateRepository = candidateRepository;
+            _unitOfWork = unitOfWork;
+            _sensitiveDataHelper = sensitiveDataHelper;
+            _citizenRepository = citizenRepository;
         }
 
-        public async Task<Result<bool>> DeleteByNationalIdAsync(DeleteCandidateRequestDTO request)
-        {
-            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
-            if (candidate == null)
-            {
-                return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
-            }
-            _candidateRepository.Delete(candidate);
-            await _unitOfWork.SaveChangesAsync();
 
-            return Result<bool>.Success(true);
-        }
-
-        public async Task<Result<CandidateResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenCandidateRequestDTO request)
+        public async Task<Result<CandidateResponseDTO>> GetCandidateByNationalIdAsync(GetCandidateRequestDTO request)
         {
-            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(encryptedNationalId);
+
             if (candidate == null)
             {
                 return Result<CandidateResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
             }
-            candidate.GenerateNewNominationToken();
-            _candidateRepository.Update(candidate);
-            await _unitOfWork.SaveChangesAsync();
 
-            var response = candidate.ToCandidateResponse();
+            var response = candidate.ToCandidateResponse(_sensitiveDataHelper);
+
             return Result<CandidateResponseDTO>.Success(response);
         }
 
-        public async Task<Result<List<CandidateResponseDTO>>> GetAllCandidatesAsync()
-        {
-            var candidates = await _candidateRepository.GetAllCandidatesAsync();
-            if (candidates.Count == 0)
-            {
-                return Result<List<CandidateResponseDTO>>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "No candidates found."));
-            }
-            var response = candidates.Select(c => c.ToCandidateResponse()).ToList();
-            return Result<List<CandidateResponseDTO>>.Success(response);
-        }
-
-        public async Task<Result<List<CandidateResponseDTO>>>   GetPaginatedCandidatesAsync(int pageNumber, int pageSize)
+        public async Task<Result<PagedResult<CandidateResponseDTO>>> GetCandidatesPagedAsync(int pageNumber, int pageSize)
         {
             // 1. VALIDATION (Must be first)
             if (pageNumber < 1)
             {
-                return Result<List<CandidateResponseDTO>>.Failure(
+                return Result<PagedResult<CandidateResponseDTO>>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageNumber must be greater than 0."));
             }
             // 1. VALIDATION (Must be first)
             if (pageSize < 1)
             {
-                return Result<List<CandidateResponseDTO>>.Failure(
+                return Result<PagedResult<CandidateResponseDTO>>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageSize must be greater than 0."));
             }
 
             // 2. SECURITY: Cap the PageSize
             // If they ask for 5000, force it down to 100 to protect RAM/Network.
             if (pageSize > 100) pageSize = 100;
-            if (pageSize < 1) pageSize = 20; // Default safety
 
-            // 3. CALCULATION
-            int skip = (pageNumber - 1) * pageSize;
-            int take = pageSize;
+            // 3. Get total count
+            int totalCount = await _candidateRepository.CountAsync();
 
-            // 4. DATA RETRIEVAL (Parallel Execution for Speed)
-            // We need both the Data (Page) and the Count (Total)
-            var candidatesTask = _candidateRepository.GetPagedCandidatesStoredProcAsync(skip, take);
-            var countTask = _candidateRepository.GetTotalCandidatesCountAsync(); // You need to add this Repo method
-            await Task.WhenAll(candidatesTask, countTask);
+            var candidates = await _candidateRepository.GetPagedAsync(pageNumber, pageSize);
+            var response = candidates.Select(c => c.ToCandidateResponse(_sensitiveDataHelper)).ToList();
 
-            /*
-            Task 1 (Stored Proc): Uses Connection A (Created manually).
-
-            Task 2 (Count): Uses Connection B (Inside _dbContext).
-
-            Result: They are two different cables going to the database.
-            They can run at the same time. Task.WhenAll works.*/
-
-            //Here we are waiting for both tasks to complete but from different contexts.
-            //as candidatesTask is fetching data using ADO.NET and countTask is fetching data using Entity Framework Core.
-
-            var candidates = candidatesTask.Result;
-            var totalCount = countTask.Result;
-
-            // 5. HANDLE EMPTY RESULTS
-            if (candidates.Count == 0 && pageNumber == 1)
+            var pagedResult = new PagedResult<CandidateResponseDTO>
             {
-                // It's not an error if the DB is empty, just return empty response
-                return Result<List<CandidateResponseDTO>>.Success([]);
-            }
-            // If they ask for Page 100 but we only have 5 pages
-            if (candidates.Count == 0 && totalCount > 0)
-            {
-                return Result<List<CandidateResponseDTO>>.Failure(
-                    Error.NotFound(nameof(ProblemDetails404ErrorTypes.Paging_OutOfBounds), "Page number exceeds total pages."));
-            }
+                Data = response,
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
 
-            var response = candidates.Select(c => c.ToCandidateResponse()).ToList();
-            return Result<List<CandidateResponseDTO>>.Success(response);
+            return Result<PagedResult<CandidateResponseDTO>>.Success(pagedResult);
         }
 
-        public async Task<Result<CandidateResponseDTO>> GetByNationalIdAsync(GetCandidateRequestDTO request)
+        public async Task<Result<CandidateVerifyResponseDTO>> VerifyCandidateCredentialsAsync(GetCandidateVerificationRequestDTO request)
         {
-            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
-            if (candidate == null)
-            {
-                return Result<CandidateResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
-            }
-            var response = candidate.ToCandidateResponse();
-            return Result<CandidateResponseDTO>.Success(response);
-        }
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+            string encryptedNominationToken = _sensitiveDataHelper.Encrypt(request.NominationToken!);
+            string hashedData = _sensitiveDataHelper.HashData(encryptedNationalId, encryptedNominationToken);
 
-        public async Task<Result<CandidateResponseDTO>> UpdateByNationalIdAsync(UpdateCandidateRequestDTO request)
-        {
-            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(request.NationalId!.Value);
+            var candidate = await _candidateRepository.GetCandidateByHashedDataAsync(hashedData);
+
             if (candidate == null)
             {
-                return Result<CandidateResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
+                return Result<CandidateVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
             }
-            candidate.UpdateDetails(
-                (GovernorateIdEnum)request.GovernorateId!.Value,
-                request.FirstName!,
-                request.LastName!,
-                request.DateOfBirth!.Value,
-                request.Gender!.Value,
-                request.EligibleForElection!.Value,
-                request.ValidToken!.Value,
-                request.IsRegistered!.Value
-            );
-            _candidateRepository.Update(candidate);
+
+            var response = candidate.ToNeoVoting_CandidateResponse();
+            return Result<CandidateVerifyResponseDTO>.Success(response);
+        }
+        public async Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request)
+        {
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var citizen = await _citizenRepository.GetCitizenByNationalIdAsync(encryptedNationalId);
+
+            if (citizen == null)
+            {
+                return Result<CandidateResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Citizen_NotFound), "Citizen not found."));
+            }
+
+            bool isCandidateExists = await _candidateRepository.IsCandidateExistByNationalIdAsync(encryptedNationalId);
+
+            if (isCandidateExists)
+            {
+                return Result<CandidateResponseDTO>.Failure(Error.Conflict(nameof(ProblemDetails409ErrorTypes.Candidate_AlreadyRegistered), "Candidate already registered."));
+            }
+
+            string rawNominationToken = _sensitiveDataHelper.GenerateNominationToken
+               (citizen.FirstName,
+               citizen.LastName,
+               (int)citizen.GovernorateId,
+               citizen.Gender,
+               citizen.DateOfBirth);
+
+            string encryptedNominationToken = _sensitiveDataHelper.Encrypt(rawNominationToken);
+
+            string hashedData = _sensitiveDataHelper.HashData(encryptedNationalId, encryptedNominationToken);
+
+            var candidate = Candidate.Create(
+                encryptedNominationToken,
+                hashedData,
+                citizen.Id
+                 );
+
+            _candidateRepository.Add(candidate);
+
             await _unitOfWork.SaveChangesAsync();
 
-            var response = candidate.ToCandidateResponse();
+            var response = candidate.ToCandidateResponse(_sensitiveDataHelper);
+
             return Result<CandidateResponseDTO>.Success(response);
         }
 
-        
+        public async Task<Result<bool>> DeleteCandidateByNationalIdAsync(DeleteCandidateRequestDTO request)
+        {
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(encryptedNationalId);
+
+            if (candidate == null)
+            {
+                return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
+            }
+
+            _candidateRepository.Delete(candidate);
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result<bool>.Success(true);
+        }
+
+        public async Task<Result<CandidateResponseDTO>> GenerateNewNominationTokenByNationalIdAsync(UpdateCandidateRequestDTO request)
+        {
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var candidate = await _candidateRepository.GetCandidateByNationalIdAsync(encryptedNationalId);
+
+            if (candidate == null)
+            {
+                return Result<CandidateResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
+            }
+            string rawNominationToken = _sensitiveDataHelper.GenerateNominationToken
+              (candidate.Citizen.FirstName,
+              candidate.Citizen.LastName,
+              (int)candidate.Citizen.GovernorateId,
+              candidate.Citizen.Gender,
+              candidate.Citizen.DateOfBirth);
+
+            string encryptedNominationToken = _sensitiveDataHelper.Encrypt(rawNominationToken);
+
+            string hashedData = _sensitiveDataHelper.HashData(encryptedNationalId, encryptedNominationToken);
+
+            candidate.Update(encryptedNominationToken, hashedData);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var response = candidate.ToCandidateResponse(_sensitiveDataHelper);
+
+            return Result<CandidateResponseDTO>.Success(response);
+        }
+
+        public async Task<Result<int>> GetCandidatesTotalCountAsync()
+        {
+            int totalCount = await _candidateRepository.CountAsync();
+            return Result<int>.Success(totalCount);
+        }
+
     }
 }

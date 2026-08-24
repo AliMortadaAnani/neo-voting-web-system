@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GovernmentSystem.API.Infrastructure.Repositories
 {
     public class CitizenRepository : ICitizenRepository
-    {   
+    {
         private readonly ApplicationDbContext _dbContext;
 
         public CitizenRepository(ApplicationDbContext dbContext)
@@ -16,7 +16,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
 
         public void Add(Citizen citizen)
         {
-           _dbContext.Citizens.Add(citizen);
+            _dbContext.Citizens.Add(citizen);
         }
 
         public void Delete(Citizen citizen)

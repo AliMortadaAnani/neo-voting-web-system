@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using GovernmentSystem.API.Application.CLI;
+﻿using GovernmentSystem.API.Application.CLI;
 
 namespace GovernmentSystem.API.StartupExtensions
 {
     public static class SeedingWithCLI
     {
         /// <summary>
-        /// Checks incoming command line arguments and routes to the correct seeding function. 
+        /// Checks incoming command line arguments and routes to the correct seeding function.
         /// Returns true if a CLI command was handled (meaning the app should exit instead of starting the web server).
         /// </summary>
         public static async Task<bool> HandleCliCommandsAsync(WebApplication app, string[] args)
@@ -40,8 +37,6 @@ namespace GovernmentSystem.API.StartupExtensions
 
         private static async Task<bool> HandleSeedAdminAsync(WebApplication app)
         {
-           
-            
             Console.WriteLine("Starting Admin Seeding Process...");
 
             using var scope = app.Services.CreateScope();
@@ -71,11 +66,11 @@ namespace GovernmentSystem.API.StartupExtensions
             string usernameFromCli = args[1];
             string passwordFromCli = args[2];
 
-            if(string.IsNullOrWhiteSpace(usernameFromCli) || string.IsNullOrWhiteSpace(passwordFromCli))
+            if (string.IsNullOrWhiteSpace(usernameFromCli) || string.IsNullOrWhiteSpace(passwordFromCli))
             {
                 Console.WriteLine("Error: Username or Password cannot be empty.");
                 return true;
-            } 
+            }
             Console.WriteLine("Starting Admin Resetting Password Process...");
 
             using var scope = app.Services.CreateScope();

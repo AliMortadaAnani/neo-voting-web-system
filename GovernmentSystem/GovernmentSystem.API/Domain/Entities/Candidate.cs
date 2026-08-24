@@ -1,6 +1,4 @@
-﻿using GovernmentSystem.API.Domain.Shared;
-
-namespace GovernmentSystem.API.Domain.Entities
+﻿namespace GovernmentSystem.API.Domain.Entities
 {
     public class Candidate
     {
@@ -61,6 +59,5 @@ namespace GovernmentSystem.API.Domain.Entities
             NominationToken = nominationToken;
             HashedData = hashedData;
         }
-
     }
 }

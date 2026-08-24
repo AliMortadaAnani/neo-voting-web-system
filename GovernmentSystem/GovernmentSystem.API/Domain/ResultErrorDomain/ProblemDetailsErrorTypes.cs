@@ -12,7 +12,6 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails401ErrorTypes // Unauthorized (Auth & Credentials)
     {
-        
         Admin_InvalidCredentials,
         Voter_InvalidCredentials,
         Candidate_InvalidCredentials,
@@ -35,7 +34,7 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails404ErrorTypes // Not Found
     {
-        Voter_NotFound,           
+        Voter_NotFound,
         Candidate_NotFound,
         Citizen_NotFound,
         Paging_OutOfBounds
@@ -127,11 +126,11 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
         public new IDictionary<string, object>? Extensions { get; }
     }
 
-
     public class TooManyRequests429ProblemDetails : ProblemDetails
     {
         [JsonPropertyName("type")]
         public new ProblemDetails429ErrorTypes Type { get; set; }
+
         [JsonIgnore]
         public new IDictionary<string, object>? Extensions { get; }
     }

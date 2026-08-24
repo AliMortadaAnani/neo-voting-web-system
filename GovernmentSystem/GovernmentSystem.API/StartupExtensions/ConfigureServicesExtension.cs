@@ -5,14 +5,12 @@ using GovernmentSystem.API.Application.Exceptions;
 using GovernmentSystem.API.Application.Helpers;
 using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
-using GovernmentSystem.API.Application.Validators;
 using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
 using GovernmentSystem.API.Infrastructure.DbContext;
 using GovernmentSystem.API.Infrastructure.Repositories;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -76,10 +74,9 @@ namespace GovernmentSystem.API.StartupExtensions
 
             return builder;
         }
-      
+
         public static WebApplicationBuilder ConfigureCookies(this WebApplicationBuilder builder)
         {
-
             // Cookie configuration with ProblemDetails for 401/403
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -143,14 +140,11 @@ namespace GovernmentSystem.API.StartupExtensions
 
             static bool IsApiRequest(HttpRequest request)
             {
-                
                 return request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase);
             }
 
             return builder;
         }
-
-
 
         public static WebApplicationBuilder ConfigureControllers(this WebApplicationBuilder builder)
         {
@@ -179,7 +173,6 @@ namespace GovernmentSystem.API.StartupExtensions
                 // This tells Swagger: "I support a security mode called 'ApiKey'.
                 // It works by sending a value in the Header named 'X-Gov-Api-Key'."
 
-                
                 //c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
                 //{
                 //    Description = "Enter your API Key below.",
@@ -189,13 +182,11 @@ namespace GovernmentSystem.API.StartupExtensions
                 //    Scheme = "ApiKeyScheme"
                 //});
 
-
                 // 2. REQUIREMENT: "Apply this scheme to the endpoints"
                 // This tells Swagger: "By default, assume every endpoint might need this lock."
                 // When you click 'Authorize' and enter the key, Swagger will send that key
                 // with EVERY request you make in the browser.
-                
-                
+
                 //c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 //{
                 //    {
@@ -212,7 +203,6 @@ namespace GovernmentSystem.API.StartupExtensions
                 //    }
                 //});
 
-                
                 // 1. Get the name of the generated XML file (usually YourProjectName.xml)
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 
@@ -228,8 +218,6 @@ namespace GovernmentSystem.API.StartupExtensions
 
         public static WebApplicationBuilder ConfigureCors(this WebApplicationBuilder builder)
         {
-            
-
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("FrontendPolicy", policyBuilder =>
@@ -261,7 +249,6 @@ namespace GovernmentSystem.API.StartupExtensions
             builder.Services.AddScoped<ICandidateServices, CandidateServices>();
             builder.Services.AddScoped<INeoVotingServices, NeoVotingServices>();
 
-
             // Inside ConfigureApplicationServices extension:
             builder.Services.AddScoped<DataSeederCLI>(); // Don't forget to register it here!
 
@@ -279,11 +266,9 @@ namespace GovernmentSystem.API.StartupExtensions
 
         public static WebApplicationBuilder ConfigureSensitiveDataServices(this WebApplicationBuilder builder)
         {
-            
             builder.Services.AddSingleton<SensitiveDataHelper>();
 
             return builder;
         }
-
     }
 }

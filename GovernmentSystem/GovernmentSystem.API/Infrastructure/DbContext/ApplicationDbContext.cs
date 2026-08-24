@@ -1,5 +1,4 @@
-﻿using Bogus;
-using GovernmentSystem.API.Domain.Entities;
+﻿using GovernmentSystem.API.Domain.Entities;
 using GovernmentSystem.API.Domain.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -39,8 +38,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
 
                 entity.Property(e => e.HashedData).IsRequired().HasMaxLength(2000);
                 entity.HasIndex(e => e.HashedData).IsUnique(); // Enforce Uniqueness
-                
-
             });
 
             // 3. Candidate Configuration
@@ -80,8 +77,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 entity.Property(e => e.GovernorateId).IsRequired();
                 entity.Property(e => e.Gender).IsRequired().HasMaxLength(1);
 
-
-
                 entity.ToTable(tb =>
                 tb.HasCheckConstraint("CK_Citizen_Gender", "[Gender] IN ('M', 'F')"));
 
@@ -95,13 +90,12 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 // 3. Add the Check Constraint
                 // SQL: CHECK ([GovernorateId] IN (1, 2, 3) OR [GovernorateId] IS NULL)
                 entity.ToTable(t =>
-                    t.HasCheckConstraint("CK_Citizen_GovernorateId", 
+                    t.HasCheckConstraint("CK_Citizen_GovernorateId",
                     $"([GovernorateId] IN ({sqlValues}) )")
                 );
 
-
-                entity.HasOne<Voter>()                
-                      .WithOne(s => s.Citizen)            
+                entity.HasOne<Voter>()
+                      .WithOne(s => s.Citizen)
                       .HasForeignKey<Voter>(s => s.CitizenId)
                       .OnDelete(DeleteBehavior.Cascade);
 
@@ -109,7 +103,6 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                       .WithOne(s => s.Citizen)
                       .HasForeignKey<Candidate>(s => s.CitizenId)
                       .OnDelete(DeleteBehavior.Cascade);
-
             });
         }
     }

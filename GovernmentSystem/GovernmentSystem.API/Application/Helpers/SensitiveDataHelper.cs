@@ -5,8 +5,6 @@ namespace GovernmentSystem.API.Application.Helpers
 {
     public class SensitiveDataHelper
     {
-       
-
         private readonly byte[] _key;
         private readonly byte[] _iv;
 
@@ -15,8 +13,6 @@ namespace GovernmentSystem.API.Application.Helpers
             // Read values from secrets/appsettings.json
             string keyString = configuration["SecuritySettings:AESKey"] ?? throw new InvalidOperationException("AES key not configured.");
             string ivString = configuration["SecuritySettings:AESIV"] ?? throw new InvalidOperationException("AES IV not configured.");
-
-            
 
             // Convert to bytes (ensure correct length!)
             _key = Encoding.UTF8.GetBytes(keyString);
@@ -54,13 +50,17 @@ namespace GovernmentSystem.API.Application.Helpers
             return Encoding.UTF8.GetString(plainBytes);
         }
 
-        public string HashData(string input)
+        public string HashData(string encryptedNationalId, string encryptedToken)
         {
-            if (string.IsNullOrEmpty(input))
-                return string.Empty;
+            // Optional: handle nulls safely if inputs can be null
+            encryptedNationalId ??= string.Empty;
+            encryptedToken ??= string.Empty;
 
-            // Convert string to UTF-8 bytes
-            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            // Concatenate according to your format: string1 + 10452 + string2
+            string combinedInput = $"{encryptedNationalId}10452{encryptedToken}";
+
+            // Convert the combined string to UTF-8 bytes
+            byte[] inputBytes = Encoding.UTF8.GetBytes(combinedInput);
 
             // Compute SHA-256 hash securely
             byte[] hashBytes = SHA256.HashData(inputBytes);
@@ -68,7 +68,6 @@ namespace GovernmentSystem.API.Application.Helpers
             // Convert byte array to a lowercase hex string
             return Convert.ToHexString(hashBytes).ToLowerInvariant();
         }
-
 
         private static readonly string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -118,7 +117,5 @@ namespace GovernmentSystem.API.Application.Helpers
             return new string(Enumerable.Repeat(_chars, length)
                 .Select(s => s[Random.Shared.Next(s.Length)]).ToArray());
         }
-
-
     }
 }

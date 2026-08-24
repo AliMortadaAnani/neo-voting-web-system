@@ -1,11 +1,12 @@
-﻿using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
+﻿using GovernmentSystem.API.Application.Helpers;
+using GovernmentSystem.API.Application.RequestDTOs.VoterDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.CitizenDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
-using GovernmentSystem.API.Domain.Enums;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
-using GovernmentSystem.API.Application.RequestDTOs.VoterDTOs;
-
 
 namespace GovernmentSystem.API.Application.Services
 {
@@ -13,32 +14,135 @@ namespace GovernmentSystem.API.Application.Services
     {
         private readonly IVoterRepository _voterRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly SensitiveDataHelper _sensitiveDataHelper;
+        private readonly ICitizenRepository _citizenRepository;
 
-        public VoterServices(IVoterRepository voterRepository, IUnitOfWork unitOfWork)
+        public VoterServices(IVoterRepository voterRepository, ICitizenRepository citizenRepository, IUnitOfWork unitOfWork, SensitiveDataHelper sensitiveDataHelper)
         {
             _voterRepository = voterRepository;
             _unitOfWork = unitOfWork;
+            _sensitiveDataHelper = sensitiveDataHelper;
+            _citizenRepository = citizenRepository;
         }
+
+        public async Task<Result<VoterResponseDTO>> GetVoterByNationalIdAsync(GetVoterRequestDTO request)
+        {
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var voter = await _voterRepository.GetVoterByNationalIdAsync(encryptedNationalId);
+
+            if (voter == null)
+            {
+                return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
+            }
+
+            var response = voter.ToVoterResponse(_sensitiveDataHelper);
+
+            return Result<VoterResponseDTO>.Success(response);
+        }
+
+        public async Task<Result<PagedResult<VoterResponseDTO>>> GetVotersPagedAsync(int pageNumber, int pageSize)
+        {
+            // 1. VALIDATION (Must be first)
+            if (pageNumber < 1)
+            {
+                return Result<PagedResult<VoterResponseDTO>>.Failure(
+                    Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageNumber must be greater than 0."));
+            }
+            // 1. VALIDATION (Must be first)
+            if (pageSize < 1)
+            {
+                return Result<PagedResult<VoterResponseDTO>>.Failure(
+                    Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageSize must be greater than 0."));
+            }
+
+            // 2. SECURITY: Cap the PageSize
+            // If they ask for 5000, force it down to 100 to protect RAM/Network.
+            if (pageSize > 100) pageSize = 100;
+
+            // 3. Get total count
+            int totalCount = await _voterRepository.CountAsync();
+
+            var voters = await _voterRepository.GetPagedAsync(pageNumber, pageSize);
+            var response = voters.Select(v => v.ToVoterResponse(_sensitiveDataHelper)).ToList();
+
+            var pagedResult = new PagedResult<VoterResponseDTO>
+            {
+                Data = response,
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return Result<PagedResult<VoterResponseDTO>>.Success(pagedResult);
+        }
+
+        public async Task<Result<VoterVerifyResponseDTO>> VerifyVoterCredentialsAsync(GetVoterVerificationRequestDTO request)
+        {
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+            string encryptedVotingToken = _sensitiveDataHelper.Encrypt(request.VotingToken!);
+            string hashedData = _sensitiveDataHelper.HashData(encryptedNationalId, encryptedVotingToken);
+
+            var voter = await _voterRepository.GetVoterByHashedDataAsync(hashedData);
+
+            if (voter == null)
+            {
+                return Result<VoterVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
+            }
+
+            var response = voter.ToNeoVoting_VoterResponse();
+            return Result<VoterVerifyResponseDTO>.Success(response);
+        }
+
 
         public async Task<Result<VoterResponseDTO>> AddVoterAsync(CreateVoterRequestDTO request)
         {
-            Voter voter = request.ToVoter();
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
 
-            var voterAdded = await _voterRepository.AddVoterAsync(voter);
+            var citizen = await _citizenRepository.GetCitizenByNationalIdAsync(encryptedNationalId);
 
-            if (voterAdded == null)
+            if (citizen == null)
             {
-                return Result<VoterResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Voter_OperationFailed), "Voter could not be added."));
+                return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Citizen_NotFound), "Citizen not found."));
             }
+
+            bool isVoterExists = await _voterRepository.IsVoterExistByNationalIdAsync(encryptedNationalId);
+
+            if (isVoterExists)
+            {
+                return Result<VoterResponseDTO>.Failure(Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyRegistered), "Voter already registered."));
+            }
+
+            string rawVotingToken = _sensitiveDataHelper.GenerateVotingToken
+               (citizen.FirstName,
+               citizen.LastName,
+               (int)citizen.GovernorateId,
+               citizen.Gender,
+               citizen.DateOfBirth);
+
+            string encryptedVotingToken = _sensitiveDataHelper.Encrypt(rawVotingToken);
+
+            string hashedData = _sensitiveDataHelper.HashData(encryptedNationalId, encryptedVotingToken);
+            var voter = Voter.Create(
+                encryptedVotingToken,
+                hashedData,
+                citizen.Id
+                 );
+
+            _voterRepository.Add(voter);
 
             await _unitOfWork.SaveChangesAsync();
 
-            return Result<VoterResponseDTO>.Success(voter.ToVoterResponse());
+            var response = voter.ToVoterResponse(_sensitiveDataHelper);
+
+            return Result<VoterResponseDTO>.Success(response);
         }
 
-        public async Task<Result<bool>> DeleteByNationalIdAsync(DeleteVoterRequestDTO request)
+        public async Task<Result<bool>> DeleteVoterByNationalIdAsync(DeleteVoterRequestDTO request)
         {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var voter = await _voterRepository.GetVoterByNationalIdAsync(encryptedNationalId);
 
             if (voter == null)
             {
@@ -46,174 +150,47 @@ namespace GovernmentSystem.API.Application.Services
             }
 
             _voterRepository.Delete(voter);
-
             await _unitOfWork.SaveChangesAsync();
 
             return Result<bool>.Success(true);
         }
 
-        public async Task<Result<VoterResponseDTO>> GenerateNewTokenByNationalIdAsync(GenerateNewTokenVoterRequestDTO request)
+        public async Task<Result<VoterResponseDTO>> GenerateNewVotingTokenByNationalIdAsync(UpdateVoterRequestDTO request)
         {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var voter = await _voterRepository.GetVoterByNationalIdAsync(encryptedNationalId);
 
             if (voter == null)
             {
                 return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
             }
+            string rawVotingToken = _sensitiveDataHelper.GenerateVotingToken
+              (voter.Citizen.FirstName,
+              voter.Citizen.LastName,
+              (int)voter.Citizen.GovernorateId,
+              voter.Citizen.Gender,
+              voter.Citizen.DateOfBirth);
 
-            // Domain logic
-            voter.GenerateNewVotingToken();
-            _voterRepository.Update(voter);
+            string encryptedVotingToken = _sensitiveDataHelper.Encrypt(rawVotingToken);
+
+            string hashedData = _sensitiveDataHelper.HashData(encryptedNationalId, encryptedVotingToken);
+
+            voter.Update(encryptedVotingToken, hashedData);
 
             await _unitOfWork.SaveChangesAsync();
 
-            return Result<VoterResponseDTO>.Success(voter.ToVoterResponse());
-        }
+            var response = voter.ToVoterResponse(_sensitiveDataHelper);
 
-        public async Task<Result<List<VoterResponseDTO>>> GetAllVotersAsync()
-        {
-            var voters = await _voterRepository.GetAllVotersAsync();
-
-            if (voters.Count == 0)
-            {
-                return Result<List<VoterResponseDTO>>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "No voters found."));
-            }
-
-            var response = voters.Select(v => v.ToVoterResponse()).ToList();
-            return Result<List<VoterResponseDTO>>.Success(response);
-        }
-
-        public async Task<Result<List<VoterResponseDTO>>> GetPaginatedVotersAsync(int pageNumber, int pageSize)
-        {
-            // 1. VALIDATION (Must be first)
-            if (pageNumber < 1)
-            {
-                return Result<List<VoterResponseDTO>>.Failure(
-                    Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageNumber must be greater than 0."));
-            }
-            // 1. VALIDATION (Must be first)
-            if (pageSize < 1)
-            {
-                return Result<List<VoterResponseDTO>>.Failure(
-                    Error.Validation(nameof(ProblemDetails400ErrorTypes.Paging_InvalidInput), "PageSize must be greater than 0."));
-            }
-
-            // 2. SECURITY: Cap the PageSize
-            // If they ask for 5000, force it down to 100 to protect RAM/Network.
-            if (pageSize > 100) pageSize = 100;
-            if (pageSize < 1) pageSize = 20; // Default safety
-
-            // 3. CALCULATION
-            int skip = (pageNumber - 1) * pageSize;
-            int take = pageSize;
-            // 4. DATA RETRIEVAL (Parallel Execution for Speed)
-            // We need both the Data (Page) and the Count (Total)
-            var votersTask = await _voterRepository.GetPagedVotersStoredProcAsync(skip, take);
-
-            var countTask = await _voterRepository.GetTotalVotersCountAsync(); // You need to add this Repo method
-                                                                               //await Task.WhenAll(votersTask, countTask);
-            /*
-             * Summary
-            If you use new SqlConnection(): You can use Task.WhenAll (Parallel).
-            If you use _dbContext: You must use await ...; await ...; (Sequential).
-            Since you requested to use EF Core (FromSqlRaw) for consistency,
-            you must accept the trade-off of executing them sequentially.
-             */
-
-            var votersFromPagedVoters = votersTask;  //votersTask.Result;
-            var totalCountOfVotersInDB = countTask; //countTask.Result;
-
-            // 5. HANDLE EMPTY RESULTS
-            if (votersFromPagedVoters.Count == 0 && pageNumber == 1)
-            {
-                // It's not an error if the DB is empty, just return empty response
-                return Result<List<VoterResponseDTO>>.Success(new List<VoterResponseDTO>());
-            }
-            // If they ask for Page 100 but we only have 5 pages
-            if (votersFromPagedVoters.Count == 0 && totalCountOfVotersInDB > 0)
-            {
-                return Result<List<VoterResponseDTO>>.Failure(
-                    Error.NotFound(nameof(ProblemDetails404ErrorTypes.Paging_OutOfBounds), "Page number exceeds total pages."));
-            }
-
-            var response = votersFromPagedVoters.Select(v => v.ToVoterResponse()).ToList();
-            return Result<List<VoterResponseDTO>>.Success(response);
-        }
-
-        public async Task<Result<VoterResponseDTO>> UpdateByNationalIdAsync(UpdateVoterRequestDTO request)
-        {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
-
-            if (voter == null)
-            {
-                return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
-            }
-
-            // Update Entity State
-            voter.UpdateDetails(
-               (GovernorateIdEnum)request.GovernorateId!.Value,
-               request.FirstName!,
-               request.LastName!,
-               request.DateOfBirth!.Value,
-               request.Gender!.Value,
-               request.EligibleForElection!.Value,
-               request.ValidToken!.Value,
-               request.IsRegistered!.Value,
-               request.Voted!.Value
-               );
-
-            _voterRepository.Update(voter);
-
-            // If the admin clicks save without changing data, it should still say Success.
-            await _unitOfWork.SaveChangesAsync();
-
-            return Result<VoterResponseDTO>.Success(voter.ToVoterResponse());
-        }
-
-        public async Task<Result<VoterResponseDTO>> GetByNationalIdAsync(GetVoterRequestDTO request)
-        {
-            var voter = await _voterRepository.GetVoterByNationalIdAsync(request.NationalId!.Value);
-            if (voter == null)
-            {
-                return Result<VoterResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
-            }
-            var response = voter.ToVoterResponse();
             return Result<VoterResponseDTO>.Success(response);
+
         }
 
-        public Task<Result<VoterResponseDTO>> GetVoterByNationalIdAsync(GetVoterRequestDTO request)
+        public async Task<Result<int>> GetVotersTotalCountAsync()
         {
-            throw new NotImplementedException();
+            int totalCount = await _voterRepository.CountAsync();
+            return Result<int>.Success(totalCount);
         }
 
-        public Task<Result<VoterResponseDTO>> GetVoterByHashedDataAsync(GetVoterRequestDTO request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<List<VoterResponseDTO>>> GetVotersPagedAsync(int pageNumber, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<int>> GetVotersTotalCountAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<bool>> DeleteVoterByNationalIdAsync(DeleteVoterRequestDTO request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<VoterResponseDTO>> GenerateNewVotingTokenByNationalIdAsync(UpdateVoterRequestDTO request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<VoterVerifyResponseDTO>> VerifyVoterCredentialsAsync(GetVoterVerificationRequestDTO request)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

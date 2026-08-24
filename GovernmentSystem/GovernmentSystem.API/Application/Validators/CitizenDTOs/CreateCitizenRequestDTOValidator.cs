@@ -24,7 +24,6 @@ namespace GovernmentSystem.API.Application.Validators.CitizenDTOs
             RuleFor(x => x.GovernorateId)
                 .NotNull()
                 .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateIdEnum), id.Value));
-                
 
             RuleFor(x => x.Gender)
                 .NotNull()

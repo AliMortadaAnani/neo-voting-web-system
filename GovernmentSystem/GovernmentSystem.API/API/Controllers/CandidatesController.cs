@@ -1,19 +1,15 @@
-﻿using GovernmentSystem.API.API.Controllers;
-using GovernmentSystem.API.Application.RequestDTOs.Candidate;
-using GovernmentSystem.API.Application.ResponseDTOs.Candidate;
-using GovernmentSystem.API.Application.ServicesContracts;
+﻿using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-  
-   // [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     public class CandidatesController(ICandidateServices candidateServices, ILogger<CandidatesController> logger) : ApiController
     {
         private readonly ICandidateServices _candidateServices = candidateServices;
         private readonly ILogger<CandidatesController> _logger = logger;
+
         /// <summary>
         /// Retrieves a full list of candidates in the system(with all db fields).
         /// </summary>
@@ -25,7 +21,7 @@ namespace GovernmentSystem.API.API.Controllers
         [ProducesResponseType(typeof(List<CandidateResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
-        {   
+        {
             _logger.LogInformation("Fetching all candidates from the database.");
             var result = await _candidateServices.GetAllCandidatesAsync();
             return HandleResult(result);

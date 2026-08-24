@@ -1,5 +1,7 @@
 ﻿using Bogus;
-using GovernmentSystem.API.Application.RequestDTOs;
+using GovernmentSystem.API.Application.RequestDTOs.CandidateDTOs;
+using GovernmentSystem.API.Application.RequestDTOs.CitizenDTOs;
+using GovernmentSystem.API.Application.RequestDTOs.VoterDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Enums;
 
@@ -8,170 +10,261 @@ namespace GovernmentSystem.API.Application.CLI
     public class DataSeederCLI
     {
         private readonly IVoterServices _voterServices;
+
         private readonly ICandidateServices _candidateServices;
 
-        public DataSeederCLI(IVoterServices voterServices, ICandidateServices candidateServices)
+        private readonly ICitizenServices _citizenServices;
+
+        public DataSeederCLI(IVoterServices voterServices, ICandidateServices candidateServices, ICitizenServices citizenServices)
         {
             _voterServices = voterServices;
             _candidateServices = candidateServices;
+            _citizenServices = citizenServices;
         }
 
-        //public async Task SeedAsync(int voters_count = 50, int candidates_count = 50)
-        //{
-        //    Console.WriteLine($"--- Starting Seeding Process ({voters_count} voters, {candidates_count} candidates) ---");
+        public async Task SeedAsync()
+        {
+            Console.WriteLine($"--- Starting Seeding Process ---");
 
-        //    await SeedVotersAsync(voters_count);
-        //    await SeedCandidatesAsync(candidates_count);
+            
+            await SeedCitizensAsync(200);
+            
+            //await SeedVotersAsync(new List<string>(), 100);
+            
+            //await SeedCandidatesAsync(new List<string>(), 50);
 
-        //    Console.WriteLine("--- Seeding Process Completed ---");
-        //}
+            Console.WriteLine("--- Seeding Process Completed ---");
+        }
 
-        //private async Task SeedVotersAsync(int count)
-        //{
-        //    Console.WriteLine(">> Seeding Voters with Lebanese Names...");
+        private async Task SeedCitizensAsync(int count)
+        {
+            Console.WriteLine(">> Seeding Citizens with Lebanese Names...");
 
-        //    var voterFaker = new Faker<CreateVoterRequestDTO>()
-        //        // 1. Pick Gender first
-        //        .RuleFor(v => v.Gender, f => f.PickRandom('M', 'F'))
+            var citizenFaker = new Faker<CreateCitizenRequestDTO>()
+                // 1. Pick Gender first
+                .RuleFor(v => v.Gender, f => f.PickRandom('M', 'F'))
 
-        //        // 2. Pick Lebanese First Name based on Gender
-        //        .RuleFor(v => v.FirstName, (f, v) =>
-        //            v.Gender == 'M' ? f.PickRandom(LebaneseMaleNames) : f.PickRandom(LebaneseFemaleNames))
+                // 2. Pick Lebanese First Name based on Gender
+                .RuleFor(v => v.FirstName, (f, v) =>
+                    v.Gender == 'M' ? f.PickRandom(LebaneseMaleNames) : f.PickRandom(LebaneseFemaleNames))
 
-        //        // 3. Pick Lebanese Last Name
-        //        .RuleFor(v => v.LastName, f => f.PickRandom(LebaneseLastNames))
+                // 3. Pick Lebanese Last Name
+                .RuleFor(v => v.LastName, f => f.PickRandom(LebaneseLastNames))
 
-        //        // 4. Other Rules
-        //        .RuleFor(v => v.GovernorateId, f => (GovernorateIdEnum)f.PickRandom(1, 2, 3, 4, 5))
-        //        .RuleFor(v => v.DateOfBirth, f => DateOnly.FromDateTime(f.Date.Past(80, DateTime.Now.AddYears(-18))))
-        //        //.RuleFor(c => c.EligibleForElection, f => f.Random.Bool());
-        //        .RuleFor(c => c.EligibleForElection, f => /*f.Random.Bool()=*/true);
+                // 4. Other Rules
+                .RuleFor(v => v.GovernorateId, f => (GovernorateIdEnum)f.PickRandom(1, 2, 3, 4, 5))
+                .RuleFor(v => v.DateOfBirth, f => DateOnly.FromDateTime(f.Date.Past(80, DateTime.Now.AddYears(-18))));
+               
 
-        //    var fakeVoters = voterFaker.Generate(count);
-        //    int successCount = 0;
+            var fakeCitizens = citizenFaker.Generate(count);
+            int successCount = 0;
 
-        //    foreach (var dto in fakeVoters)
-        //    {
-        //        try
-        //        {
-        //            var result = await _voterServices.AddVoterAsync(dto);
-        //            if (result.IsSuccess) successCount++;
-        //            else Console.WriteLine($"   [Error] Voter {dto.FirstName} {dto.LastName}: {result.Error.Code}");
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine($"   [Exception] {ex.Message}");
-        //        }
-        //    }
+            Console.WriteLine(">> Seeding Citizens with Lebanese Names...");
 
-        //    Console.WriteLine($"   Successfully added {successCount}/{count} Voters.");
-        //}
+        
 
-        //private async Task SeedCandidatesAsync(int count)
-        //{
-        //    Console.WriteLine(">> Seeding Candidates with Lebanese Names...");
+            foreach (var dto in fakeCitizens)
+            {
+                try
+                {
+                    var result = await _citizenServices.AddCitizenAsync(dto);
+                    if (result.IsSuccess) successCount++;
+                    else Console.WriteLine($"   [Error] Citizen {dto.FirstName} {dto.LastName}: {result.Error.Code}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"   [Exception] {ex.Message}");
+                }
+            }
 
-        //    var candidateFaker = new Faker<CreateCandidateRequestDTO>()
-        //        .RuleFor(c => c.Gender, f => f.PickRandom('M', 'F'))
-        //        .RuleFor(c => c.FirstName, (f, c) =>
-        //            c.Gender == 'M' ? f.PickRandom(LebaneseMaleNames) : f.PickRandom(LebaneseFemaleNames))
-        //        .RuleFor(c => c.LastName, f => f.PickRandom(LebaneseLastNames))
-        //        .RuleFor(c => c.GovernorateId, f => (GovernorateIdEnum)f.PickRandom(1, 2, 3, 4, 5))
-        //        .RuleFor(c => c.DateOfBirth, f => DateOnly.FromDateTime(f.Date.Past(80, DateTime.Now.AddYears(-18))))
-        //        //.RuleFor(c => c.EligibleForElection, f => f.Random.Bool());
-        //        .RuleFor(c => c.EligibleForElection, f => /*f.Random.Bool()=*/true);
-        //    var fakeCandidates = candidateFaker.Generate(count);
-        //    int successCount = 0;
+            Console.WriteLine($"   Successfully added {successCount}/{count} Citizens.");
+        }
 
-        //    foreach (var dto in fakeCandidates)
-        //    {
-        //        try
-        //        {
-        //            var result = await _candidateServices.AddCandidateAsync(dto);
-        //            if (result.IsSuccess) successCount++;
-        //            else Console.WriteLine($"   [Error] Candidate {dto.FirstName} {dto.LastName}: {result.Error.Code}");
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine($"   [Exception] {ex.Message}");
-        //        }
-        //    }
+        private async Task SeedVotersAsync(List<string> citizenNationalIds, int count)
+        {
+            Console.WriteLine(">> Seeding Voters...");
 
-        //    Console.WriteLine($"   Successfully added {successCount}/{count} Candidates.");
-        //}
+            var voterIds = citizenNationalIds.Take(count).ToList();
+            int successCount = 0;
 
-        // ==========================================
-        // LEBANESE DATASETS
-        // ==========================================
+            foreach (var nationalId in voterIds)
+            {
+                try
+                {
+                    CreateVoterRequestDTO voterDto = new CreateVoterRequestDTO
+                    {
+                        NationalId = nationalId,
+                        // You can add other properties if needed
+                    };
+                    var result = await _voterServices.AddVoterAsync(voterDto);
+                    if (result.IsSuccess) successCount++;
+                    else Console.WriteLine($"   [Error] Voter {nationalId}: {result.Error.Code}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"   [Exception] {ex.Message}");
+                }
+            }
+
+            Console.WriteLine($"   Successfully added {successCount}/{count} Voters.");
+        }
+
+        private async Task SeedCandidatesAsync(List<string> citizenNationalIds, int count)
+        {
+            Console.WriteLine(">> Seeding Candidates...");
+
+            var candidateIds = citizenNationalIds.Skip(count).Take(count).ToList();
+            int successCount = 0;
+
+            foreach (var nationalId in candidateIds)
+            {
+                try
+                {
+                    CreateCandidateRequestDTO candidateDto = new CreateCandidateRequestDTO
+                    {
+                        NationalId = nationalId,
+                        // You can add other properties if needed
+                    };
+                    var result = await _candidateServices.AddCandidateAsync(candidateDto);
+                    if (result.IsSuccess) successCount++;
+                    else Console.WriteLine($"   [Error] Candidate {nationalId}: {result.Error.Code}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"   [Exception] {ex.Message}");
+                }
+            }
+
+            Console.WriteLine($"   Successfully added {successCount}/{count} Candidates.");
+        }
+
+
+
 
         private static readonly string[] LebaneseMaleNames = new[]
- {
-    // Existing + expanded genuine Lebanese/Levantine male names
-    "Ali", "Charbel", "Mohammad", "Jad", "Elie", "Omar", "Georges", "Hussein",
-    "Joseph", "Fadi", "Hassan", "Rabih", "Tony", "Wissam", "Ziad", "Karim",
-    "Tarek", "Bassam", "Elias", "Ahmad", "Ibrahim", "Walid", "Michel", "Roy",
-    "Samer", "Ghassan", "Nabil", "Toufic", "Bilal", "Hadi", "Rami", "Alain",
-    "Marwan", "Jean", "Pierre", "Youssef", "Mahmoud", "Khaled", "Assaad", "Danny",
-    "Mazen", "Chadi", "Firas", "Hicham", "Kamil", "Mounir", "Nadim", "Riad",
-    "Samir", "Zaher", "Abdallah", "Adnan", "Boutros", "Fouad", "Gaby", "Haitham",
-    "Imad", "Jawad", "Kassem", "Louay", "Malek", "Naji", "Osama", "Paul", "Raed",
-    "Said", "Talal", "Wael", "Yahya", "Zakaria", "Abbas", "Hamza", "Mustafa",
-    // Additions
-    "Fouad", "Issam", "Munir", "Mounir", "Amine", "Ramzi", "Farid", "Dani",
-    "Mounzer", "Salim", "Fadi", "Khalil", "Hicham", "Elie", "Roger", "Salah",
-    "Adel", "Anis", "Amin", "Antoine", "Bashir", "Bahaa", "Bahij", "Bassel",
-    "Edmond", "Firas", "Fares", "Gamal", "Ghazi", "Habib", "Jihad", "Karim",
-    "Khodor", "Labib", "Majed", "Mamdouh", "Naseem", "Nazih", "Rafic", "Riad",
-    "Samy", "Selim", "Sleiman", "Walid", "Yamen", "Zaher", "Zaki", "Shadi",
-    "Marcel", "Asaad", "Wadih", "Rashed", "Chafic", "Fayez", "Rifat", "Jamil",
-    "Najib", "Habib", "Fahd", "Raouf", "Elia", "Samih", "Shaker", "Ramzi", "Rony"
+{
+    // ─── Existing + massively expanded genuine Lebanese male names ───
+    "Abbas", "Abdallah", "Abdo", "Abed", "Adel", "Adib", "Adnan",
+    "Afif", "Ahmad", "Akram", "Alaa", "Alain", "Ali", "Amer",
+    "Amin", "Amine", "Amjad", "Anis", "Antoine", "Anwar", "Aref",
+    "Asaad", "Assaad", "Ayman", "Azmi", "Badr", "Bahaa", "Bahij",
+    "Bahjat", "Baraa", "Bashir", "Bassam", "Bassel", "Bechara",
+    "Bilal", "Bishara", "Boulos", "Boutros", "Burhan", "Chadi",
+    "Chafic", "Charbel", "Dani", "Danny", "Daoud", "Darwish",
+    "Edmond", "Elia", "Elias", "Elie", "Fadel", "Fadi", "Fahd",
+    "Faraj", "Fares", "Farid", "Farouk", "Fawaz", "Fawzi",
+    "Fayez", "Faysal", "Firas", "Fouad", "Gaby", "Gamal",
+    "Georges", "Ghaleb", "Ghanem", "Ghassan", "Ghattas", "Ghazi",
+    "Habib", "Hadi", "Haitham", "Hakam", "Hakim", "Hamza",
+    "Hani", "Harb", "Haroun", "Hashem", "Hassan", "Hatim",
+    "Haydar", "Hicham", "Hilal", "Husam", "Hussein", "Ibrahim",
+    "Ihab", "Imad", "Issam", "Iyad", "Jaber", "Jad", "Jalal",
+    "Jamal", "Jamil", "Jawad", "Jean", "Jihad", "Joseph",
+    "Kamal", "Kamil", "Karim", "Kassem", "Khaled", "Khalil",
+    "Khodor", "Kifah", "Labib", "Louay", "Mahdi", "Maher",
+    "Mahmoud", "Majd", "Majdi", "Majed", "Malek", "Malik",
+    "Mamdouh", "Mansour", "Marcel", "Maroun", "Marwan", "Mazen",
+    "Maan", "Mehdi", "Michel", "Mohammad", "Mounir", "Mounzer",
+    "Moussa", "Muhannad", "Munir", "Murad", "Musa", "Mustafa",
+    "Nabil", "Nader", "Nadim", "Naeem", "Najati", "Naji",
+    "Najib", "Naseem", "Nasser", "Nazih", "Nuhad", "Nuri",
+    "Omar", "Osama", "Paul", "Pierre", "Qasim", "Rabih",
+    "Rachid", "Raed", "Rafic", "Ramez", "Rami", "Ramzi",
+    "Raouf", "Rashad", "Rashed", "Rasheed", "Raymond", "Reda",
+    "Refik", "Riad", "Rifat", "Riyad", "Roger", "Rony",
+    "Roy", "Saad", "Saadallah", "Saeed", "Saeb", "Safi",
+    "Said", "Salah", "Salih", "Salim", "Samer", "Samih",
+    "Samir", "Sami", "Samy", "Selim", "Shadi", "Shafic",
+    "Shaker", "Shakir", "Sharif", "Shawki", "Shibli", "Sleiman",
+    "Suleiman", "Talal", "Tamer", "Tamim", "Tarek", "Tawfik",
+    "Tony", "Toufic", "Wadih", "Wael", "Wahib", "Wajdi",
+    "Walid", "Wissam", "Yahya", "Yamen", "Yassin", "Younes",
+    "Youssef", "Yusuf", "Zaher", "Zakaria", "Zaki", "Zayn",
+    "Ziad"
 };
 
         private static readonly string[] LebaneseFemaleNames = new[]
         {
-    // Existing + expanded genuine Lebanese/Levantine female names
-    "Nour", "Maya", "Zeina", "Fatima", "Layla", "Maria", "Rita", "Sara", "Yara",
-    "Rima", "Zainab", "Lynn", "Jana", "Nayla", "Dalal", "Manal", "Hiba", "Rana",
-    "Mona", "Amani", "Samar", "Roula", "Pascale", "Sabine", "Dima", "Hanan",
-    "Amal", "Joumana", "Aline", "Elissa", "Carla", "Dania", "Elsa", "Farah",
-    "Ghada", "Hala", "Joelle", "Karen", "Lama", "Maha", "Nada", "Ola", "Pamela",
-    "Rawan", "Soha", "Tala", "Vanessa", "Wafa", "Yasmina", "Zahra", "Aya",
-    "Bane", "Celine", "Dana", "Esraa", "Fida", "Grace", "Huda", "Ingrid", "Jessica",
-    "Khouloud", "Lara", "Mirna", "Nancy", "Rola", "Sally", "Tamara", "Rim",
-    // Additions
-    "Siham", "Samira", "May", "Salwa", "Widad", "Hind", "Ghada", "Imane", "Diala",
-    "Haifa", "Majida", "Raghd", "Suzanne", "Christelle", "Najwa", "Michelle", "Rosy",
-    "Loraine", "Angie", "Ruwayda", "Claudine", "Rosine", "Micheline", "Nada", "Hala",
-    "Melissa", "Ruba", "Jihane", "Racha", "Rabab", "Raghad", "Nadine", "Thuraya",
-    "Feryal", "Mona", "Jumana", "Yasmine", "Sherine", "Maguy", "Reine", "Zeina",
-    "Loulwa", "Samya", "Nehad", "Souha", "Chantal", "Jehan", "Fatmeh", "Abir", "Sabah",
-    "Miriam", "Yousra", "Micheline", "Lea", "Jumana"
+    // ─── Existing + massively expanded genuine Lebanese female names ───
+    "Abir", "Aline", "Amal", "Amani", "Amira", "Angie", "Asma",
+    "Aya", "Badia", "Bane", "Basma", "Bushra", "Carla", "Celine",
+    "Chantal", "Christelle", "Christine", "Claudette", "Claudine",
+    "Dalal", "Dalia", "Dana", "Dania", "Diala", "Dima", "Dina",
+    "Dunia", "Elissa", "Elsa", "Eman", "Esraa", "Farah", "Fatima",
+    "Fatmeh", "Fawzia", "Feryal", "Fida", "Gabrielle", "Ghada",
+    "Ghenwa", "Gisele", "Grace", "Gulnar", "Haifa", "Hala", "Hana",
+    "Hanan", "Hania", "Hayat", "Hiba", "Hind", "Hiyam", "Huda",
+    "Ibtisam", "Iman", "Imane", "Inaya", "Ingrid", "Jala", "Jana",
+    "Jamila", "Jehan", "Jessica", "Jihane", "Joelle", "Josiane",
+    "Joumana", "Joyce", "Jumana", "Karen", "Karima", "Khouloud",
+    "Lama", "Lamia", "Lara", "Latifa", "Layla", "Lea", "Liliane",
+    "Lina", "Linda", "Loraine", "Loulwa", "Lourdes", "Lujain",
+    "Lynn", "Maguy", "Maha", "Majida", "Manal", "Manar", "Maria",
+    "May", "Maya", "Maysa", "Maysun", "Melissa", "Micheline",
+    "Michelle", "Mira", "Miriam", "Mirna", "Mona", "Nada", "Nadia",
+    "Nadine", "Nahed", "Naila", "Najwa", "Najat", "Nancy", "Nayla",
+    "Nazira", "Nehad", "Nicole", "Nisrine", "Nour", "Nuhad", "Ola",
+    "Odette", "Pamela", "Pascale", "Qamar", "Rabab", "Racha", "Raghad",
+    "Raghd", "Rana", "Rania", "Rasha", "Rawan", "Raya", "Rayan",
+    "Reem", "Reine", "Renée", "Rihab", "Rim", "Rima", "Rita",
+    "Rola", "Rosine", "Rosy", "Rouba", "Roula", "Ruba", "Ruwayda",
+    "Saba", "Sabah", "Sabine", "Sahar", "Salma", "Sally", "Salwa",
+    "Samar", "Samira", "Samya", "Sana", "Sara", "Selma", "Shadia",
+    "Shatha", "Sherine", "Siham", "Soha", "Souad", "Souha", "Suha",
+    "Suhair", "Suzanne", "Taghrid", "Tala", "Tamara", "Therese",
+    "Thuraya", "Vanessa", "Vivian", "Wafa", "Wafaa", "Walaa",
+    "Warda", "Wiam", "Widad", "Yara", "Yasmina", "Yasmine",
+    "Yousra", "Zahra", "Zaina", "Zainab", "Zakia", "Zeina"
 };
 
         private static readonly string[] LebaneseLastNames = new[]
         {
-    // Existing + expanded (removing less common ones and adding frequent Lebanese surnames)
-    "Khoury", "Haddad", "Ghanem", "Najjar", "Karam", "Saab", "Khalil", "Assaf",
-    "Aoun", "Nasr", "Hamdan", "Fakih", "Awad", "Moussa", "Saleh", "Farhat",
-    "Antoun", "Saliba", "Raad", "Jaber", "Haidar", "Zein", "Chehab", "Frangieh",
-    "Jumblatt", "Hariri", "Berri", "Geagea", "Gemayel", "Arslan", "Karami",
-    "Mikati", "Salam", "Solh", "Edde", "Chamoun", "Lahoud", "Helou",
-    "Sfeir", "Rahi", "Qassem", "Mughniyeh", "Hobeika", "Barakat", "Chahine",
-    "Daou", "Eid", "Fares", "Gebran", "Habib", "Issa", "Jabbour", "Kanaan",
-    "Latif", "Maalouf", "Nader", "Obeid", "Rahme", "Sarkis", "Tawk", "Yazbek",
-    "Zakhour", "Abdallah", "Baalbaki", "Chidiac", "Daghir", "Elian", "Fakhoury",
-    "Ghosn", "Hage", "Itani", "Jammal", "Kaakour", "Labaki", "Matar", "Nahas",
-    // Additions
-    "AbiNader", "Abillama", "AbouChakra", "AbouJaoude", "AbouRjeily", "Accad", "Adjami", "Akl", "Alam",
-    "Alameddine", "Arbid", "Assi", "Atallah", "Azar", "Bahri", "Baghdadi", "Bazzi", "Baz",
-    "Berro", "BouAntoun", "BouChalhoub", "BouEid", "BouKhalil", "BouMansour", "BouRached",
-    "BouYounes", "Boutros", "Chemali", "Chebli", "Daouk", "Debs", "Dib", "Doueihy", "Eid",
-    "Fadel", "Fahed", "Fayad", "Fayez", "Fawaz", "Faraj", "Habib", "Haddadin", "Hadid",
-    "Haikal", "Hakim", "Hamati", "Haouch", "Hashem", "Hindi", "Idriss", "Issa", "Kassis",
-    "Kattar", "Kfoury", "Khater", "Khazen", "Kheir", "Khodr", "Khourani", "Kiwan", "Kortbawi",
-    "Labbad", "Mansour", "Matta", "Mezher", "Moawad", "Murr", "Najm", "Nassar", "Nehme",
-    "Obeid", "Rached", "Sadek", "Safieddine", "Sleiman", "Soubra", "Tabet", "Tannous", "Touma",
-    "Trad", "Wehbe", "Yammine", "Zein", "Zgheib"
+    // ─── Existing + massively expanded genuine Lebanese surnames ───
+    "Abdallah", "Abi-Aad", "Abi-Haydar", "Abi-Saab", "Abillama",
+    "AbiNader", "Abou-Assi", "AbouChakra", "Abou-Hamad", "Abou-Harb",
+    "Abou-Hassan", "AbouJaoude", "Abou-Nader", "Abou-Rahme",
+    "AbouRjeily", "Abou-Said", "Abou-Shakra", "Accad", "Achkar",
+    "Adjami", "Akl", "Alam", "Alameddine", "Antoun", "Aouad",
+    "Aoun", "Arbid", "Arslan", "Assaf", "Assi", "Atallah",
+    "Awad", "Ayash", "Azar", "Azrak", "Baalbaki", "Baghdadi",
+    "Bahri", "Ballout", "Barakat", "Baroud", "Basha", "Baydoun",
+    "Baz", "Bazzi", "Berri", "Berro", "Bitar", "BouAntoun",
+    "BouChalhoub", "BouEid", "Bou-Farhat", "Bou-Habib", "Bou-Halim",
+    "BouKhalil", "BouMansour", "Bou-Nasr", "BouRached", "BouYounes",
+    "Boutros", "Chaaban", "Chahine", "Chahwan", "Chammas", "Chamoun",
+    "Charaf", "Chehab", "Chemali", "Chebli", "Chidiac", "Daghir",
+    "Daher", "Dandan", "Daou", "Daouk", "Darwish", "Debs", "Diab",
+    "Dib", "Domit", "Douaihy", "Doueihy", "Edde", "Eid", "El-Hachem",
+    "El-Hajj", "Elian", "Fadel", "Fahed", "Fakhoury", "Fakih",
+    "Farah", "Faraj", "Fares", "Farhat", "Farran", "Fawaz", "Fayad",
+    "Fayed", "Fayez", "Fayyad", "Fleihan", "Frangieh", "Gargour",
+    "Geagea", "Gebran", "Gedeon", "Gemayel", "Ghanem", "Ghosn",
+    "Habib", "Hachem", "Haddad", "Haddadin", "Hadid", "Hage",
+    "Haidar", "Haikal", "Hajj", "Hakim", "Hamati", "Hamdan",
+    "Haouch", "Harb", "Hariri", "Hashem", "Hasrouni", "Hawi",
+    "Hayek", "Helou", "Hindi", "Hitti", "Hneiny", "Hobeika",
+    "Ibrahim", "Idriss", "Idris", "Issa", "Itani", "Jabbour",
+    "Jaber", "Jafet", "Jammal", "Jbeily", "Jumblatt", "Kaakour",
+    "Kanaan", "Karami", "Karam", "Kassis", "Kattar", "Kfoury",
+    "Khairallah", "Khalil", "Khater", "Khattar", "Khazen", "Kheir",
+    "Kheireddine", "Khodr", "Khourani", "Khoury", "Kiwan", "Kmeid",
+    "Kojok", "Kortbawi", "Labaki", "Labbad", "Lahoud", "Lakkis",
+    "Latif", "Lichaa", "Maalouf", "Maatouk", "Makarem", "Makhlouf",
+    "Makki", "Mansour", "Maroun", "Matar", "Matta", "Melki",
+    "Metni", "Mezher", "Mikati", "Moawad", "Mokbel", "Mougharbel",
+    "Moussa", "Mrad", "Mughniyeh", "Murr", "Nader", "Nahas",
+    "Nahra", "Najjar", "Najm", "Nammour", "Nasr", "Nassar",
+    "Nassif", "Nehme", "Nohra", "Obeid", "Qassem", "Raad",
+    "Rached", "Rahbani", "Rahi", "Rahme", "Rizk", "Saab",
+    "Saad", "Saadeh", "Saade", "Saba", "Sabbagh", "Sadek",
+    "Safieddine", "Sakr", "Salam", "Salameh", "Saleh", "Saliba",
+    "Salloum", "Salman", "Sarkis", "Sawaya", "Sayegh", "Sfeir",
+    "Shadid", "Shamieh", "Shamoun", "Shehadeh", "Sidani", "Sleiman",
+    "Slim", "Solh", "Soubra", "Tabet", "Tahan", "Tannous",
+    "Tarabay", "Tawk", "Tayah", "Tohme", "Touma", "Traboulsi",
+    "Trad", "Turk", "Usta", "Wakim", "Wehbe", "Yammine",
+    "Yazbek", "Yazigi", "Younes", "Zaarour", "Zaatari", "Zain",
+    "Zaitoun", "Zakhour", "Zein", "Zgheib"
 };
     }
 }

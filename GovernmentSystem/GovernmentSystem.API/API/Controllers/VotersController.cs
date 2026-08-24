@@ -1,7 +1,4 @@
 ﻿using GovernmentSystem.API.API.Controllers;
-using GovernmentSystem.API.Application.RequestDTOs;
-using GovernmentSystem.API.Application.RequestDTOs.Voter;
-using GovernmentSystem.API.Application.ResponseDTOs.Voter;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.Controllers
 {
-
     [Authorize(Roles = "Admin")]
     public class VotersController : ApiController
     {

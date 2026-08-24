@@ -56,5 +56,10 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
         {
             return _dbContext.Candidates.CountAsync();
         }
+
+        public async Task<bool> IsCandidateExistByNationalIdAsync(string nationalId)
+        {
+            return await _dbContext.Candidates.AnyAsync(c => c.Citizen.NationalId == nationalId);
+        }
     }
 }

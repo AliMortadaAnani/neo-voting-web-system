@@ -1,19 +1,15 @@
-﻿using GovernmentSystem.API.Application.RequestDTOs.Admin;
-using GovernmentSystem.API.Application.ResponseDTOs.Admin;
-using GovernmentSystem.API.Application.Services;
-using GovernmentSystem.API.Application.ServicesContracts;
+﻿using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-    
-    
     public class AuthController : ApiController
     {
         private readonly IAdminServices _adminServices;
         private readonly ICandidateServices _candidateServices;
+
         public AuthController(IAdminServices adminServices, ICandidateServices candidateServices)
         {
             _adminServices = adminServices;

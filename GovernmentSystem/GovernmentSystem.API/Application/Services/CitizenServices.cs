@@ -10,7 +10,7 @@ using GovernmentSystem.API.Domain.ResultErrorDomain;
 namespace GovernmentSystem.API.Application.Services
 {
     public class CitizenServices : ICitizenServices
-    {   
+    {
         private readonly ICitizenRepository _citizenRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly SensitiveDataHelper _sensitiveDataHelper;
@@ -20,62 +20,6 @@ namespace GovernmentSystem.API.Application.Services
             _citizenRepository = citizenRepository;
             _unitOfWork = unitOfWork;
             _sensitiveDataHelper = sensitiveDataHelper;
-        }
-
-        public async Task<Result<CitizenResponseDTO>> AddCitizenAsync(CreateCitizenRequestDTO request)
-        {   
-            string rawNationalId = _sensitiveDataHelper.GenerateNationalId
-                (request.FirstName!,
-                request.LastName!,
-                (int)request.GovernorateId!.Value,
-                request.Gender!.Value,
-                request.DateOfBirth!.Value);
-
-            string encryptedNationalId = _sensitiveDataHelper.Encrypt(rawNationalId);
-
-            var citizen = Citizen.Create(
-                encryptedNationalId,
-                request.FirstName!,
-                request.LastName!,
-                request.DateOfBirth!.Value,
-                request.Gender!.Value,
-                request.GovernorateId!.Value
-                 );
-
-            _citizenRepository.Add(citizen);
-
-           int rowsAdded = await _unitOfWork.SaveChangesAsync();
-
-            if (rowsAdded == 1)
-            {
-                var response = citizen.ToCitizenResponse(_sensitiveDataHelper);
-
-                return Result<CitizenResponseDTO>.Success(response);
-            }
-
-            return Result<CitizenResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Citizen_OperationFailed), "Failed to add citizen."));
-        }
-
-        public async Task<Result<bool>> DeleteCitizenByNationalIdAsync(DeleteCitizenRequestDTO request)
-        {
-            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
-
-            var citizen = await _citizenRepository.GetCitizenByNationalIdAsync(encryptedNationalId);
-
-            if (citizen == null)
-            {
-                return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Citizen_NotFound), "Citizen not found."));
-            }
-
-            _citizenRepository.Delete(citizen);
-            int rowsDeleted = await _unitOfWork.SaveChangesAsync();
-
-            if (rowsDeleted == 1)
-            {
-                return Result<bool>.Success(true);
-            }
-
-            return Result<bool>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Citizen_OperationFailed), "Failed to delete citizen."));
         }
 
         public async Task<Result<CitizenResponseDTO>> GetCitizenByNationalIdAsync(GetCitizenRequestDTO request)
@@ -114,7 +58,6 @@ namespace GovernmentSystem.API.Application.Services
             // 3. Get total count
             int totalCount = await _citizenRepository.CountAsync();
 
-
             var citizens = await _citizenRepository.GetPagedAsync(pageNumber, pageSize);
             var response = citizens.Select(c => c.ToCitizenResponse(_sensitiveDataHelper)).ToList();
 
@@ -123,17 +66,55 @@ namespace GovernmentSystem.API.Application.Services
                 Data = response,
                 CurrentPage = pageNumber,
                 PageSize = pageSize,
-                TotalCount = totalCount              
+                TotalCount = totalCount
             };
-
 
             return Result<PagedResult<CitizenResponseDTO>>.Success(pagedResult);
         }
-
-        public async Task<Result<int>> GetCitizensTotalCountAsync()
+        public async Task<Result<CitizenResponseDTO>> AddCitizenAsync(CreateCitizenRequestDTO request)
         {
-            var totalCount = await _citizenRepository.CountAsync();
-            return Result<int>.Success(totalCount);
+            string rawNationalId = _sensitiveDataHelper.GenerateNationalId
+                (request.FirstName!,
+                request.LastName!,
+                (int)request.GovernorateId!.Value,
+                request.Gender!.Value,
+                request.DateOfBirth!.Value);
+
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(rawNationalId);
+
+            var citizen = Citizen.Create(
+                encryptedNationalId,
+                request.FirstName!,
+                request.LastName!,
+                request.DateOfBirth!.Value,
+                request.Gender!.Value,
+                request.GovernorateId!.Value
+                 );
+
+            _citizenRepository.Add(citizen);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var response = citizen.ToCitizenResponse(_sensitiveDataHelper);
+
+            return Result<CitizenResponseDTO>.Success(response);
+        }
+
+        public async Task<Result<bool>> DeleteCitizenByNationalIdAsync(DeleteCitizenRequestDTO request)
+        {
+            string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
+
+            var citizen = await _citizenRepository.GetCitizenByNationalIdAsync(encryptedNationalId);
+
+            if (citizen == null)
+            {
+                return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Citizen_NotFound), "Citizen not found."));
+            }
+
+            _citizenRepository.Delete(citizen);
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result<bool>.Success(true);
         }
 
         public async Task<Result<CitizenResponseDTO>> UpdateCitizenByNationalIdAsync(UpdateCitizenRequestDTO request)
@@ -156,13 +137,18 @@ namespace GovernmentSystem.API.Application.Services
                 request.GovernorateId!.Value
             );
 
-                 await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
-            
-                var response = citizen.ToCitizenResponse(_sensitiveDataHelper);
-                return Result<CitizenResponseDTO>.Success(response);
-         
-
+            var response = citizen.ToCitizenResponse(_sensitiveDataHelper);
+            return Result<CitizenResponseDTO>.Success(response);
         }
+
+
+        public async Task<Result<int>> GetCitizensTotalCountAsync()
+        {
+            var totalCount = await _citizenRepository.CountAsync();
+            return Result<int>.Success(totalCount);
+        }
+
     }
 }

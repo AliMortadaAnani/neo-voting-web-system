@@ -36,6 +36,5 @@ namespace GovernmentSystem.API.Application.Exceptions
 
             return true; // We handled it
         }
-
     }
 }

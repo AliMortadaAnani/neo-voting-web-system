@@ -6,7 +6,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs
     public class CandidateResponseDTO
     {
         public int Id { get; set; }
-        public string NationalId { get; set; } = string.Empty; 
+        public string NationalId { get; set; } = string.Empty;
         public int CitizenId { get; set; }
         public string NominationToken { get; set; } = string.Empty;
         public string HashedData { get; set; } = string.Empty;
@@ -15,6 +15,5 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs
         public DateOnly DateOfBirth { get; set; }
         public GovernorateIdEnum GovernorateId { get; set; }
         public char Gender { get; set; }
-
     }
 }
