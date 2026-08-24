@@ -2,7 +2,7 @@
 
 namespace NeoVoting.Domain.Enums
 {
-    public enum GovernoratesEnum
+    public enum GovernorateIdEnum
     {
         [Description("Beirut")]
         Beirut = 1,

@@ -4,12 +4,13 @@ using System.Text;
 
 namespace NeoVoting.Domain.Entities
 {
-    public class ElectionStatistics
+    public class ElectionAndPollStatistics
     {
         // Structural Keys (Keep these non-nullable for EF Core Identity/Relationships)
         public int Id { get; private set; }
-        public Guid ElectionId { get; private set; }
-        public int? GovernorateId { get; private set; }
+        public int? ElectionId { get; private set; }
+        public int? PollId { get; private set; }
+        public GovernorateIdEnum? Governorate { get; private set; }
 
         // ==================================================================
         // 1. RAW COUNTS (Nullable)
@@ -63,20 +64,22 @@ namespace NeoVoting.Domain.Entities
         public double? Age65AndOverVotedOutOfTotalVotedPercentage { get; private set; }
 
         // Navigation properties
-        public Election Election { get; private set; }
-        public Governorate? Governorate { get; private set; }
+        public Election? Election { get; private set; }
+        public Poll? Poll { get; private set; }
 
         // Private constructor for EF Core
-        private ElectionStatistics() {
-        Election = null!;
+        private ElectionAndPollStatistics() {
+            Election = null!;
+            Poll = null!;
         }
 
         // ==================================================================
         // 3. FACTORY METHOD
         // ==================================================================
-        public static ElectionStatistics Create(
-            Guid electionId,
-            int? governorateId,
+        public static ElectionAndPollStatistics Create(
+            int? electionId,
+            int? pollId,
+            GovernorateIdEnum? governorate,
             int? candidatesNominatedCount,
             // Counts
             int? registeredVotersCount,
@@ -126,15 +129,16 @@ namespace NeoVoting.Domain.Entities
                 age46To64VotedOutOfTotalVotedPercentage, age65AndOverVotedOutOfTotalVotedPercentage
             );
 
-            if (electionId == Guid.Empty) throw new ArgumentException("ElectionId cannot be empty.", nameof(electionId));
-            if (governorateId.HasValue && !Enum.IsDefined(typeof(GovernoratesEnum), governorateId.Value))
-                throw new ArgumentException($"Invalid governorate id: {governorateId}", nameof(governorateId));
+           
+            if (governorate.HasValue && !Enum.IsDefined(typeof(GovernorateIdEnum), governorate.Value))
+                throw new ArgumentException($"Invalid governorate id: {governorate}", nameof(governorate));
 
             // 2. Direct Assignment
-            return new ElectionStatistics
+            return new ElectionAndPollStatistics
             {
                 ElectionId = electionId,
-                GovernorateId = governorateId,
+                PollId = pollId,
+                Governorate = governorate,
                 CandidatesNominatedCount = candidatesNominatedCount,
 
                 RegisteredVotersCount = registeredVotersCount,
@@ -176,7 +180,7 @@ namespace NeoVoting.Domain.Entities
                 // Only check if value has a value (not null) AND is negative
                 if (value.HasValue && value.Value < 0)
                 {
-                    throw new ArgumentException("Election statistics cannot contain negative values.");
+                    throw new ArgumentException("Election/Poll statistics cannot contain negative values.");
                 }
             }
         }

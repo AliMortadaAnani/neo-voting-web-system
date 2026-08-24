@@ -13,13 +13,13 @@ namespace NeoVoting.Infrastructure.Repositories
     public class ElectionStatisticsRepository (ApplicationDbContext dbContext) : IElectionStatisticsRepository
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
-        public async Task<ElectionStatistics> AddAsync(ElectionStatistics entity, CancellationToken cancellationToken)
+        public async Task<ElectionAndPollStatistics> AddAsync(ElectionAndPollStatistics entity, CancellationToken cancellationToken)
         {
            await _dbContext.ElectionRegisteredVotersPerGovernorates.AddAsync(entity, cancellationToken);
             return entity;
         }
         // governorateId is nullable because it can represent the total registered voters across all governorates when null
-        public async Task<ElectionStatistics?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int? governorateId, CancellationToken cancellationToken)
+        public async Task<ElectionAndPollStatistics?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int? governorateId, CancellationToken cancellationToken)
         {
             return await _dbContext.ElectionRegisteredVotersPerGovernorates
                 .FirstOrDefaultAsync(erpg => erpg.ElectionId == electionId && erpg.GovernorateId == governorateId, cancellationToken);

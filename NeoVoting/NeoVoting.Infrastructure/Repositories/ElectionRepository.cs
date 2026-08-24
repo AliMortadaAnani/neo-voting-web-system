@@ -42,7 +42,7 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _dbContext.Elections
                 .Include(e => e.ElectionStatus)
-                .Where(e => e.ElectionStatusId != (int)ElectionStatusEnum.Completed)
+                .Where(e => e.ElectionStatusId != (int)StatusEnum.Completed)
                 .OrderByDescending(e => e.VotingEndDate)
                 .FirstOrDefaultAsync(cancellationToken);
         }
@@ -51,14 +51,14 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.Elections
-               .AnyAsync(e => e.ElectionStatusId != (int)ElectionStatusEnum.Completed, cancellationToken);
+               .AnyAsync(e => e.ElectionStatusId != (int)StatusEnum.Completed, cancellationToken);
         }
 
         public async Task<IReadOnlyList<Election>> GetAllCompletedElectionsAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.Elections
                 .Include(e => e.ElectionStatus)
-                .Where(e => e.ElectionStatusId == (int)ElectionStatusEnum.Completed)
+                .Where(e => e.ElectionStatusId == (int)StatusEnum.Completed)
                 .OrderByDescending(e => e.VotingEndDate)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);

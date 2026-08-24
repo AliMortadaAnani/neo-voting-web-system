@@ -5,9 +5,9 @@ using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-    public class IIElectionStatisticsConfiguration : IEntityTypeConfiguration<ElectionStatistics>
+    public class IIElectionStatisticsConfiguration : IEntityTypeConfiguration<ElectionAndPollStatistics>
     {
-        public void Configure(EntityTypeBuilder<ElectionStatistics> builder)
+        public void Configure(EntityTypeBuilder<ElectionAndPollStatistics> builder)
         {
            
 

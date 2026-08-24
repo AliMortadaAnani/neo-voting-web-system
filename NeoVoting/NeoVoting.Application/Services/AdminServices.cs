@@ -107,7 +107,7 @@ namespace NeoVoting.Application.Services
 
         }
 
-        public async Task<Result<Election_ResponseDTO>> UpdateElectionStatusAsync(Guid electionId, ElectionStatusEnum newStatus, CancellationToken cancellationToken)
+        public async Task<Result<Election_ResponseDTO>> UpdateElectionStatusAsync(Guid electionId, StatusEnum newStatus, CancellationToken cancellationToken)
         {
             var election = await _electionRepository.GetElectionByIdAsync(electionId, cancellationToken);
 
@@ -118,7 +118,7 @@ namespace NeoVoting.Application.Services
                     $"Election with ID '{electionId}' was not found."));
             }
 
-            var currentStatus = (ElectionStatusEnum)election.ElectionStatusId;
+            var currentStatus = (StatusEnum)election.ElectionStatusId;
 
             if (currentStatus == newStatus)
             {
@@ -132,16 +132,16 @@ namespace NeoVoting.Application.Services
                 // Use the appropriate factory method based on the target status
                 switch (newStatus)
                 {
-                    case ElectionStatusEnum.Nomination:
+                    case StatusEnum.Nomination:
                         election.StartNominationPhase();
                         break;
-                    case ElectionStatusEnum.PreVotingPhase:
+                    case StatusEnum.PreVotingPhase:
                         election.StartPreVotingPhase();
                         break;
-                    case ElectionStatusEnum.Voting:
+                    case StatusEnum.Voting:
                         election.StartVotingPhase();
                         break;
-                    case ElectionStatusEnum.Completed:
+                    case StatusEnum.Completed:
                         {
                             election.CompleteElection();
                             //insert winners and statistics logic here
@@ -149,7 +149,7 @@ namespace NeoVoting.Application.Services
 
                         }
                         break;
-                    case ElectionStatusEnum.Upcoming:
+                    case StatusEnum.Upcoming:
                         return Result<Election_ResponseDTO>.Failure(Error.Validation(
                             nameof(ProblemDetails400ErrorTypes.Election_InvalidStatusTransition),
                             "Cannot transition an election back to 'Upcoming' status."));

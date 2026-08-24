@@ -5,23 +5,16 @@
     /// </summary>
     public enum SystemActionTypesEnum
     {
-        /// <summary>
-        /// A user successfully registered as a voter.
-        /// </summary>
-        VOTER_REGISTERED,
+        ADMIN_CREATED_ELECTION = 1,
+        ADMIN_STARTED_VOTING_PHASE = 2,
+        ADMIN_ENDED_VOTING_PHASE = 3,
 
-        /// <summary>
-        /// A user successfully registered as a candidate.
-        /// </summary>
-        CANDIDATE_REGISTERED,
+        ADMIN_CREATED_POLL = 4,
+        ADMIN_STARTED_POLL = 5,
+        ADMIN_ENDED_POLL = 6,
 
-        ERROR_VOTER_NOT_REGISTERED,
+        ADMIN_BANNED_CANDIDATE_ACCOUNT = 7,
 
-        ERROR_CANDIDATE_NOT_REGISTERED,
-
-        /// <summary>
-        /// A candidate profile was successfully created for an election.
-        /// </summary>
-        CANDIDATE_PROFILE_CREATED
+        ADMIN_BANNED_VOTER_ACCOUNT = 8
     }
 }

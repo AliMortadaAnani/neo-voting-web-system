@@ -2,8 +2,8 @@
 {
     public enum RoleTypesEnum
     {
-        Admin,
-        Voter,
-        Candidate
+        Admin = 0,
+        Voter = 1,
+        Candidate = 2
     }
 }

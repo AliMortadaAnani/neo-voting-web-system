@@ -14,7 +14,7 @@ namespace NeoVoting.Application.ServicesContracts
     {
         Task<Result<Election_ResponseDTO>> AddElectionAsync(ElectionAdd_RequestDTO requestDTO,CancellationToken cancellationToken);
 
-        Task<Result<Election_ResponseDTO>> UpdateElectionStatusAsync(Guid electionId, ElectionStatusEnum newStatus, CancellationToken cancellationToken);
+        Task<Result<Election_ResponseDTO>> UpdateElectionStatusAsync(Guid electionId, StatusEnum newStatus, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<SystemAuditLog_ResponseDTO>>> GetPagedSystemAuditLogsAsync
             (int pageNumber, int pageSize, CancellationToken cancellationToken);

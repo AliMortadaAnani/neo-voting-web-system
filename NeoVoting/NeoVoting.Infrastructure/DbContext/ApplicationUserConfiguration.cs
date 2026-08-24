@@ -70,7 +70,7 @@ namespace NeoVoting.Infrastructure.DbContext
             tb.HasCheckConstraint("CK_User_Gender", "[Gender] IN ('M', 'F') OR [Gender] IS NULL"));
 
             // 1. Get all integer values from the Enum
-            var enumValues = Enum.GetValues(typeof(GovernoratesEnum))
+            var enumValues = Enum.GetValues(typeof(GovernorateIdEnum))
                                  .Cast<int>();
 
             // 2. Create the SQL string: "1, 2, 3"

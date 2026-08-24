@@ -10,9 +10,9 @@ namespace NeoVoting.Domain.RepositoryContracts
     public interface IElectionStatisticsRepository
     {
         // governorateId is nullable because it can represent the total registered voters across all governorates when null
-        Task<ElectionStatistics?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int? governorateId, CancellationToken cancellationToken);
+        Task<ElectionAndPollStatistics?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int? governorateId, CancellationToken cancellationToken);
 
-        Task<ElectionStatistics> AddAsync(ElectionStatistics entity, CancellationToken cancellationToken);
+        Task<ElectionAndPollStatistics> AddAsync(ElectionAndPollStatistics entity, CancellationToken cancellationToken);
 
     }
 }

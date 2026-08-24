@@ -54,7 +54,7 @@ namespace NeoVoting.Application.Services
             }
             
             
-            if(election.ElectionStatusId != (int)ElectionStatusEnum.Nomination)
+            if(election.ElectionStatusId != (int)StatusEnum.Nomination)
             {
                 return Result<CandidateProfile_ResponseDTO>.Failure(Error.Forbidden
                     (

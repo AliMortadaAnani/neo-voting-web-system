@@ -67,7 +67,7 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateElectionStatus(
             [FromRoute] Guid electionId,
-            [FromQuery] ElectionStatusEnum newStatus,
+            [FromQuery] StatusEnum newStatus,
             CancellationToken ct)
         {
             var result = await _adminServices.UpdateElectionStatusAsync(electionId, newStatus, ct);

@@ -17,7 +17,7 @@ namespace NeoVoting.Domain.Entities
 
        
 
-        public Guid CandidateProfileId { get; private set; }
+        public int CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
 
         private ElectionWinner()
@@ -28,18 +28,13 @@ namespace NeoVoting.Domain.Entities
             CandidateProfile = null!;
         }
 
-        // --- Factory Method ---
 
-        /// <summary>
-        /// Creates a new, valid ElectionWinner instance.
-        /// </summary>
-        /// <param name="candidateProfileId">The ID of the winning candidate's profile.</param>
-        /// <param name="voteCount">The final vote count for the winner, if available.</param>
-        /// <returns>A new, valid ElectionWinner object.</returns>
-        /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static ElectionWinner Create(Guid candidateProfileId, int? voteCount)
+        public static ElectionWinner Create(int candidateProfileId, int? voteCount)
         {
-            Validate(candidateProfileId, voteCount);
+            if(voteCount.HasValue && voteCount < 0)
+            {
+                throw new ArgumentException("Vote count cannot be negative.", nameof(voteCount));
+            }
 
             var winner = new ElectionWinner
             {
@@ -67,28 +62,6 @@ namespace NeoVoting.Domain.Entities
             this.VoteCount = newVoteCount;
         }
 
-        /// <summary>
-        /// Private helper method to contain all validation rules.
-        /// </summary>
-        private static void Validate(Guid candidateProfileId, int? voteCount)
-        {
-            var errors = new StringBuilder();
-
-            if (candidateProfileId == Guid.Empty)
-            {
-                errors.AppendLine("CandidateProfileId is required.");
-            }
-
-            // A vote count, if it exists, cannot be a negative number.
-            if (voteCount.HasValue && voteCount < 0)
-            {
-                errors.AppendLine("Vote count cannot be negative.");
-            }
-
-            if (errors.Length > 0)
-            {
-                throw new ArgumentException(errors.ToString());
-            }
-        }
+        
     }
 }

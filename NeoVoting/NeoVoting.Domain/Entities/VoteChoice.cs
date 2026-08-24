@@ -7,24 +7,21 @@ namespace NeoVoting.Domain.Entities
     /// Represents the link between a single Vote and a single CandidateProfile.
     /// A collection of these objects represents a single voter's choices.
     /// </summary>
-    public class VoteChoice : ISoftDeletable
+    public class VoteChoice 
     {
         // --- Properties ---
 
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
 
         // --- Foreign Keys & Navigation Properties ---
 
         public Guid VoteId { get; private set; }
         public Vote Vote { get; private set; }
 
-        public Guid CandidateProfileId { get; private set; }
+        public int CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
 
-        // --- Soft Delete Implementation ---
-        public bool IsDeleted { get; set; }
-
-        public DateTimeOffset? DeletedAt { get; set; }
+    
 
         private VoteChoice()
         {
@@ -41,13 +38,13 @@ namespace NeoVoting.Domain.Entities
         /// <param name="candidateProfileId">The ID of the candidate being voted for.</param>
         /// <returns>A new, valid VoteChoice object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static VoteChoice Create(Guid voteId, Guid candidateProfileId)
+        public static VoteChoice Create(Guid voteId, int candidateProfileId)
         {
-            Validate(voteId, candidateProfileId);
+           
 
             var voteChoice = new VoteChoice
             {
-                Id = Guid.NewGuid(),
+                
                 VoteId = voteId,
                 CandidateProfileId = candidateProfileId
             };
@@ -57,27 +54,6 @@ namespace NeoVoting.Domain.Entities
 
         // Like a Vote, a VoteChoice is immutable. Once created, it should not be changed.
 
-        /// <summary>
-        //  Private helper method for validating the foreign keys.
-        /// </summary>
-        private static void Validate(Guid voteId, Guid candidateProfileId)
-        {
-            var errors = new StringBuilder();
-
-            if (voteId == Guid.Empty)
-            {
-                errors.AppendLine("VoteId is required.");
-            }
-
-            if (candidateProfileId == Guid.Empty)
-            {
-                errors.AppendLine("CandidateProfileId is required.");
-            }
-
-            if (errors.Length > 0)
-            {
-                throw new ArgumentException(errors.ToString());
-            }
-        }
+        
     }
 }

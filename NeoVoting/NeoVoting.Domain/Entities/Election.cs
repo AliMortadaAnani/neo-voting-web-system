@@ -8,174 +8,58 @@ namespace NeoVoting.Domain.Entities
 {
     public class Election
     {
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
         public string Name { get; private set; } = string.Empty;
         public DateTime NominationStartDate { get; private set; }
         public DateTime NominationEndDate { get; private set; }
         public DateTime VotingStartDate { get; private set; }
         public DateTime VotingEndDate { get; private set; }
+        public StatusEnum Status { get; private set; }
+
+        public ICollection<CandidateProfile> CandidateProfiles { get; private set; } = new List<CandidateProfile>(); // 1 election can have many candidate profiles
+
+        public ICollection<Vote> Votes { get; private set; } = new List<Vote>(); // 1 election can have many votes
+        private Election()  {}
 
         
-
-        // --- Foreign Key & Navigation Property ---
-
-        public int ElectionStatusId { get; private set; }
-        public ElectionStatus ElectionStatus { get; private set; }
-
-        // Computed property - what the status SHOULD be based on current time
-        [NotMapped]
-        public ElectionStatusEnum ExpectedStatus => GetExpectedStatus(DateTime.UtcNow);
-
-        // Computed property - is the stored status in sync with expected?
-        [NotMapped]
-        public bool IsStatusCurrent => ElectionStatusId == (int)ExpectedStatus;
-
-        /// <summary>
-        /// Determines what the election status should be based on the current UTC time.
-        /// This does NOT change the stored status - use transition methods for that.
-        /// </summary>
-        public ElectionStatusEnum GetExpectedStatus(DateTime currentUtc)
-        {
-            if (currentUtc < NominationStartDate)
-                return ElectionStatusEnum.Upcoming;
-
-            if (currentUtc >= NominationStartDate && currentUtc < NominationEndDate)
-                return ElectionStatusEnum.Nomination;
-
-            if (currentUtc >= NominationEndDate && currentUtc < VotingStartDate)
-                return ElectionStatusEnum.PreVotingPhase;
-
-            if (currentUtc >= VotingStartDate && currentUtc < VotingEndDate)
-                return ElectionStatusEnum.Voting;
-
-            if (currentUtc >= VotingEndDate)
-                return ElectionStatusEnum.Completed;
-
-            return ElectionStatusEnum.Upcoming; // fallback
-        }
-
-        /// <summary>
-        /// Auto-transitions the election to the expected status based on current time.
-        /// Returns true if status was updated, false if already current.
-        /// </summary>
-        public bool AutoTransitionIfNeeded()
-        {
-            var expected = GetExpectedStatus(DateTime.UtcNow);
-
-            if (ElectionStatusId == (int)expected)
-                return false; // Already correct
-
-            // Auto-transition to the expected status
-            ElectionStatusId = (int)expected;
-            return true;
-        }
-        /* 
-        THE LOGIC: Let the entity fix itself based on the current time
-        // We don't care what the old status was. We trust the Entity.
-        bool statusChanged = election.AutoTransitionIfNeeded();
-
-    if (statusChanged)
-    {
-        // 3. If the status changed (e.g., from Upcoming -> Nomination), persist it now.
-        _electionRepository.Update(election);
-        await _unitOfWork.SaveChangesAsync(ct);
-
-        // Optional: Log this automatic transition
-        _logger.LogInformation("Election {Id} auto-transitioned to {Status}", election.Id, election.ElectionStatus);
-    }*/
-
-        private Election()
-        {
-            ElectionStatus = null!;
-        }
-
-        // --- Factory Method ---
-
-        /// <summary>
-        /// Creates a new, valid Election instance.
-        /// Enforces business rules, such as date ordering, before creation.
-        /// </summary>
-        /// <param name="name">The official name of the election.</param>
-        /// <param name="nominationStartDate">The UTC date when nominations open.</param>
-        /// <param name="nominationEndDate">The UTC date when nominations close.</param>
-        /// <param name="votingStartDate">The UTC date when voting opens.</param>
-        /// <param name="votingEndDate">The UTC date when voting closes.</param>
-        /// <returns>A new, valid Election object.</returns>
-        /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
         public static Election Create(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
         {
             // --- Centralized Validation Logic ---
             Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate, isCreating: true);
 
             var election = new Election
-            {
-                Id = Guid.NewGuid(),
+            { 
                 Name = name,
                 NominationStartDate = nominationStartDate,
                 NominationEndDate = nominationEndDate,
                 VotingStartDate = votingStartDate,
                 VotingEndDate = votingEndDate,
-                ElectionStatusId = (int)ElectionStatusEnum.Upcoming // New elections always start as 'Upcoming'.
+                Status = StatusEnum.Upcoming
             };
 
             return election;
         }
 
-        /// <summary>
-        /// Moves the election to the Nomination phase.
-        /// Throws an exception if the election is not in the 'Upcoming' state.
-        /// </summary>
-        public void StartNominationPhase()
-        {
-            if (ElectionStatusId != (int)ElectionStatusEnum.Upcoming)
-            {
-                throw new InvalidOperationException("Cannot start nomination unless the election is in the 'Upcoming' state.");
-            }
-            ElectionStatusId = (int)ElectionStatusEnum.Nomination;
-        }
-
-        /// <summary>
-        /// Moves the election to the pre-Voting phase.
-        /// Throws an exception if the election is not in the 'Nomination' state.
-        /// </summary>
-        public void StartPreVotingPhase()
-        {
-            if (ElectionStatusId != (int)ElectionStatusEnum.Nomination)
-            {
-                throw new InvalidOperationException("Cannot start pre-voting phase unless the election is in the 'Nomination' state.");
-            }
-            ElectionStatusId = (int)ElectionStatusEnum.PreVotingPhase;
-        }
-
-        /// <summary>
-        /// Moves the election to the Voting phase.
-        /// Throws an exception if the election is not in the 'pre-Voting' state.
-        /// </summary>
         public void StartVotingPhase()
         {
-            if (ElectionStatusId != (int)ElectionStatusEnum.PreVotingPhase)
+            if (Status != StatusEnum.Upcoming)
             {
-                throw new InvalidOperationException("Cannot start voting unless the election is in the 'pre-Voting' state.");
+                throw new InvalidOperationException("Cannot start voting unless the election is in the 'Upcoming' state.");
             }
-            ElectionStatusId = (int)ElectionStatusEnum.Voting;
+            Status = StatusEnum.Voting;
         }
 
-        /// <summary>
-        /// Moves the election to the Completed phase.
-        /// Throws an exception if the election is not in the 'Voting' state.
-        /// </summary>
-        public void CompleteElection()
+        
+        public void EndVotingPhase()
         {
-            if (ElectionStatusId != (int)ElectionStatusEnum.Voting)
+            if (Status != StatusEnum.Voting)
             {
-                throw new InvalidOperationException("Cannot complete the election unless it is in the 'Voting' state.");
+                throw new InvalidOperationException("Cannot end voting phase unless the election is in the 'Voting' state.");
             }
-
-           
-            ElectionStatusId = (int)ElectionStatusEnum.Completed;
+            Status = StatusEnum.Completed;
         }
 
-       
+
         /// <summary>
         /// Private helper method to contain all validation rules for creating an election.
         /// </summary>
@@ -195,7 +79,7 @@ namespace NeoVoting.Domain.Entities
                 errors.AppendLine("Election name is required.");
             }
             //when creating, nomination start date must be in the future
-            if (isCreating && nominationStartDate <= DateTime.UtcNow)
+            if (isCreating && nominationStartDate < DateTime.UtcNow)
             {
                 errors.AppendLine("Nomination start date must be in the future.");
             }
@@ -207,9 +91,9 @@ namespace NeoVoting.Domain.Entities
             }
 
             // Rule 2: Voting start date must be after nomination has ended.
-            if (votingStartDate <= nominationEndDate)
+            if (votingStartDate < nominationEndDate)
             {
-                errors.AppendLine("Voting start date must be after the nomination period has ended.");
+                errors.AppendLine("Voting start date must not be before the nomination period has ended.");
             }
 
             // Rule 3: Voting end date must be after voting has started.
