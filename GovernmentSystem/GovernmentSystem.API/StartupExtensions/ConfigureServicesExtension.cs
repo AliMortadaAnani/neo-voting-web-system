@@ -3,6 +3,8 @@ using FluentValidation.AspNetCore;
 using GovernmentSystem.API.Application.CLI;
 using GovernmentSystem.API.Application.Exceptions;
 using GovernmentSystem.API.Application.Helpers;
+using GovernmentSystem.API.Application.RequestDTOs.AdminDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.Admin;
 using GovernmentSystem.API.Application.Services;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
@@ -16,6 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Security.Claims;
+using System.Threading.RateLimiting;
 
 namespace GovernmentSystem.API.StartupExtensions
 {
@@ -29,14 +33,15 @@ namespace GovernmentSystem.API.StartupExtensions
         {
             builder.ConfigureDatabase()
                    .ConfigureIdentity()
-                   //.ConfigureCookies()
+                   .ConfigureCookies()
                    .ConfigureControllers()
                    .ConfigureExceptions()
                    .ConfigureSwagger()
-                   //.ConfigureCors()
+                   .ConfigureCors()
                    .ConfigureApplicationServices()
                    .ConfigureValidation()
                    .ConfigureSensitiveDataServices()
+                   .ConfigureRateLimiting()
                    ;
 
             return builder;
@@ -83,7 +88,7 @@ namespace GovernmentSystem.API.StartupExtensions
                 // A. Security Settings
                 options.Cookie.HttpOnly = true; // Prevents JavaScript from reading the cookie
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Requires HTTPS
-                options.Cookie.SameSite = SameSiteMode.Strict; // strict prevents CSRF
+                options.Cookie.SameSite = SameSiteMode.None; // strict prevents CSRF
                 options.Cookie.Name = "__Host-Gov-Auth";
 
                 options.Events.OnRedirectToLogin = context =>
@@ -173,35 +178,35 @@ namespace GovernmentSystem.API.StartupExtensions
                 // This tells Swagger: "I support a security mode called 'ApiKey'.
                 // It works by sending a value in the Header named 'X-Gov-Api-Key'."
 
-                //c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
-                //{
-                //    Description = "Enter your API Key below.",
-                //    Name = "X-Gov-Api-Key",       // The actual HTTP Header name to send
-                //    In = ParameterLocation.Header,// Where to put the key (Header, Query, Cookie)
-                //    Type = SecuritySchemeType.ApiKey, // The type of auth
-                //    Scheme = "ApiKeyScheme"
-                //});
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Description = "Enter your API Key below.",
+                    Name = "X-Gov-Api-Key",       // The actual HTTP Header name to send
+                    In = ParameterLocation.Header,// Where to put the key (Header, Query, Cookie)
+                    Type = SecuritySchemeType.ApiKey, // The type of auth
+                    Scheme = "ApiKeyScheme"
+                });
 
                 // 2. REQUIREMENT: "Apply this scheme to the endpoints"
                 // This tells Swagger: "By default, assume every endpoint might need this lock."
                 // When you click 'Authorize' and enter the key, Swagger will send that key
                 // with EVERY request you make in the browser.
 
-                //c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                //{
-                //    {
-                //        new OpenApiSecurityScheme
-                //        {
-                //            Reference = new OpenApiReference
-                //            {
-                //                Type = ReferenceType.SecurityScheme,
-                //                Id = "ApiKey" // Must match the name defined in AddSecurityDefinition
-                //            },
-                //            In = ParameterLocation.Header
-                //        },
-                //        new List<string>() // Scopes (used for OAuth, empty for ApiKey)
-                //    }
-                //});
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "ApiKey" // Must match the name defined in AddSecurityDefinition
+                            },
+                            In = ParameterLocation.Header
+                        },
+                        new List<string>() // Scopes (used for OAuth, empty for ApiKey)
+                    }
+                });
 
                 // 1. Get the name of the generated XML file (usually YourProjectName.xml)
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -222,7 +227,7 @@ namespace GovernmentSystem.API.StartupExtensions
             {
                 options.AddPolicy("FrontendPolicy", policyBuilder =>
                 {
-                    policyBuilder.AllowAnyOrigin() // Allow all origins (for development). Change to specific origins in production.
+                    policyBuilder.WithOrigins("http://localhost:3000") // Your Frontend URL
                                  .AllowAnyHeader()
                                  .AllowAnyMethod()
                                  .AllowCredentials();
@@ -244,10 +249,11 @@ namespace GovernmentSystem.API.StartupExtensions
             // --- REGISTER REPOSITORIES ---
             builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
             builder.Services.AddScoped<IVoterRepository, VoterRepository>();
+            builder.Services.AddScoped<ICitizenRepository, CitizenRepository>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
             builder.Services.AddScoped<IVoterServices, VoterServices>();
             builder.Services.AddScoped<ICandidateServices, CandidateServices>();
-            builder.Services.AddScoped<INeoVotingServices, NeoVotingServices>();
+            builder.Services.AddScoped<ICitizenServices, CitizenServices>();
 
             // Inside ConfigureApplicationServices extension:
             builder.Services.AddScoped<DataSeederCLI>(); // Don't forget to register it here!
@@ -258,7 +264,7 @@ namespace GovernmentSystem.API.StartupExtensions
         public static WebApplicationBuilder ConfigureValidation(this WebApplicationBuilder builder)
         {
             builder.Services.AddFluentValidationAutoValidation();
-            builder.Services.AddValidatorsFromAssemblyContaining<LoginDTOValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<LoginDTO>();
             builder.Services.AddFluentValidationRulesToSwagger();
 
             return builder;
@@ -267,6 +273,93 @@ namespace GovernmentSystem.API.StartupExtensions
         public static WebApplicationBuilder ConfigureSensitiveDataServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddSingleton<SensitiveDataHelper>();
+
+            return builder;
+        }
+
+        public static WebApplicationBuilder ConfigureRateLimiting(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddRateLimiter(options =>
+            {
+                // 1. Set the default status code to 429 Too Many Requests
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                // 2. Customize the response to match your ProblemDetails architecture!
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                    context.HttpContext.Response.ContentType = "application/problem+json";
+
+                    var problem = new ProblemDetails
+                    {
+                        Status = StatusCodes.Status429TooManyRequests,
+                        Title = "Too many requests",
+                        Detail = "You have exceeded your rate limit. Please try again later.",
+                        Type = nameof(ProblemDetails429ErrorTypes.RateLimit_Exceeded) // Assuming you have this enum
+                    };
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(problem, token);
+                };
+
+                // 3. Define your policies
+
+                // Policy A: Strict limit for Login/Auth endpoints (Prevents brute force)
+                options.AddPolicy("AuthLimiter", httpContext =>
+                {
+                    var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                    return RateLimitPartition.GetSlidingWindowLimiter(
+                        partitionKey: ip,
+                        factory: _ => new SlidingWindowRateLimiterOptions
+                        {
+                            PermitLimit = 20,                 // Max 20 requests allowed...
+                            Window = TimeSpan.FromMinutes(1), // ...in a total 1-minute window
+                            SegmentsPerWindow = 4,            // Split that minute into four 15-second blocks
+                            QueueLimit = 0,                   // Reject instantly (no waiting queue)
+                            AutoReplenishment = true          // Automatically release expired segments
+                        });
+                });
+
+                // Policy B: General limit for the rest of the API (e.g., 100 requests per minute)
+                options.AddPolicy("GeneralApiLimiter", httpContext =>
+                {
+                    string? userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                    string ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                    return RateLimitPartition.GetSlidingWindowLimiter(
+                            partitionKey: userId ?? ip,
+                            factory: _ => new SlidingWindowRateLimiterOptions
+                            {
+                                PermitLimit = 100,                // Max 100 requests allowed...
+                                Window = TimeSpan.FromMinutes(1), // ...in a total 1-minute window
+                                SegmentsPerWindow = 4,            // Split that minute into four 15-second blocks
+                                QueueLimit = 0,                   // Reject instantly (no waiting queue)
+                                AutoReplenishment = true          // Automatically release expired segments
+                            });
+                });
+
+                options.AddPolicy("ApiKeyLimiter", httpContext =>
+                {
+                    //Try to get the API Key (matching your ApiKeyAuthAttribute!)
+                    string? apiKey = httpContext.Request.Headers["X-Gov-Api-Key"].FirstOrDefault();
+
+                    //Get the IP Address as a fallback
+                    string ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                    // Apply the limit to whichever key we just determined
+                    return RateLimitPartition.GetSlidingWindowLimiter(
+                        partitionKey: apiKey ?? ip,
+                        factory: _ => new SlidingWindowRateLimiterOptions
+                        {
+                            PermitLimit = 400,                 // Max 400 requests allowed...
+                            Window = TimeSpan.FromMinutes(1), // ...in a total 1-minute window
+                            SegmentsPerWindow = 4,            // Split that minute into four 15-second blocks
+                            QueueLimit = 0,                   // Reject instantly (no waiting queue)
+                            AutoReplenishment = true          // Automatically release expired segments
+                        });
+                });
+            });
 
             return builder;
         }

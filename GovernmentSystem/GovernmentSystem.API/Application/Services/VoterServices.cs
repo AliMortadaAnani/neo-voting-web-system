@@ -1,7 +1,6 @@
 ﻿using GovernmentSystem.API.Application.Helpers;
 using GovernmentSystem.API.Application.RequestDTOs.VoterDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
-using GovernmentSystem.API.Application.ResponseDTOs.CitizenDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
@@ -87,13 +86,12 @@ namespace GovernmentSystem.API.Application.Services
 
             if (voter == null)
             {
-                return Result<VoterVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Voter_NotFound), "Voter not found."));
+                return Result<VoterVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails401ErrorTypes.Voter_InvalidCredentials), "Voter invalid credentials."));
             }
 
             var response = voter.ToNeoVoting_VoterResponse();
             return Result<VoterVerifyResponseDTO>.Success(response);
         }
-
 
         public async Task<Result<VoterResponseDTO>> AddVoterAsync(CreateVoterRequestDTO request)
         {
@@ -183,7 +181,6 @@ namespace GovernmentSystem.API.Application.Services
             var response = voter.ToVoterResponse(_sensitiveDataHelper);
 
             return Result<VoterResponseDTO>.Success(response);
-
         }
 
         public async Task<Result<int>> GetVotersTotalCountAsync()
@@ -191,6 +188,5 @@ namespace GovernmentSystem.API.Application.Services
             int totalCount = await _voterRepository.CountAsync();
             return Result<int>.Success(totalCount);
         }
-
     }
 }

@@ -26,11 +26,10 @@ namespace GovernmentSystem.API.Application.CLI
         {
             Console.WriteLine($"--- Starting Seeding Process ---");
 
-            
             await SeedCitizensAsync(200);
-            
+
             //await SeedVotersAsync(new List<string>(), 100);
-            
+
             //await SeedCandidatesAsync(new List<string>(), 50);
 
             Console.WriteLine("--- Seeding Process Completed ---");
@@ -54,14 +53,11 @@ namespace GovernmentSystem.API.Application.CLI
                 // 4. Other Rules
                 .RuleFor(v => v.GovernorateId, f => (GovernorateIdEnum)f.PickRandom(1, 2, 3, 4, 5))
                 .RuleFor(v => v.DateOfBirth, f => DateOnly.FromDateTime(f.Date.Past(80, DateTime.Now.AddYears(-18))));
-               
 
             var fakeCitizens = citizenFaker.Generate(count);
             int successCount = 0;
 
             Console.WriteLine(">> Seeding Citizens with Lebanese Names...");
-
-        
 
             foreach (var dto in fakeCitizens)
             {
@@ -137,9 +133,6 @@ namespace GovernmentSystem.API.Application.CLI
 
             Console.WriteLine($"   Successfully added {successCount}/{count} Candidates.");
         }
-
-
-
 
         private static readonly string[] LebaneseMaleNames = new[]
 {

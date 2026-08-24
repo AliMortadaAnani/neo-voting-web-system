@@ -25,8 +25,6 @@ namespace GovernmentSystem.API.Application.CLI
                 return;
             }
 
-            Console.WriteLine($"Attempting to seed Admin: {adminUsername}...");
-
             string adminPassword = configuration["Admin:Password"] ?? "none";
 
             if (string.IsNullOrEmpty(adminPassword) || adminPassword == "none")

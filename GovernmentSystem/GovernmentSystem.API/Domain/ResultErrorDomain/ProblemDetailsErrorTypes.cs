@@ -43,8 +43,8 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails409ErrorTypes // Conflict
     {
-        Citizen_AlreadyRegistered,  // For Voter / Candidate / Citizen
-        Candidate_AlreadyRegistered,
+        Citizen_AlreadyRegistered,   // Citizen auto generated unique NationalId // cannot conflict
+        Candidate_AlreadyRegistered,// For Voter / Candidate
         Voter_AlreadyRegistered
     }
 
@@ -58,7 +58,7 @@ namespace GovernmentSystem.API.Domain.ResultErrorDomain
     {
         Server_Error,             // Generic Global Handler
         Server_ConfigurationError,// Missing API Key in Config
-        Voter_OperationFailed,    // Add/Delete in repos returned unexpected output
+        Voter_OperationFailed,    // Add/Delete in repos returned unexpected output (omitted)
         Candidate_OperationFailed,
         Citizen_OperationFailed
     }

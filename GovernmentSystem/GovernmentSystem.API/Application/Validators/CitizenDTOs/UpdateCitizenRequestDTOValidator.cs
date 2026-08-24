@@ -48,4 +48,3 @@ namespace GovernmentSystem.API.Application.Validators.CitizenDTOs
         }
     }
 }
-}

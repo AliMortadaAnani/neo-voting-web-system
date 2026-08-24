@@ -30,7 +30,7 @@ namespace GovernmentSystem.API.StartupExtensions
         {
             using var scope = app.Services.CreateScope();
             var seeder = scope.ServiceProvider.GetRequiredService<DataSeederCLI>();
-            await seeder.SeedAsync(100, 150);
+            await seeder.SeedAsync();
             Console.WriteLine("Data seeding complete. Exiting.");
             return true;
         }

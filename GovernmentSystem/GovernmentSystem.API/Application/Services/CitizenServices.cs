@@ -71,6 +71,7 @@ namespace GovernmentSystem.API.Application.Services
 
             return Result<PagedResult<CitizenResponseDTO>>.Success(pagedResult);
         }
+
         public async Task<Result<CitizenResponseDTO>> AddCitizenAsync(CreateCitizenRequestDTO request)
         {
             string rawNationalId = _sensitiveDataHelper.GenerateNationalId
@@ -143,12 +144,10 @@ namespace GovernmentSystem.API.Application.Services
             return Result<CitizenResponseDTO>.Success(response);
         }
 
-
         public async Task<Result<int>> GetCitizensTotalCountAsync()
         {
             var totalCount = await _citizenRepository.CountAsync();
             return Result<int>.Success(totalCount);
         }
-
     }
 }

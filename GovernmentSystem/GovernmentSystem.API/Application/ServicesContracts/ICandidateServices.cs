@@ -7,11 +7,17 @@ namespace GovernmentSystem.API.Application.ServicesContracts
     public interface ICandidateServices
     {
         Task<Result<CandidateResponseDTO>> GetCandidateByNationalIdAsync(GetCandidateRequestDTO request);
+
         Task<Result<PagedResult<CandidateResponseDTO>>> GetCandidatesPagedAsync(int pageNumber, int pageSize);
+
         Task<Result<CandidateVerifyResponseDTO>> VerifyCandidateCredentialsAsync(GetCandidateVerificationRequestDTO request);
+
         Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request);
+
         Task<Result<bool>> DeleteCandidateByNationalIdAsync(DeleteCandidateRequestDTO request);
+
         Task<Result<CandidateResponseDTO>> GenerateNewNominationTokenByNationalIdAsync(UpdateCandidateRequestDTO request);
+
         Task<Result<int>> GetCandidatesTotalCountAsync();
     }
 }

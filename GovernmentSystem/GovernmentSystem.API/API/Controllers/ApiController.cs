@@ -39,20 +39,22 @@ namespace GovernmentSystem.API.API.Controllers
         private static int GetStatusCode(ErrorType errorType) => errorType switch
         {
             ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Conflict => StatusCodes.Status409Conflict,
-            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
-            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+            ErrorType.TooManyRequests => StatusCodes.Status429TooManyRequests,
             _ => StatusCodes.Status500InternalServerError
         };
 
         private static string GetTitle(ErrorType errorType) => errorType switch
         {
             ErrorType.Validation => "Bad Request",
+            ErrorType.Unauthorized => "Unauthorized",
+            ErrorType.Forbidden => "Forbidden",
             ErrorType.NotFound => "Not Found",
             ErrorType.Conflict => "Conflict",
-            ErrorType.Forbidden => "Forbidden",
-            ErrorType.Unauthorized => "Unauthorized",
+            ErrorType.TooManyRequests => "Too Many Requests",
             _ => "Server Failure"
         };
     }

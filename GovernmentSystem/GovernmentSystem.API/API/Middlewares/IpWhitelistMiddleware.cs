@@ -31,11 +31,15 @@ namespace GovernmentSystem.API.API.Middlewares
             string incomingIp = remoteIp?.ToString() ?? "";
 
             // 1. Load IP Lists
+
+            // Admin IPs that are allowed to access all /api
             var adminIps = _configuration.GetSection("SecuritySettings:AdminWhitelist").Get<string[]>() ?? Array.Empty<string>();
+
+            // system IPs that are allowed to access /api/public but not /api
             var externalIps = _configuration.GetSection("SecuritySettings:ExternalSystemWhitelist").Get<string[]>() ?? Array.Empty<string>();
 
             // 2. Check if Admin (Super User)
-            // Admins can access EVERYTHING (/api/admin and /api/external)
+            // Admins can access EVERYTHING (/api/admin and /api/public)
             if (adminIps.Contains(incomingIp))
             {
                 await _next(context);
@@ -45,8 +49,8 @@ namespace GovernmentSystem.API.API.Middlewares
             // 3. Check if External System (Restricted User)
             if (externalIps.Contains(incomingIp))
             {
-                // They are only allowed to touch /api/external
-                if (path.StartsWith("/api/external", StringComparison.OrdinalIgnoreCase))
+                // They are only allowed to touch /api/public
+                if (path.StartsWith("/api/public", StringComparison.OrdinalIgnoreCase))
                 {
                     await _next(context);
                     return;

@@ -1,29 +1,23 @@
-﻿using GovernmentSystem.API.Application.ServicesContracts;
+﻿using GovernmentSystem.API.Application.RequestDTOs.AdminDTOs;
+using GovernmentSystem.API.Application.ResponseDTOs.AdminDTOs;
+using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GovernmentSystem.API.API.Controllers
 {
+    [EnableRateLimiting("AuthLimiter")]
     public class AuthController : ApiController
     {
         private readonly IAdminServices _adminServices;
-        private readonly ICandidateServices _candidateServices;
 
-        public AuthController(IAdminServices adminServices, ICandidateServices candidateServices)
+        public AuthController(IAdminServices adminServices)
         {
             _adminServices = adminServices;
-            _candidateServices = candidateServices;
         }
 
-        /// <summary>
-        /// Login to the Government System as an Admin.
-        /// </summary>
-        /// <remarks>
-        /// **Rules:**
-        /// - Correct Username and Password required
-        /// - Requested from allowed IPs only
-        /// </remarks>
         [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
@@ -35,14 +29,6 @@ namespace GovernmentSystem.API.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Logout from the Government System.
-        /// </summary>
-        /// <remarks>
-        /// **Rules:**
-        /// - Authentication required
-        /// - Requested from allowed IPs only
-        /// </remarks>
         [Authorize(Roles = "Admin")]
         [HttpPost("logout")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
@@ -50,14 +36,6 @@ namespace GovernmentSystem.API.API.Controllers
         public async Task<IActionResult> Logout()
         {
             var result = await _adminServices.LogoutAsync();
-            return HandleResult(result);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("test")]
-        public async Task<IActionResult> Test([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-        {
-            var result = await _candidateServices.GetPaginatedCandidatesAsync(pageNumber, pageSize);
             return HandleResult(result);
         }
     }

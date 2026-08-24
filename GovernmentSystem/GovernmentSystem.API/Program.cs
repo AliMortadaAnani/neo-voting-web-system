@@ -1,3 +1,4 @@
+using GovernmentSystem.API.API.Middlewares;
 using GovernmentSystem.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,21 +20,21 @@ app.UseSwaggerUI();
 app.UseExceptionHandler(); // Custom Exception Handler Middleware : Global Exception Handling
 //in Application layer , registered in StartupExtensions/ServiceExtensions.cs
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseHsts();
-//}
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
 
-//app.UseCors("FrontendPolicy");
+app.UseCors("FrontendPolicy");
 
-//app.UseMiddleware<IpWhitelistMiddleware>(); // IP Whitelisting Middleware in API layer
+app.UseMiddleware<IpWhitelistMiddleware>(); // IP Whitelisting Middleware in API layer
 
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseRateLimiter();
 
-//app.UseStaticFiles();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

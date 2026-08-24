@@ -2,13 +2,10 @@
 using GovernmentSystem.API.Application.RequestDTOs.CandidateDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs;
 using GovernmentSystem.API.Application.ResponseDTOs.CandidateDTOs;
-using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
 using GovernmentSystem.API.Application.ServicesContracts;
 using GovernmentSystem.API.Domain.Entities;
-using GovernmentSystem.API.Domain.Enums;
 using GovernmentSystem.API.Domain.RepositoryContracts;
 using GovernmentSystem.API.Domain.ResultErrorDomain;
-using GovernmentSystem.API.Infrastructure.Repositories;
 
 namespace GovernmentSystem.API.Application.Services
 {
@@ -19,7 +16,6 @@ namespace GovernmentSystem.API.Application.Services
         private readonly SensitiveDataHelper _sensitiveDataHelper;
         private readonly ICitizenRepository _citizenRepository;
 
-
         public CandidateServices(ICandidateRepository candidateRepository, ICitizenRepository citizenRepository, IUnitOfWork unitOfWork, SensitiveDataHelper sensitiveDataHelper)
         {
             _candidateRepository = candidateRepository;
@@ -27,7 +23,6 @@ namespace GovernmentSystem.API.Application.Services
             _sensitiveDataHelper = sensitiveDataHelper;
             _citizenRepository = citizenRepository;
         }
-
 
         public async Task<Result<CandidateResponseDTO>> GetCandidateByNationalIdAsync(GetCandidateRequestDTO request)
         {
@@ -91,12 +86,13 @@ namespace GovernmentSystem.API.Application.Services
 
             if (candidate == null)
             {
-                return Result<CandidateVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Candidate_NotFound), "Candidate not found."));
+                return Result<CandidateVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails401ErrorTypes.Candidate_InvalidCredentials), "Candidate invalid credentials."));
             }
 
             var response = candidate.ToNeoVoting_CandidateResponse();
             return Result<CandidateVerifyResponseDTO>.Success(response);
         }
+
         public async Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request)
         {
             string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
@@ -193,6 +189,5 @@ namespace GovernmentSystem.API.Application.Services
             int totalCount = await _candidateRepository.CountAsync();
             return Result<int>.Success(totalCount);
         }
-
     }
 }
