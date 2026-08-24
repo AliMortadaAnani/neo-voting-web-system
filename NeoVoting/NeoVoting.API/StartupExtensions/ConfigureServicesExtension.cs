@@ -12,6 +12,7 @@ using NeoVoting.Application.Services;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Application.Validators;
 using NeoVoting.Domain.Contracts;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.IdentityEntities;
 using NeoVoting.Domain.RepositoryContracts;

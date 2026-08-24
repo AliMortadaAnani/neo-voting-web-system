@@ -92,7 +92,7 @@ namespace GovernmentSystem.API.Application.Services
             string rawNationalId = _sensitiveDataHelper.GenerateNationalId
                 (request.FirstName!,
                 request.LastName!,
-                (int)request.GovernorateId!.Value,
+                (int)request.Governorate!.Value,
                 request.Gender!.Value,
                 request.DateOfBirth!.Value);
 
@@ -104,7 +104,7 @@ namespace GovernmentSystem.API.Application.Services
                 request.LastName!,
                 request.DateOfBirth!.Value,
                 request.Gender!.Value,
-                request.GovernorateId!.Value
+                request.Governorate!.Value
                  );
 
             _citizenRepository.Add(citizen);
@@ -156,7 +156,7 @@ namespace GovernmentSystem.API.Application.Services
                 request.LastName!,
                 request.DateOfBirth!.Value,
                 request.Gender!.Value,
-                request.GovernorateId!.Value
+                request.Governorate!.Value
             );
 
             await _unitOfWork.SaveChangesAsync();

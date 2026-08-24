@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.IdentityEntities;
 using System;

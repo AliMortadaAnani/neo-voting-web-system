@@ -74,7 +74,7 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.DateOfBirth).IsRequired();
-                entity.Property(e => e.GovernorateId).IsRequired();
+                entity.Property(e => e.Governorate).IsRequired();
                 entity.Property(e => e.Gender).IsRequired().HasMaxLength(1);
 
                 entity.ToTable(tb =>
@@ -90,8 +90,8 @@ namespace GovernmentSystem.API.Infrastructure.DbContext
                 // 3. Add the Check Constraint
                 // SQL: CHECK ([GovernorateId] IN (1, 2, 3) OR [GovernorateId] IS NULL)
                 entity.ToTable(t =>
-                    t.HasCheckConstraint("CK_Citizen_GovernorateId",
-                    $"([GovernorateId] IN ({sqlValues}) )")
+                    t.HasCheckConstraint("CK_Citizen_Governorate",
+                    $"([Governorate] IN ({sqlValues}) )")
                 );
 
                 entity.HasOne<Voter>()

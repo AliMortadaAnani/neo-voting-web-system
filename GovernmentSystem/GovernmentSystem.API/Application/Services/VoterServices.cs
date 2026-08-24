@@ -101,7 +101,7 @@ namespace GovernmentSystem.API.Application.Services
             if (voter == null)
             {
                 _logger.LogWarning("Voter verification failed - invalid credentials");
-                return Result<VoterVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails401ErrorTypes.Voter_InvalidCredentials), "Voter invalid credentials."));
+                return Result<VoterVerifyResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Voter_InvalidCredentials), "Voter invalid credentials."));
             }
 
             _logger.LogInformation("Voter verification successful");
@@ -133,7 +133,7 @@ namespace GovernmentSystem.API.Application.Services
             string rawVotingToken = _sensitiveDataHelper.GenerateVotingToken
                (citizen.FirstName,
                citizen.LastName,
-               (int)citizen.GovernorateId,
+               (int)citizen.Governorate,
                citizen.Gender,
                citizen.DateOfBirth);
 
@@ -191,7 +191,7 @@ namespace GovernmentSystem.API.Application.Services
             string rawVotingToken = _sensitiveDataHelper.GenerateVotingToken
               (voter.Citizen.FirstName,
               voter.Citizen.LastName,
-              (int)voter.Citizen.GovernorateId,
+              (int)voter.Citizen.Governorate,
               voter.Citizen.Gender,
               voter.Citizen.DateOfBirth);
 

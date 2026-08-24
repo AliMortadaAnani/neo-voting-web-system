@@ -11,7 +11,7 @@ namespace GovernmentSystem.API.Application.RequestDTOs.CitizenDTOs
 
         public DateOnly? DateOfBirth { get; set; }
 
-        public GovernorateIdEnum? GovernorateId { get; set; }
+        public GovernorateIdEnum? Governorate { get; set; }
 
         public char? Gender { get; set; }
     }

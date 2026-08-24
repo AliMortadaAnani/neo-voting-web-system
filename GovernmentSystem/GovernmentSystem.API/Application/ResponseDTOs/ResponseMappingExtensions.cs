@@ -14,7 +14,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
             {
                 Id = citizen.Id,
                 NationalId = sensitiveDataHelper?.Decrypt(citizen.NationalId) ?? citizen.NationalId,
-                GovernorateId = citizen.GovernorateId,
+                Governorate = citizen.Governorate,
                 FirstName = citizen.FirstName,
                 LastName = citizen.LastName,
                 DateOfBirth = citizen.DateOfBirth,
@@ -31,7 +31,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
                 VotingToken = sensitiveDataHelper?.Decrypt(voter.VotingToken) ?? voter.VotingToken,
                 HashedData = voter.HashedData,
                 NationalId = sensitiveDataHelper?.Decrypt(voter.Citizen.NationalId) ?? voter.Citizen.NationalId,
-                GovernorateId = voter.Citizen.GovernorateId,
+                Governorate = voter.Citizen.Governorate,
                 FirstName = voter.Citizen.FirstName,
                 LastName = voter.Citizen.LastName,
                 DateOfBirth = voter.Citizen.DateOfBirth,
@@ -44,7 +44,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
             return new VoterVerifyResponseDTO
             {
                 HashedData = voter.HashedData,
-                GovernorateId = voter.Citizen.GovernorateId,
+                Governorate = voter.Citizen.Governorate,
                 FirstName = voter.Citizen.FirstName,
                 LastName = voter.Citizen.LastName,
                 DateOfBirth = voter.Citizen.DateOfBirth,
@@ -63,7 +63,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
                 NominationToken = sensitiveDataHelper?.Decrypt(candidate.NominationToken) ?? candidate.NominationToken,
                 HashedData = candidate.HashedData,
                 NationalId = sensitiveDataHelper?.Decrypt(candidate.Citizen.NationalId) ?? candidate.Citizen.NationalId,
-                GovernorateId = candidate.Citizen.GovernorateId,
+                Governorate = candidate.Citizen.Governorate,
                 FirstName = candidate.Citizen.FirstName,
                 LastName = candidate.Citizen.LastName,
                 DateOfBirth = candidate.Citizen.DateOfBirth,
@@ -76,7 +76,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
             return new CandidateVerifyResponseDTO
             {
                 HashedData = candidate.HashedData,
-                GovernorateId = candidate.Citizen.GovernorateId,
+                Governorate = candidate.Citizen.Governorate,
                 FirstName = candidate.Citizen.FirstName,
                 LastName = candidate.Citizen.LastName,
                 DateOfBirth = candidate.Citizen.DateOfBirth,

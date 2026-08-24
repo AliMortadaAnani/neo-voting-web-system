@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
+using GovernmentSystem.API.API.Filters;
 using GovernmentSystem.API.Application.CLI;
 using GovernmentSystem.API.Application.Exceptions;
 using GovernmentSystem.API.Application.Helpers;
@@ -19,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 
 namespace GovernmentSystem.API.StartupExtensions
@@ -153,8 +155,15 @@ namespace GovernmentSystem.API.StartupExtensions
 
         public static WebApplicationBuilder ConfigureControllers(this WebApplicationBuilder builder)
         {
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    // Automatically convert ALL enums to their string names in JSON responses
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
             builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddProblemDetails(); // Required for .NET 8 Exception Handler to work
 
             return builder;
@@ -173,6 +182,9 @@ namespace GovernmentSystem.API.StartupExtensions
             {
                 // Standard Swagger metadata
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Government System API", Version = "v1" });
+
+                // Register the enum filter here
+                c.SchemaFilter<EnumSchemaFilter>();
 
                 // 1. DEFINITION: "Here is a security scheme that exists"
                 // This tells Swagger: "I support a security mode called 'ApiKey'.

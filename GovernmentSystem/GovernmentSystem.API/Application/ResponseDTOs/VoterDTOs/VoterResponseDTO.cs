@@ -12,7 +12,7 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public DateOnly DateOfBirth { get; set; }
-        public GovernorateIdEnum GovernorateId { get; set; }
+        public GovernorateIdEnum Governorate { get; set; }
         public char Gender { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
         /// </summary>
         public void Dispose()
         {
-            _logger.LogInformation("UnitOfWork: Disposing DbContext");
+            //_logger.LogInformation("UnitOfWork: Disposing DbContext");
             _context.Dispose();
         }
     }

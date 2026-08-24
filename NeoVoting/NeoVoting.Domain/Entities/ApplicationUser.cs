@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NeoVoting.Domain.IdentityEntities
 {
-    public class ApplicationUser : IdentityUser<Guid>
+    public class ApplicationUser : IdentityUser<int>
     {
         // For JWT Refresh Tokens
         public string? RefreshToken { get; private set; }

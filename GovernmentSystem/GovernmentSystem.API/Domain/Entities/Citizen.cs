@@ -9,7 +9,7 @@ namespace GovernmentSystem.API.Domain.Entities
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
         public DateOnly DateOfBirth { get; private set; }
-        public GovernorateIdEnum GovernorateId { get; private set; }
+        public GovernorateIdEnum Governorate { get; private set; }
         public char Gender { get; private set; } // 'M'/ 'm' or 'F' / 'f'
 
         private Citizen()
@@ -36,7 +36,7 @@ namespace GovernmentSystem.API.Domain.Entities
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 Gender = char.ToUpper(gender),
-                GovernorateId = governorateId
+                Governorate = governorateId
             };
         }
 
@@ -57,7 +57,7 @@ namespace GovernmentSystem.API.Domain.Entities
             LastName = lastName;
             DateOfBirth = dateOfBirth;
             Gender = char.ToUpper(gender);
-            GovernorateId = governorateId;
+            Governorate = governorateId;
         }
 
         //Helpers to sanitize and validate inputs(last resort, should be handled in validation layer ideally by Fluent Validators)

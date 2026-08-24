@@ -101,7 +101,7 @@ namespace GovernmentSystem.API.Application.Services
             if (candidate == null)
             {
                 _logger.LogWarning("Candidate verification failed - invalid credentials");
-                return Result<CandidateVerifyResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails401ErrorTypes.Candidate_InvalidCredentials), "Candidate invalid credentials."));
+                return Result<CandidateVerifyResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Candidate_InvalidCredentials), "Candidate invalid credentials."));
             }
 
             _logger.LogInformation("Candidate verification successful");
@@ -133,7 +133,7 @@ namespace GovernmentSystem.API.Application.Services
             string rawNominationToken = _sensitiveDataHelper.GenerateNominationToken
                (citizen.FirstName,
                citizen.LastName,
-               (int)citizen.GovernorateId,
+               (int)citizen.Governorate,
                citizen.Gender,
                citizen.DateOfBirth);
 
@@ -192,7 +192,7 @@ namespace GovernmentSystem.API.Application.Services
             string rawNominationToken = _sensitiveDataHelper.GenerateNominationToken
               (candidate.Citizen.FirstName,
               candidate.Citizen.LastName,
-              (int)candidate.Citizen.GovernorateId,
+              (int)candidate.Citizen.Governorate,
               candidate.Citizen.Gender,
               candidate.Citizen.DateOfBirth);
 

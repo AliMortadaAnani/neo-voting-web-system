@@ -21,7 +21,7 @@ namespace GovernmentSystem.API.Application.Validators.CitizenDTOs
                 .Must(d => d.HasValue && BeAtLeast18YearsOld(d.Value))
                 .WithMessage("The candidate must be at least 18 years old.");
 
-            RuleFor(x => x.GovernorateId)
+            RuleFor(x => x.Governorate)
                 .NotNull()
                 .Must(id => id.HasValue && Enum.IsDefined(typeof(GovernorateIdEnum), id.Value));
 
