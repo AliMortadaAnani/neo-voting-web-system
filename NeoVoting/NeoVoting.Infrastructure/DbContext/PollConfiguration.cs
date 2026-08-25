@@ -2,12 +2,17 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-    public class ElectionConfiguration : IEntityTypeConfiguration<Election>
+    public class PollConfiguration : IEntityTypeConfiguration<Poll>
     {
-        public void Configure(EntityTypeBuilder<Election> builder)
+        public void Configure(EntityTypeBuilder<Poll> builder)
         {
             // Primary key
             builder.HasKey(e => e.Id);
@@ -21,17 +26,14 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsUnique();
 
             // Dates
-            builder.Property(e => e.NominationStartDate)
+            builder.Property(e => e.StartDate)
                 .IsRequired();
 
-            builder.Property(e => e.NominationEndDate)
+            builder.Property(e => e.EndDate)
                 .IsRequired();
-
-            builder.Property(e => e.VotingStartDate)
-                .IsRequired();
-
-            builder.Property(e => e.VotingEndDate)
-                .IsRequired();
+            builder.Property(e => e.Question)
+                .IsRequired()
+                .HasMaxLength(4000); // adjust as needed
 
 
             builder.Property(e => e.Status)
@@ -48,26 +50,17 @@ namespace NeoVoting.Infrastructure.DbContext
             // 3. Add the Check Constraint
             // SQL: CHECK ([GovernorateId] IN (1, 2, 3) OR [GovernorateId] IS NULL)
             builder.ToTable(t =>
-                t.HasCheckConstraint("CK_Election_Status",
+                t.HasCheckConstraint("CK_Poll_Status",
                 $"([Status] IN ({sqlValues}) )")
             );
 
             // Table name and constraints
             builder.ToTable(tb =>
             {
-                // Example: enforce that NominationEndDate > NominationStartDate
-                tb.HasCheckConstraint("CK_Election_NominationDates",
-                    "[NominationEndDate] > [NominationStartDate]");
+                // Example: enforce that EndDate > StartDate
+                tb.HasCheckConstraint("CK_Poll_StartEndDates",
+                    "[EndDate] > [StartDate]");
 
-                // Example: enforce that VotingEndDate > VotingStartDate
-                tb.HasCheckConstraint("CK_Election_VotingDates",
-                    "[VotingEndDate] > [VotingStartDate]");
-
-                // Example: enforce that VotingStartDate >= NominationEndDate
-                tb.HasCheckConstraint("CK_Election_VotingAfterNomination",
-                    "[VotingStartDate] >= [NominationEndDate]");
-
-               
             });
         }
     }

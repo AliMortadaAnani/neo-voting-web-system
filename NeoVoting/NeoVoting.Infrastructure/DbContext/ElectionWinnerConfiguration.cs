@@ -15,14 +15,14 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(ew => ew.VoteCount)
                 .IsRequired(false); // nullable, allows recounts or non-applicable
 
-            
 
-            builder.HasOne(ew => ew.CandidateProfile)
-                .WithMany() // no back navigation from CandidateProfile
-                .HasForeignKey(ew => ew.CandidateProfileId)
+
+            // RELATIONSHIP: ElectionWinner HAS ONE CandidateProfile
+            builder.HasOne(ew => ew.CandidateProfile)       // Navigation property on ElectionWinner
+                .WithOne(cp => cp.ElectionWinner)           // Navigation property on CandidateProfile (if you add it)
+                .HasForeignKey<ElectionWinner>(ew => ew.CandidateProfileId) // Foreign key is on ElectionWinner
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-            // Prevent deleting a CandidateProfile if it is marked as a winner
 
             builder.HasIndex(ew => new { ew.CandidateProfileId }).IsUnique();
         }

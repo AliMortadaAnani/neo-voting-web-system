@@ -23,7 +23,7 @@ namespace NeoVoting.Domain.Entities
 
         public ApplicationUser User { get; private set; }
 
-       public ICollection<CandidateProfile> candidateProfiles { get; private set; } 
+       public ICollection<CandidateProfile> CandidateProfiles { get; private set; } 
             = new List<CandidateProfile>();
 
         private Candidate()

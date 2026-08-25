@@ -20,6 +20,10 @@ namespace NeoVoting.Domain.Entities
         //same user as candidate can have multiple profiles in different elections (one profile per election to be considered nominated for that election)
         public Election Election { get; private set; }
 
+        public ElectionWinner? ElectionWinner { get; private set; } // Nullable, as not all candidates will win
+
+        public ICollection<VoteChoice> VoteChoices { get; private set; } = new List<VoteChoice>();
+
         private CandidateProfile()
         {
             Candidate = null!;

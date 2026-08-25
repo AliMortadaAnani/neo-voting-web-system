@@ -8,7 +8,7 @@ namespace NeoVoting.Domain.RepositoryContracts
         void Add(Vote vote);
 
     
-
+        Task<bool> IsVoteChoicesForVoteEqualFive(Vote vote); 
         Task<int> GetCountOfTotalVotesByElectionIdAsync(int electionId);
 
         Task<int> GetCountOfVotesByElectionIdAndGenderAsync(int electionId, char gender);

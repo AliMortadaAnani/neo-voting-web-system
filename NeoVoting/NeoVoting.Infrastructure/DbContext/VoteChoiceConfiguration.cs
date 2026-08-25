@@ -10,16 +10,16 @@ namespace NeoVoting.Infrastructure.DbContext
         {
             // Primary key
             builder.HasKey(vc => vc.Id);
-            builder.Property(entity => entity.Id).ValueGeneratedNever();
+            builder.Property(entity => entity.Id).ValueGeneratedOnAdd();
             // Relationships
             builder.HasOne(vc => vc.Vote)
-                .WithMany() // no back navigation from Vote
+                .WithMany(v => v.VoteChoices) 
                 .HasForeignKey(vc => vc.VoteId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(vc => vc.CandidateProfile)
-                .WithMany() // no back navigation from CandidateProfile
+                .WithMany(cp => cp.VoteChoices)
                 .HasForeignKey(vc => vc.CandidateProfileId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
@@ -28,13 +28,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasIndex(vc => new { vc.VoteId, vc.CandidateProfileId })
               .IsUnique();
 
-            builder.HasIndex(v => v.IsDeleted);
-
-            // OR a filtered index (Better for performance)
-            /*builder.HasIndex(vc => vc.ExampleFieldId)
-                   .HasFilter("[IsDeleted] = 0");*/
-
-            /*Why ? 99 % of your queries will be WHERE ElectionId = X AND IsDeleted = 0.Without a filtered index, the DB scans deleted rows too.*/
+            
         }
     }
 }

@@ -18,24 +18,18 @@ namespace NeoVoting.Infrastructure.DbContext
 
             builder.Property(v => v.VoterGender)
                 .IsRequired()
-                .HasMaxLength(1)
-                .IsUnicode(false);
+                .HasMaxLength(1);
 
             builder.Property(v => v.TimestampUTC)
                 .IsRequired();
 
             // Relationships
             builder.HasOne(v => v.Election)
-                .WithMany() // no back navigation
+                .WithMany(e => e.Votes) // no back navigation
                 .HasForeignKey(v => v.ElectionId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(v => v.Governorate)
-                .WithMany() // no back navigation
-                .HasForeignKey(v => v.GovernorateId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
 
             // Table name and constraints
             builder.ToTable(tb =>
@@ -47,6 +41,9 @@ namespace NeoVoting.Infrastructure.DbContext
                 tb.HasCheckConstraint("CK_Vote_VoterGender", "[VoterGender] IN ('M','F')");
             });
 
+           builder.Property(v => v.Governorate)
+                .IsRequired()
+                .HasConversion<int>(); // Store enum as int in the database
 
             // 1. Get all integer values from the Enum
             var enumValues = Enum.GetValues(typeof(GovernorateIdEnum))
@@ -56,12 +53,12 @@ namespace NeoVoting.Infrastructure.DbContext
             var sqlValues = string.Join(", ", enumValues);
 
             // 3. Add the Check Constraint
-            // SQL: CHECK ([GovernorateId] IN (1, 2, 3) OR [GovernorateId] IS NULL)
+            // SQL: CHECK ([GovernorateId] IN (1, 2, 3) )
             builder.ToTable(t =>
-                t.HasCheckConstraint("CK_Voter_GovernorateId", $"([GovernorateId] IN ({sqlValues}) OR [GovernorateId] IS NULL)")
+                t.HasCheckConstraint("CK_Vote_Governorate", $"([Governorate] IN ({sqlValues}) )")
             );
 
-            builder.HasIndex(v => v.IsDeleted);
+           
         }
     }
 }

@@ -19,17 +19,13 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(sal => sal.TimestampUTC)
                 .IsRequired();
 
-            builder.Property(sal => sal.UserId)
+            builder.Property(sal => sal.AdminId)
                 .IsRequired();
 
             builder.Property(sal => sal.Username)
                 .IsRequired()
                 .HasMaxLength(100); // Standard Identity Username length
 
-            // Optional Links
-            builder.Property(sal => sal.CandidateProfileId).IsRequired(false);
-            builder.Property(sal => sal.ElectionId).IsRequired(false);
-            builder.Property(sal => sal.ElectionName).IsRequired(false).HasMaxLength(100);
 
             // Details (JSON or Text)
             builder.Property(sal => sal.Details)
@@ -57,26 +53,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 $"[ActionType] IN ({enumActionValues})"
             ));
 
-            // --- Indexes ---
-
-            // 1. Security Auditing: "Show me everything User X did"
-            builder.HasIndex(sal => sal.UserId)
-                   .HasDatabaseName("IX_SystemAuditLogs_UserId");
-
-        
-
-            builder.HasIndex(sal => sal.ElectionId)
-                   .HasDatabaseName("IX_SystemAuditLogs_ElectionId");
-
-          
-
-            // 2. Timeline: "Show me logs from yesterday"
-            builder.HasIndex(sal => sal.TimestampUTC)
-                   .HasDatabaseName("IX_SystemAuditLogs_Timestamp");
-
-            // 3. Action Filtering: "Show me all CANDIDATE_CREATED events"
-            builder.HasIndex(sal => sal.ActionType)
-                   .HasDatabaseName("IX_SystemAuditLogs_ActionType");
+            
         }
     }
 }

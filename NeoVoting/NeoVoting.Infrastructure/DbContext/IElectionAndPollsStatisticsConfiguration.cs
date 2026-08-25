@@ -5,7 +5,7 @@ using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
-    public class IIElectionStatisticsConfiguration : IEntityTypeConfiguration<ElectionAndPollStatistics>
+    public class IElectionAndPollsStatisticsConfiguration : IEntityTypeConfiguration<ElectionAndPollStatistics>
     {
         public void Configure(EntityTypeBuilder<ElectionAndPollStatistics> builder)
         {
@@ -18,26 +18,23 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .ValueGeneratedOnAdd();
 
-            // Foreign key: ElectionId
-            builder.Property(e => e.ElectionId)
-                .IsRequired();
+
+
 
             builder.HasOne(e => e.Election)
-                .WithMany() // no back navigation
-                .HasForeignKey(e => e.ElectionId)
+                .WithOne(e => e.ElectionAndPollStatistics) 
+                .HasForeignKey<ElectionAndPollStatistics>(e => e.ElectionId)
+                .IsRequired(false) // ElectionId is optional
                 .OnDelete(DeleteBehavior.Restrict);
 
             
-            builder.HasOne(e => e.Governorate)
-                .WithMany() // no back navigation
-                .HasForeignKey(e => e.GovernorateId)
+            builder.HasOne(e => e.Poll)
+                .WithOne(e => e.ElectionAndPollStatistics)
+                .HasForeignKey<ElectionAndPollStatistics>(e => e.PollId)
+                .IsRequired(false) // PollId is optional
                 .OnDelete(DeleteBehavior.Restrict);
 
             
-
-            builder.HasIndex(cp => new { cp.ElectionId, cp.GovernorateId})
-             .IsUnique();
-
             
         }
     }

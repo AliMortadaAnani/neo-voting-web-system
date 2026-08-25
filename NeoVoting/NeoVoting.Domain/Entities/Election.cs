@@ -18,6 +18,8 @@ namespace NeoVoting.Domain.Entities
         public ICollection<Vote> Votes { get; private set; } = new List<Vote>(); // 1 election can have many votes
 
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
+
+        public ElectionAndPollStatistics? ElectionAndPollStatistics { get; private set; }
         private Election()  {}
 
         

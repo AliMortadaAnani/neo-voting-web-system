@@ -12,6 +12,9 @@ namespace NeoVoting.Domain.IdentityEntities
 
         public DateTime? RefreshTokenExpirationDateTime { get; private set; }
 
+        public Candidate? Candidate { get; private set; }
+
+        public Voter? Voter { get; private set; }
         private ApplicationUser()
         { }
 

@@ -11,43 +11,38 @@ namespace NeoVoting.Infrastructure.DbContext
         {
             // Primary key
             builder.HasKey(cp => cp.Id);
-            builder.Property(entity => entity.Id).ValueGeneratedNever();
+            builder.Property(entity => entity.Id).ValueGeneratedOnAdd();
             // Properties
             builder.Property(cp => cp.Goals)
                 .IsRequired()
-                .HasMaxLength(1000); // adjust as needed
+                .HasMaxLength(2000); // adjust as needed
 
             builder.Property(cp => cp.NominationReasons)
                 .IsRequired()
-                .HasMaxLength(1000); // adjust as needed
+                .HasMaxLength(2000); // adjust as needed
 
             builder.Property(cp => cp.ProfilePhotoFilename)
+                .IsRequired(false)
                 .HasMaxLength(500); // optional, allow null
 
             // Relationships
-            builder.HasOne(cp => cp.User)
-                .WithMany() // no back navigation from ApplicationUser
-                .HasForeignKey(cp => cp.UserId)
+            builder.HasOne(cp => cp.Candidate)
+                .WithMany(c => c.CandidateProfiles) 
+                .HasForeignKey(cp => cp.CandidateId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
+
             builder.HasOne(cp => cp.Election)
-                .WithMany() // no back navigation from Election
+                .WithMany(e => e.CandidateProfiles)
                 .HasForeignKey(cp => cp.ElectionId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-            //NO!
-            // Cascade makes sense: if an Election is deleted, its CandidateProfiles should go too
+            
 
-            // Table name and constraints
-            builder.ToTable(tb =>
-            {
-                // Example: ensure Goals and NominationReasons are not empty strings
-                tb.HasCheckConstraint("CK_CandidateProfile_Goals", "LEN([Goals]) > 0");
-                tb.HasCheckConstraint("CK_CandidateProfile_NominationReasons", "LEN([NominationReasons]) > 0");
-            });
+            
 
-            builder.HasIndex(cp => new { cp.ElectionId , cp.UserId })
+            builder.HasIndex(cp => new { cp.ElectionId , cp.CandidateId })
               .IsUnique();
 
             

@@ -1,7 +1,4 @@
-﻿using NeoVoting.Domain.Contracts;
-using System.Text;
-
-namespace NeoVoting.Domain.Entities
+﻿namespace NeoVoting.Domain.Entities
 {
     /// <summary>
     /// Represents the link between a single Vote and a single CandidateProfile.
