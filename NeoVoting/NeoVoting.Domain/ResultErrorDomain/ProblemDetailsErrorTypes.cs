@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 
-namespace NeoVoting.Domain.ErrorHandling
+namespace NeoVoting.Domain.ResultErrorDomain
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     //Government System comments indicate enums specific to government-related functionalities.
@@ -91,6 +91,11 @@ namespace NeoVoting.Domain.ErrorHandling
         CandidateProfile_CreationFailed
     }
 
+    public enum ProblemDetails429ErrorTypes // Too Many Requests
+    {
+        RateLimit_Exceeded
+    }
+
     // ==============================================================================
     // 400 Bad Request (Logic / Validation)
     // ==============================================================================
@@ -149,6 +154,15 @@ namespace NeoVoting.Domain.ErrorHandling
     {
         [JsonPropertyName("type")]
         public new ProblemDetails409ErrorTypes Type { get; set; }
+
+        [JsonIgnore]
+        public new IDictionary<string, object>? Extensions { get; }
+    }
+
+    public class TooManyRequests429ProblemDetails : ProblemDetails
+    {
+        [JsonPropertyName("type")]
+        public new ProblemDetails429ErrorTypes Type { get; set; }
 
         [JsonIgnore]
         public new IDictionary<string, object>? Extensions { get; }

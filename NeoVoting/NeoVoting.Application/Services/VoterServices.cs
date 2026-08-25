@@ -3,7 +3,6 @@ using NeoVoting.Application.NeoVotingDTOs;
 using NeoVoting.Application.RequestDTOs;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Domain.Contracts;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.ErrorHandling;

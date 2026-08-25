@@ -1,4 +1,4 @@
-﻿using NeoVoting.Domain.Contracts;
+﻿using NeoVoting.Domain.RepositoryContracts;
 
 namespace NeoVoting.Infrastructure.DbContext
 {

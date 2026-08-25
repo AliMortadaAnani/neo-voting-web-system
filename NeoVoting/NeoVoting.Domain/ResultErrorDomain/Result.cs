@@ -1,4 +1,4 @@
-﻿namespace NeoVoting.Domain.ErrorHandling
+﻿namespace NeoVoting.Domain.ResultErrorDomain
 {
     public class Result<T>
     {

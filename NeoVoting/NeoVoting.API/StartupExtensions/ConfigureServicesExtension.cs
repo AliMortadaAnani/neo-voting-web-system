@@ -11,7 +11,6 @@ using NeoVoting.Application.Exceptions;
 using NeoVoting.Application.Services;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Application.Validators;
-using NeoVoting.Domain.Contracts;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.IdentityEntities;
@@ -236,7 +235,7 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             builder.Services.AddScoped<IVoteRepository, VoteRepository>();
             builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
-            builder.Services.AddScoped<IElectionStatisticsRepository, ElectionStatisticsRepository>();
+            builder.Services.AddScoped<IElectionAndPollsStatisticsRepository, ElectionStatisticsRepository>();
 
             // Services
             builder.Services.AddScoped<ICurrentUserServices, CurrentUserServices>();

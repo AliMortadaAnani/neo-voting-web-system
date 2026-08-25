@@ -1,4 +1,4 @@
-﻿namespace NeoVoting.Domain.ErrorHandling
+﻿namespace NeoVoting.Domain.ResultErrorDomain
 {
     public enum ErrorType
     {
@@ -8,6 +8,7 @@
         Conflict = 3,     // 409 Already exists / conflict
         Forbidden = 4,    // 403 Not allowed even if authenticated (IP whitelisting...)
         Unauthorized = 5, // 401 not authenticated (No valid cookies,jwt,api keys...)
-        None = 6          // Represents "no error" // return when success
+        TooManyRequests = 6, // 429 Too many requests
+        None = 7          // Represents "no error" // return when success
     }
 }

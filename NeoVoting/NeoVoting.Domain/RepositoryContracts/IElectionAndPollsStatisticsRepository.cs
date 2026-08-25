@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
-    public interface IElectionStatisticsRepository
+    public interface IElectionAndPollsStatisticsRepository
     {
         // governorateId is nullable because it can represent the total registered voters across all governorates when null
         Task<ElectionAndPollStatistics?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int? governorateId, CancellationToken cancellationToken);

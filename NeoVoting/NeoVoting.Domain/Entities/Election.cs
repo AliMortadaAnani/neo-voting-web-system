@@ -1,8 +1,5 @@
-﻿using NeoVoting.Domain.Contracts;
-using NeoVoting.Domain.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using NeoVoting.Domain.Enums;
 using System.Text;
-using static System.Collections.Specialized.BitVector32;
 
 namespace NeoVoting.Domain.Entities
 {

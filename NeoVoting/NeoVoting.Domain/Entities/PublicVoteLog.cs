@@ -10,11 +10,17 @@ namespace NeoVoting.Domain.Entities
     public class PublicVoteLog
     {
         public long Id { get; private set; }
-        public Guid VoteId { get; private set; }
         public DateTime TimestampUTC { get; private set; }
-        public int ElectionId { get; private set; }
-        public string ElectionName { get; private set; } = string.Empty;
-        public GovernorateIdEnum Governorate { get; private set; }
+
+        public Guid? VoteId { get; private set; }
+        public int? ElectionId { get; private set; }
+        public string? ElectionName { get; private set; } = string.Empty;
+        public GovernorateIdEnum? Governorate { get; private set; }
+
+
+        public Guid? PollVoteId { get; private set; }
+        public int? PollId { get; private set; }
+        public string? PollName { get; private set; } = string.Empty;
 
         private PublicVoteLog() { }
 
@@ -23,7 +29,7 @@ namespace NeoVoting.Domain.Entities
         /// <summary>
         /// Creates a new PublicVoteLog instance to record the occurrence of a vote.
         /// </summary>
-        public static PublicVoteLog Create(
+        public static PublicVoteLog CreateElectionVoteLog(
             Guid voteId,
             int electionId,
             GovernorateIdEnum governorate,
@@ -36,10 +42,26 @@ namespace NeoVoting.Domain.Entities
                 ElectionId = electionId,
                 ElectionName = electionName,
                 Governorate = governorate,
+
+                TimestampUTC = DateTime.UtcNow
+            };
+        }
+        public static PublicVoteLog CreatePollVoteLog(
+            Guid pollVoteId,
+            int pollId,
+            string pollName
+            )
+        {
+            return new PublicVoteLog
+            {
+                PollVoteId = pollVoteId,
+                PollId = pollId,
+                PollName = pollName,
+
                 TimestampUTC = DateTime.UtcNow
             };
         }
 
-       
+
     }
 }

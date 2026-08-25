@@ -57,13 +57,32 @@ namespace NeoVoting.Domain.Entities
         }
 
 
-        public void UpdateVerificationHash_AtUserPasswordReset(
-          string newVerificationHash)
-        {
-            if (string.IsNullOrWhiteSpace(newVerificationHash))
-                throw new ArgumentException("New verification hash must not be null, empty, or whitespace.", nameof(newVerificationHash));
+        // when creating a new candidate or voter
+        // user enter his private data (National ID + Token) to verify his identity
+        // the government system will generate a hash of these data and store it in the database
 
-            VerificationHash = newVerificationHash;
+        // in case user want to reset his password, he will enter his private data again to verify his identity
+        // in some cases, the private data may change (e.g., the token may be updated), so the government system will generate a new hash and update it in the database
+        // for that we need to update the verification hash in the database when the user reset his password
+
+        // so we guarantee in all cases that the verification hash in the database is always up to date with the latest private data of the user
+
+        public void UpdateFields_AtUserPasswordReset(
+
+            string firstName,
+            string lastName,
+            DateOnly dateOfBirth,
+            char gender,
+            GovernorateIdEnum governorate,
+            string verificationHash
+            )
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            DateOfBirth = dateOfBirth;
+            Gender = gender;
+            Governorate = governorate;
+            VerificationHash = verificationHash;
         }
 
         public void MarkAsVoted()
