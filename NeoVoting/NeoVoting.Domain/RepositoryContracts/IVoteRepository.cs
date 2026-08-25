@@ -1,23 +1,26 @@
 ﻿using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface IVoteRepository
     {
-        Task<Vote> AddVoteAsync(Vote vote, CancellationToken cancellationToken);
+        void Add(Vote vote);
 
-        void Delete(Vote vote);//in case Voted flag in Government System was not updated correctly to true we will soft delete the Vote
+    
 
-        Task<int> GetCountOfTotalVotesByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
+        Task<int> GetCountOfTotalVotesByElectionIdAsync(int electionId);
 
-        Task<int> GetCountOfVotesByElectionIdAndGenderAsync(Guid electionId, char gender, CancellationToken cancellationToken);
+        Task<int> GetCountOfVotesByElectionIdAndGenderAsync(int electionId, char gender);
 
-        Task<int> GetCountOfVotesByElectionIdAndAgeRangeAsync(Guid electionId, int minAge, int maxAge, CancellationToken cancellationToken);
+        Task<int> GetCountOfVotesByElectionIdAndAgeRangeAsync(int electionId, int minAge, int maxAge);
 
-        Task<int> GetCountOfVotesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
+        Task<int> GetCountOfVotesByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate);
 
-        Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateIdAsync(Guid electionId, char gender, int governorateId, CancellationToken cancellationToken);
+        Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateAsync(int electionId, char gender, GovernorateIdEnum governorate, CancellationToken cancellationToken);
 
-        Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateIdAsync(Guid electionId, int minAge, int maxAge, int governorateId, CancellationToken cancellationToken);
+        Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateAsync(int electionId, int minAge, int maxAge, int governorate);
+
+
     }
 }

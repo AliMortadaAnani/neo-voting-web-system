@@ -19,6 +19,8 @@ namespace NeoVoting.Domain.Entities
         public ICollection<PollAnswer> PollAnswers { get; private set; } = new List<PollAnswer>();
 
         public ICollection<PollVote> PollVotes { get; private set; } = new List<PollVote>();
+
+        public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
         private Poll()
         {
             // Required by EF Core

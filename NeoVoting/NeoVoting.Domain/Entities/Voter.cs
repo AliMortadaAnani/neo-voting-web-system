@@ -23,7 +23,10 @@ namespace NeoVoting.Domain.Entities
 
         public ApplicationUser User { get; private set; }
 
-        public bool HasVoted { get; private set; }
+      //  public bool HasVoted { get; private set; }
+
+
+        public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
         private Voter()
         {
@@ -51,8 +54,7 @@ namespace NeoVoting.Domain.Entities
                 Gender = gender,
                 Governorate = governorate,
                 VerificationHash = verificationHash,
-                UserId = userId,
-                HasVoted = false
+                UserId = userId
             };
         }
 
@@ -85,15 +87,15 @@ namespace NeoVoting.Domain.Entities
             VerificationHash = verificationHash;
         }
 
-        public void MarkAsVoted()
-        {
-            if(HasVoted)
-            {
-                throw new InvalidOperationException("This voter has already voted.");
-            }
+        //public void MarkAsVoted()
+        //{
+        //    if(HasVoted)
+        //    {
+        //        throw new InvalidOperationException("This voter has already voted.");
+        //    }
 
-            HasVoted = true;
+        //    HasVoted = true;
 
-        }
+        //}
     }
 }

@@ -1,29 +1,30 @@
 ﻿using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface ICandidateProfileRepository
     {
 
-        Task<CandidateProfile> AddCandidateProfileAsync(CandidateProfile candidateProfile, CancellationToken cancellationToken);
+        void Add(CandidateProfile candidateProfile);
 
-        Task<CandidateProfile?> GetCandidateProfileByIdAndElectionIdAsync(Guid candidateProfileId, Guid electionId, CancellationToken cancellationToken);
-        Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken);
+        Task<CandidateProfile?> GetByUserIdAndElectionIdAsync(int userId,int electionId);
+        Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(int userId, int electionId);
 
-        Task<CandidateProfile?> GetCandidateProfileByUserIdAndElectionIdAsync(Guid userId, Guid electionId, CancellationToken cancellationToken);
+        Task<List<CandidateProfile>> GetPagedByElectionIdAndGovernorateAsync
+            (int electionId,GovernorateIdEnum governorate, int pageNumber, int pageSize);
 
-        Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken);
+        Task<int> CountByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate);
 
-        Task<int> GetCountOfTotalCandidatesProfilesByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
+        // for stats
 
-        Task<IReadOnlyList<CandidateProfile>> GetPagedCandidatesProfilesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, int skip, int take, CancellationToken cancellationToken);
+        Task<int> CountByElectionIdAsync(int electionId);
+       // Task<int> CountByGovernorateAsync(GovernorateIdEnum governorate); done above
+        Task<int> CountByElectionIdAndGenderAsync(int electionId, char gender);
+        Task<int> CountsByElectionIdAndAgeRangeAsync(int electionId, int minAge, int maxAge);
+        Task<int> CountByElectionIdAndGovernorateAndGenderAsync(int electionId, GovernorateIdEnum governorate, char gender);
+        Task<int> CountByElectionIdAndGovernorateAndAgeRangeAsync(int electionId, GovernorateIdEnum governorate, int minAge, int maxAge);
 
-        Task<int> GetCountOfTotalCandidatesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken);
-
-        void Update(CandidateProfile candidateProfile);
-
-        //for testing and debugging purposes only
-        Task<IReadOnlyList<CandidateProfile>> GetAllCandidatesProfilesByElectionIdAsync(Guid electionId, CancellationToken cancellationToken);
 
     }
 }

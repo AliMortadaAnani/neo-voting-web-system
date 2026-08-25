@@ -1,6 +1,7 @@
 ﻿using NeoVoting.Domain.RepositoryContracts;
+using NeoVoting.Infrastructure.DbContext;
 
-namespace NeoVoting.Infrastructure.DbContext
+namespace NeoVoting.Infrastructure.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
@@ -16,9 +17,9 @@ namespace NeoVoting.Infrastructure.DbContext
         /// The implementation simply delegates the call to the underlying DbContext's SaveChangesAsync method.
         /// This is where the actual database transaction happens.
         /// </summary>
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public Task<int> SaveChangesAsync()
         {
-            return _context.SaveChangesAsync(cancellationToken);
+            return _context.SaveChangesAsync();
         }
 
         /// <summary>

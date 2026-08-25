@@ -1,21 +1,21 @@
 ﻿using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface IVoteChoiceRepository
     {
-        Task<VoteChoice> AddVoteChoiceAsync(VoteChoice voteChoice, CancellationToken cancellationToken);
+        void Add(VoteChoice voteChoice);
 
-        Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(Guid voteId,Guid candidateProfileId , CancellationToken cancellationToken);
+        Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(int voteId,int candidateProfileId);
 
-        void Delete(VoteChoice voteChoice);//in case Voted flag in Government System was not updated correctly to true we will soft delete the VoteChoice
-
+      
 
         //vote count by candidate profile id(which includes election id and governorate id info)
-        Task<int> GetCountOfTotalVoteChoicesByCandidateProfileIdAsync(Guid candidateProfileId, CancellationToken cancellationToken);
+        Task<int> GetCountOfTotalVoteChoicesByCandidateProfileIdAsync(int candidateProfileId);
 
         // winners per governorate id per election id
-        Task<IReadOnlyList<Guid>> GetTop5CandidatesIdsPerGovernorate(Guid electionId,int governorateId,CancellationToken cancellationToken);
+        Task<List<CandidateProfile>> GetTop5CandidatesProfilesPerGovernorate(int electionId,GovernorateIdEnum governorate);
 
 
     }

@@ -1,15 +1,16 @@
 ﻿using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
     public interface IElectionWinnerRepository
     {
 
-        Task<ElectionWinner> AddWinnerAsync(ElectionWinner winner, CancellationToken cancellationToken);
-        Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken);// Not paged since we expect only 25 winners per election
+        void Add(ElectionWinner winner);
+        Task<List<ElectionWinner>> GetAllWinnersByElectionIdAsync(int electionId);// Not paged since we expect only 25 winners per election
 
-        Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateIdAsync(Guid electionId,int governorateId, CancellationToken cancellationToken);// Not paged since we expect only 5 winners per election
+        Task<List<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateAsync
+            (int election,GovernorateIdEnum governorate);// Not paged since we expect only 5 winners per election
 
-        void Update(ElectionWinner winner);
     }
 }

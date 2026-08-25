@@ -1,6 +1,4 @@
-﻿using NeoVoting.Domain.Contracts;
-using NeoVoting.Domain.Enums; // Assuming enums for Governorates are here
-using System.Text;
+﻿using NeoVoting.Domain.Enums; // Assuming enums for Governorates are here
 
 namespace NeoVoting.Domain.Entities
 {
@@ -41,7 +39,7 @@ namespace NeoVoting.Domain.Entities
                 ElectionId = electionId,
                 Governorate = governorate,
                 VoterAge = voterAge,
-                VoterGender = voterGender,
+                VoterGender = char.ToUpper(voterGender),
                 TimestampUTC = DateTime.UtcNow // The timestamp is always set at the moment of creation.
             };
 

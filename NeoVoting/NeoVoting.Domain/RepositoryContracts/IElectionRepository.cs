@@ -5,17 +5,18 @@ namespace NeoVoting.Domain.RepositoryContracts
     public interface IElectionRepository
     {
 
-        Task<Election> AddElectionAsync(Election election, CancellationToken cancellationToken);
+        void Add(Election election);
 
-        Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken);
+        Task<bool> IsActiveElectionExistsAsync();
 
-        Task<IReadOnlyList<Election>> GetAllElectionsAsync(CancellationToken cancellationToken);
-        Task<IReadOnlyList<Election>> GetAllCompletedElectionsAsync(CancellationToken cancellationToken);
-        Task<Election?> GetElectionByIdAsync(Guid electionId, CancellationToken cancellationToken);
+        Task<List<Election>> GetPagedAsync(int pageNumber, int pageSize);
+        
+        Task<int> CountAsync();
+        Task<Election?> GetByIdAsync(int electionId);
+        Task<Election?> GetByNameAsync(string electionName);
 
-        Task<Election?> GetLastUpcomingOrActiveElectionAsync(CancellationToken cancellationToken);
+        Task<Election?> GetActiveElectionAsync();
 
-        void Update(Election election);
 
 
 

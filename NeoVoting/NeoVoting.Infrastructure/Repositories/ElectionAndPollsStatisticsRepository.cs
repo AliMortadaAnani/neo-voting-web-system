@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class ElectionStatisticsRepository (ApplicationDbContext dbContext) : IElectionAndPollsStatisticsRepository
+    public class ElectionAndPollsStatisticsRepository (ApplicationDbContext dbContext) : IElectionAndPollsStatisticsRepository
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
         public async Task<ElectionAndPollStatistics> AddAsync(ElectionAndPollStatistics entity, CancellationToken cancellationToken)

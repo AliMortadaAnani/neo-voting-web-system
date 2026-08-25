@@ -16,6 +16,8 @@ namespace NeoVoting.Domain.Entities
         public ICollection<CandidateProfile> CandidateProfiles { get; private set; } = new List<CandidateProfile>(); // 1 election can have many candidate profiles
 
         public ICollection<Vote> Votes { get; private set; } = new List<Vote>(); // 1 election can have many votes
+
+        public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
         private Election()  {}
 
         
