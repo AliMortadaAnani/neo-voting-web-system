@@ -34,6 +34,7 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _context.Polls
                 .AsNoTracking()
+                .Include(p => p.PollAnswers)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -41,17 +42,28 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<Poll?> GetByIdAsync(int pollId)
         {
-            return await _context.Polls.FindAsync(pollId);
+            return await _context.Polls
+                .Include(p => p.PollAnswers)
+                .FirstOrDefaultAsync(p => p.Id == pollId);
         }
 
         public async Task<Poll?> GetByNameAsync(string pollName)
         {
-            return await _context.Polls.SingleOrDefaultAsync(p => p.Name == pollName);
+            return await _context.Polls
+                .Include(p => p.PollAnswers)
+                .SingleOrDefaultAsync(p => p.Name == pollName);
         }
 
         public async Task<Poll?> GetActivePollAsync()
         {
-            return await _context.Polls.SingleOrDefaultAsync(p => p.Status != StatusEnum.Completed);
+            return await _context.Polls
+                .Include(p => p.PollAnswers)
+                .SingleOrDefaultAsync(p => p.Status != StatusEnum.Completed);
+        }
+
+        public async Task<bool> IsPollNameExistsAsync(string pollName)
+        {
+            return await _context.Polls.AnyAsync(p => p.Name == pollName);
         }
     }
 }

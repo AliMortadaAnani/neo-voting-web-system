@@ -27,5 +27,10 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Where(pa => pa.PollId == pollId)
                 .ToListAsync();
         }
+
+        public async Task<bool> IsPollAnswerExistsAsync(int pollId, string answerText)
+        {
+            return await _context.PollAnswers.AnyAsync(pa => pa.PollId == pollId && pa.Answer == answerText);
+        }
     }
 }

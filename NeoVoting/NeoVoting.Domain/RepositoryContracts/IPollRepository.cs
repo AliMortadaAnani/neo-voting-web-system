@@ -12,6 +12,8 @@ namespace NeoVoting.Domain.RepositoryContracts
         void Add(Poll poll);
 
         Task<bool> IsActivePollExistsAsync();
+
+        Task<bool> IsPollNameExistsAsync(string pollName);
         Task<int> CountAsync();
 
         Task<List<Poll>> GetPagedAsync(int pageNumber, int pageSize);

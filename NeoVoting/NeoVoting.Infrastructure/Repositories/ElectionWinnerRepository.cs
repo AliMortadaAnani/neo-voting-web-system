@@ -50,5 +50,11 @@ namespace NeoVoting.Infrastructure.Repositories
                             ew.CandidateProfile.Candidate.Governorate == governorate)
                 .ToListAsync();
         }
+
+        public Task<bool> IsCandidateProfileWinnerExistByElectionIdAsync(int electionId, int candidateProfileId)
+        {
+            return _context.ElectionWinners
+                .AnyAsync(ew => ew.CandidateProfileId == candidateProfileId && ew.CandidateProfile.ElectionId == electionId);
+        }
     }
 }

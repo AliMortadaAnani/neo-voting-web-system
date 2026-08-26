@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NeoVoting.Domain.Entities
 {
-    public class ElectionAndPollStatistics
+    public class ElectionStatistics
     {
         // E : Election  P : Poll  EP : Election and Poll Statistics
         // since Elections reveals who the people want as Representatives then statistics are highly relevant
@@ -13,19 +13,14 @@ namespace NeoVoting.Domain.Entities
         //Age,Gender,Governorate, etc. then statistics are not needed in this case
 
         public int Id { get; set; } //ep
-        public int? PollId { get; set; } //p
-
-        public int? POLL_RegisteredVotersCount { get; set; } //ep // calculated at the end of the election/poll
-        public int? POLL_ActualVotersCount { get; set; } //ep // from Vote tables
-        public double? POLL_ParticipationPercentage { get; set; } //ep
-        public Poll? Poll { get; set; }
+ 
 
 
-        public int? ElectionId { get; set; } //e
+        public int ElectionId { get; set; } //e
         public GovernorateIdEnum? Governorate { get; set; } //e 
         // if Governorate is null then it means the statistics are for the whole country, otherwise they are for a specific governorate
 
-        public Election? Election { get; set; }
+        public Election Election { get; set; }
 
         // ==================================================================
         // 1. RAW COUNTS (Nullable)
@@ -116,11 +111,9 @@ namespace NeoVoting.Domain.Entities
 
         
 
-        // Private constructor for EF Core
-        public ElectionAndPollStatistics()
+        public ElectionStatistics()
         {
             Election = null!;
-            Poll = null!;
         }
     }
 }

@@ -32,7 +32,8 @@ namespace NeoVoting.Infrastructure.DbContext
    
         public DbSet<SystemAuditLog> SystemAuditLogs { get; set; }
 
-        public DbSet<ElectionAndPollStatistics> ElectionRegisteredVotersPerGovernorates { get; set; }
+        public DbSet<ElectionStatistics> Election_Statistics { get; set; }
+        public DbSet<PollStatistics> Poll_Statistics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

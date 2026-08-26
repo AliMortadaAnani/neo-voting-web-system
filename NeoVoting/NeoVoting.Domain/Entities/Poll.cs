@@ -24,7 +24,7 @@ namespace NeoVoting.Domain.Entities
 
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
-        public ElectionAndPollStatistics? ElectionAndPollStatistics { get; private set; }
+        public PollStatistics? PollStatistics { get; private set; }
         private Poll()
         {
             // Required by EF Core

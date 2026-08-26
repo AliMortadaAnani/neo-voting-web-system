@@ -68,7 +68,9 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<Vote?> GetByVoteId(Guid voteId)
         {
-            return await _context.Votes.FindAsync(voteId);
+            return await _context.Votes
+               
+                .FindAsync(voteId);
         }
 
         public async Task<List<Vote>> GetPagedByElectionIdAsync(int electionId, int pageNumber, int pageSize)

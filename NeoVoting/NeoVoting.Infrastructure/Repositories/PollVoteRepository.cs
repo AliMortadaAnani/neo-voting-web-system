@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
@@ -27,24 +28,30 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<PollVote?> GetByPollVoteIdAsync(Guid pollVoteId)
         {
             return await _context.PollVotes
+          
                 .FindAsync(pollVoteId);
         }
 
         public async Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize)
         {
             return await _context.PollVotes
+                .AsNoTracking()
                 .Where(pv => pv.PollId == pollId)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<List<PollAnswer>> GetResultsAsyncByPollId(int pollId)
+        public async Task<List<PollResultBucketDto>> GetResultsAsyncByPollId(int pollId)
         {
-            // Assuming this means get all answers with their votes included to calculate results
             return await _context.PollAnswers
-                .Include(pa => pa.PollVotes)
+                .AsNoTracking()
                 .Where(pa => pa.PollId == pollId)
+                .Select(pa => new PollResultBucketDto
+                {
+                    Answer = pa,
+                    VoteCount = pa.PollVotes.Count // EF Core handles this as a LEFT JOIN with a COUNT
+                })
                 .ToListAsync();
         }
 
@@ -53,6 +60,7 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.PollAnswers
                 .Where(pa => pa.PollId == pollId)
                 .OrderByDescending(pa => pa.PollVotes.Count)
+                .ThenBy(cp => Guid.NewGuid())
                 .FirstOrDefaultAsync();
         }
     }

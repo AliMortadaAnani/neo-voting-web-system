@@ -63,7 +63,16 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<Voter?> GetByVerificationHashAsync(string verificationHash)
         {
-            return await _context.Voters.FirstOrDefaultAsync(v => v.VerificationHash == verificationHash);
+            return await _context.Voters
+                .Include(v => v.User)
+                .FirstOrDefaultAsync(v => v.VerificationHash == verificationHash);
+        }
+
+        public async Task<Voter?> GetByUserIdAsync(int userId)
+        {
+            return await _context.Voters
+                .Include(v => v.User)
+                .FirstOrDefaultAsync(v => v.UserId == userId);
         }
 
         public void Add(Voter voter)

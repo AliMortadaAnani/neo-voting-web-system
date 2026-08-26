@@ -22,12 +22,13 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<bool> IsActiveElectionExistsAsync()
         {
-            return await _context.Elections.AnyAsync(e => e.Status == StatusEnum.Voting);
+            return await _context.Elections.AnyAsync(e => e.Status != StatusEnum.Completed);
         }
 
         public async Task<List<Election>> GetPagedAsync(int pageNumber, int pageSize)
         {
             return await _context.Elections
+                .AsNoTracking()
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -50,7 +51,12 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<Election?> GetActiveElectionAsync()
         {
-            return await _context.Elections.FirstOrDefaultAsync(e => e.Status == StatusEnum.Voting);
+            return await _context.Elections.FirstOrDefaultAsync(e => e.Status != StatusEnum.Completed);
+        }
+
+        public async Task<bool> IsElectionNameExistsAsync(string electionName)
+        {
+            return await _context.Elections.AnyAsync(e => e.Name == electionName);
         }
     }
 }

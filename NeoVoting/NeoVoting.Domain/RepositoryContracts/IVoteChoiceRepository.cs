@@ -7,7 +7,7 @@ namespace NeoVoting.Domain.RepositoryContracts
     {
         void Add(VoteChoice voteChoice);
 
-        Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(int voteId,int candidateProfileId);
+        Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(Guid voteId,int candidateProfileId);
 
       
 

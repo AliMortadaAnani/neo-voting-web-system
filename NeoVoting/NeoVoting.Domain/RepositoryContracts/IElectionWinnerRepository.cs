@@ -7,6 +7,8 @@ namespace NeoVoting.Domain.RepositoryContracts
     {
 
         void Add(ElectionWinner winner);
+
+        Task<bool> IsCandidateProfileWinnerExistByElectionIdAsync(int electionId, int candidateProfileId);
         Task<List<ElectionWinner>> GetAllWinnersByElectionIdAsync(int electionId);// Not paged since we expect only 25 winners per election
 
         Task<List<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateAsync

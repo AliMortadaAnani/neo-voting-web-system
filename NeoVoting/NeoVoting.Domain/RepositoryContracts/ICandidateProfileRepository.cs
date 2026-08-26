@@ -8,8 +8,8 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         void Add(CandidateProfile candidateProfile);
 
-        Task<CandidateProfile?> GetByUserIdAndElectionIdAsync(int userId,int electionId);
-        Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(int userId, int electionId);
+        Task<CandidateProfile?> GetByCandidateIdAndElectionIdAsync(int candidateId, int electionId);
+        Task<bool> IsCandidateProfileExistsByCandidateIdAndElectionIdAsync(int candidateId, int electionId);
 
         Task<List<CandidateProfile>> GetPagedByElectionIdAndGovernorateAsync
             (int electionId,GovernorateIdEnum governorate, int pageNumber, int pageSize);

@@ -20,23 +20,24 @@ namespace NeoVoting.Infrastructure.Repositories
             _context.CandidateProfiles.Add(candidateProfile);
         }
 
-        public async Task<CandidateProfile?> GetByUserIdAndElectionIdAsync(int userId, int electionId)
+        public async Task<CandidateProfile?> GetByCandidateIdAndElectionIdAsync(int candidateId, int electionId)
         {
             return await _context.CandidateProfiles
                 .Include(cp => cp.Candidate)
-                .FirstOrDefaultAsync(cp => cp.Candidate.UserId == userId && cp.ElectionId == electionId);
+                .FirstOrDefaultAsync(cp => cp.CandidateId == candidateId && cp.ElectionId == electionId);
         }
 
-        public async Task<bool> IsCandidateProfileExistsByUserIdAndElectionIdAsync(int userId, int electionId)
+        public async Task<bool> IsCandidateProfileExistsByCandidateIdAndElectionIdAsync(int candidateId, int electionId)
         {
             return await _context.CandidateProfiles
-                .AnyAsync(cp => cp.Candidate.UserId == userId && cp.ElectionId == electionId);
+                .AnyAsync(cp => cp.CandidateId == candidateId && cp.ElectionId == electionId);
         }
 
         public async Task<List<CandidateProfile>> GetPagedByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate, int pageNumber, int pageSize)
         {
             return await _context.CandidateProfiles
                 .Include(cp => cp.Candidate)
+                .AsNoTracking()
                 .Where(cp => cp.ElectionId == electionId && cp.Candidate.Governorate == governorate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

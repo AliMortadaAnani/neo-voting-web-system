@@ -1,4 +1,5 @@
-﻿using NeoVoting.Domain.Entities;
+﻿using NeoVoting.Domain.EF_DTOs;
+using NeoVoting.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +16,8 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<PollVote?> GetByPollVoteIdAsync(Guid pollVoteId);
 
         Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize);
-        
-        Task<List<PollAnswer>> GetResultsAsyncByPollId(int pollId);
+
+        Task<List<PollResultBucketDto>> GetResultsAsyncByPollId(int pollId);
 
         Task<PollAnswer?> GetWinnerAnswerByPollIdAsync(int pollId);
     }

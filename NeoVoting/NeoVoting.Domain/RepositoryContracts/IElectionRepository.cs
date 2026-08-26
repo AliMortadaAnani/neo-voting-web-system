@@ -8,7 +8,7 @@ namespace NeoVoting.Domain.RepositoryContracts
         void Add(Election election);
 
         Task<bool> IsActiveElectionExistsAsync();
-
+        Task<bool> IsElectionNameExistsAsync(string electionName);
         Task<List<Election>> GetPagedAsync(int pageNumber, int pageSize);
         
         Task<int> CountAsync();

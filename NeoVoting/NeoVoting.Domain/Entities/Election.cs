@@ -19,7 +19,9 @@ namespace NeoVoting.Domain.Entities
 
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
-        public ElectionAndPollStatistics? ElectionAndPollStatistics { get; private set; }
+        public ICollection<ElectionStatistics> ElectionStatisticsList { get; private set; } = new List<ElectionStatistics>();
+        // each election can have many election statistics, global and per governorate 
+
         private Election()  {}
 
         

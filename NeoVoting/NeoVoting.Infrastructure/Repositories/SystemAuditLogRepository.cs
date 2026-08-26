@@ -23,6 +23,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<List<SystemAuditLog>> GetPagedSystemAuditLogsAsync(int pageNumber, int pageSize)
         {
             return await _context.SystemAuditLogs
+                .AsNoTracking()
                 .OrderByDescending(s => s.TimestampUTC)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -37,6 +38,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<List<SystemAuditLog>> GetPagedByActionTypeAsync(SystemActionTypesEnum systemAction, int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
             return await _context.SystemAuditLogs
+                .AsNoTracking()
                 .Where(s => s.ActionType == systemAction)
                 .OrderByDescending(s => s.TimestampUTC)
                 .Skip((pageNumber - 1) * pageSize)
@@ -52,6 +54,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<List<SystemAuditLog>> GetPagedByAdminIdAsync(int adminId, int pageNumber, int pageSize)
         {
             return await _context.SystemAuditLogs
+                .AsNoTracking()
                 .Where(s => s.AdminId == adminId)
                 .OrderByDescending(s => s.TimestampUTC)
                 .Skip((pageNumber - 1) * pageSize)
