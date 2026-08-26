@@ -8,95 +8,60 @@ namespace NeoVoting.Infrastructure.Repositories
 {
     public class SystemAuditLogRepository : ISystemAuditLogRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _context;
 
-        public SystemAuditLogRepository(ApplicationDbContext dbContext)
+        public SystemAuditLogRepository(ApplicationDbContext context)
         {
-            _dbContext = dbContext;
+            _context = context;
         }
 
-        public async Task<SystemAuditLog> AddSystemAuditLogAsync(SystemAuditLog log, CancellationToken cancellationToken)
+        public void Add(SystemAuditLog log)
         {
-            await _dbContext.SystemAuditLogs.AddAsync(log, cancellationToken);
-            return log;
+            _context.SystemAuditLogs.Add(log);
         }
 
-        public async Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogsByUserIdAsync(Guid UserId, CancellationToken cancellationToken)
+        public async Task<List<SystemAuditLog>> GetPagedSystemAuditLogsAsync(int pageNumber, int pageSize)
         {
-            return await _dbContext.SystemAuditLogs
-                
-                
-                .Where(l => l.UserId == UserId)
-                .OrderByDescending(l => l.TimestampUTC)
-                .AsNoTracking()
+            return await _context.SystemAuditLogs
+                .OrderByDescending(s => s.TimestampUTC)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _context.SystemAuditLogs.CountAsync();
+        }
+
+        public async Task<List<SystemAuditLog>> GetPagedByActionTypeAsync(SystemActionTypesEnum systemAction, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        {
+            return await _context.SystemAuditLogs
+                .Where(s => s.ActionType == systemAction)
+                .OrderByDescending(s => s.TimestampUTC)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<IReadOnlyList<SystemAuditLog>> GetAllSystemAuditLogsAsync(CancellationToken cancellationToken)
+        public async Task<int> CountByActionTypeAsync(SystemActionTypesEnum systemAction)
         {
-            return await _dbContext.SystemAuditLogs
-               
-                .OrderByDescending(l => l.TimestampUTC)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            return await _context.SystemAuditLogs.CountAsync(s => s.ActionType == systemAction);
         }
 
-        public async Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsAsync(int skip, int take, CancellationToken cancellationToken)
+        public async Task<List<SystemAuditLog>> GetPagedByAdminIdAsync(int adminId, int pageNumber, int pageSize)
         {
-            return await _dbContext.SystemAuditLogs
-                
-                .OrderByDescending(l => l.TimestampUTC)
-                .Skip(skip)
-                .Take(take)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            return await _context.SystemAuditLogs
+                .Where(s => s.AdminId == adminId)
+                .OrderByDescending(s => s.TimestampUTC)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
-        public async Task<int> GetCountOfTotalSystemAuditLogsAsync(CancellationToken cancellationToken)
+        public async Task<int> CountByAdminIdAsync(int adminId)
         {
-            return await _dbContext.SystemAuditLogs.CountAsync(cancellationToken);
-        }
-
-        public async Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByActionTypeAsync(SystemActionTypesEnum systemAction, int skip, int take, CancellationToken cancellationToken)
-        {
-            return await _dbContext.SystemAuditLogs
-               
-                .Where(l => l.ActionType == systemAction)
-                .OrderByDescending(l => l.TimestampUTC)
-                .Skip(skip)
-                .Take(take)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<int> GetCountOfTotalSystemAuditLogsByActionTypeAsync(SystemActionTypesEnum systemAction, CancellationToken cancellationToken)
-        {
-            return await _dbContext.SystemAuditLogs
-               
-                .Where(l => l.ActionType == systemAction)
-                .CountAsync(cancellationToken);
-        }
-
-
-
-        public async Task<IReadOnlyList<SystemAuditLog>> GetPagedSystemAuditLogsByElectionIdAsync(Guid electionId, int skip, int take, CancellationToken cancellationToken)
-        {
-            return await _dbContext.SystemAuditLogs
-                
-                .Where(l => l.ElectionId == electionId)
-                .OrderByDescending(l => l.TimestampUTC)
-                .Skip(skip)
-                .Take(take)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<int> GetCountOfTotalSystemAuditLogsByElectionIdAsync(Guid electionId, CancellationToken cancellationToken)
-        {
-            return await _dbContext.SystemAuditLogs
-                
-                .Where(l => l.ElectionId == electionId)
-                .CountAsync(cancellationToken);
+            return await _context.SystemAuditLogs.CountAsync(s => s.AdminId == adminId);
         }
     }
 }

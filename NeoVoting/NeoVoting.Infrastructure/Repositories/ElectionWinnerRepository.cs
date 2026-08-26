@@ -1,47 +1,54 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class ElectionWinnerRepository(ApplicationDbContext dbContext) : IElectionWinnerRepository
+    public class ElectionWinnerRepository : IElectionWinnerRepository
     {
-        private readonly ApplicationDbContext _dbContext = dbContext;
+        private readonly ApplicationDbContext _context;
 
-        public async Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+        public ElectionWinnerRepository(ApplicationDbContext context)
         {
-            return await _dbContext.ElectionWinners
-                .Include(w => w.CandidateProfile)
-                    .ThenInclude(cp => cp.User)
-                .Where(w => w.CandidateProfile.ElectionId == ElectionId)
-                .OrderByDescending(w => w.VoteCount)
-                    .ThenBy(w => w.CandidateProfile.User.UserName)
+            _context = context;
+        }
+
+        public void Add(ElectionWinner winner)
+        {
+            _context.ElectionWinners.Add(winner);
+        }
+
+        public async Task<List<ElectionWinner>> GetAllWinnersByElectionIdAsync(int electionId)
+        {
+            return await _context.ElectionWinners
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                // 1. Grab CandidateProfile, then its Candidate, then its User
+                .Include(ew => ew.CandidateProfile)
+                    .ThenInclude(profile => profile.Candidate)
+                        .ThenInclude(candidate => candidate.User)
+                // 2. Grab CandidateProfile again to get the Election
+                .Include(ew => ew.CandidateProfile)
+                    .ThenInclude(profile => profile.Election)
+                .Where(ew => ew.CandidateProfile.ElectionId == electionId)
+                .ToListAsync();
         }
 
-        public async Task<ElectionWinner> AddWinnerAsync(ElectionWinner winner, CancellationToken cancellationToken)
+        public async Task<List<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate)
         {
-            await _dbContext.ElectionWinners.AddAsync(winner, cancellationToken);
-            return winner;
-        }
-
-        public void Update(ElectionWinner winner)
-        {
-            _dbContext.ElectionWinners.Update(winner);
-        }
-
-        public async Task<IReadOnlyList<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
-        {
-            return await _dbContext.ElectionWinners
-                .Include(w => w.CandidateProfile)
-                    .ThenInclude(cp => cp.User)
-                .Where(w => w.CandidateProfile.ElectionId == electionId && w.CandidateProfile.User.GovernorateId == governorateId)
-                .OrderByDescending(w => w.VoteCount)
-                    .ThenBy(w => w.CandidateProfile.User.UserName)
+            return await _context.ElectionWinners
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                // 1. Grab CandidateProfile, then its Candidate, then its User
+                .Include(ew => ew.CandidateProfile)
+                    .ThenInclude(profile => profile.Candidate)
+                        .ThenInclude(candidate => candidate.User)
+                // 2. Grab CandidateProfile again to get the Election
+                .Include(ew => ew.CandidateProfile)
+                    .ThenInclude(profile => profile.Election)
+                .Where(ew => ew.CandidateProfile.ElectionId == electionId &&
+                            ew.CandidateProfile.Candidate.Governorate == governorate)
+                .ToListAsync();
         }
     }
 }

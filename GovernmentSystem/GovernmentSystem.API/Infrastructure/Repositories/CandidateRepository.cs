@@ -50,11 +50,11 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
         {
             _logger.LogInformation("CandidateRepository: Fetching paged candidates - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
             var candidates = _dbContext.Candidates
+                 .AsNoTracking()
                  .Include(v => v.Citizen)
                  .OrderBy(v => v.Id)
                  .Skip((pageNumber - 1) * pageSize)
                  .Take(pageSize)
-                 .AsNoTracking()
                  .ToListAsync();
             return candidates;
         }

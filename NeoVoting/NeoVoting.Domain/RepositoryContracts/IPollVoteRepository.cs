@@ -12,7 +12,7 @@ namespace NeoVoting.Domain.RepositoryContracts
         void Add(PollVote vote);
 
         Task<int> CountByPollIdAsync(int pollId);
-        Task<PollVote?> GetByPollIdAndPollVoteIdAsync(int pollId, int pollVoteId);
+        Task<PollVote?> GetByPollVoteIdAsync(Guid pollVoteId);
 
         Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize);
         

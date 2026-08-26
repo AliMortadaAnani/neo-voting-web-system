@@ -9,6 +9,11 @@ namespace NeoVoting.Domain.RepositoryContracts
 
     
         Task<bool> IsVoteChoicesForVoteEqualFive(Vote vote); 
+
+        Task<Vote?> GetByVoteId(Guid voteId);
+
+        Task<List<Vote>> GetPagedByElectionIdAsync(int electionId, int pageNumber, int pageSize);
+
         Task<int> GetCountOfTotalVotesByElectionIdAsync(int electionId);
 
         Task<int> GetCountOfVotesByElectionIdAndGenderAsync(int electionId, char gender);
@@ -17,9 +22,9 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<int> GetCountOfVotesByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate);
 
-        Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateAsync(int electionId, char gender, GovernorateIdEnum governorate, CancellationToken cancellationToken);
+        Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateAsync(int electionId, char gender, GovernorateIdEnum governorate);
 
-        Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateAsync(int electionId, int minAge, int maxAge, int governorate);
+        Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateAsync(int electionId, int minAge, int maxAge, GovernorateIdEnum governorate);
 
 
     }

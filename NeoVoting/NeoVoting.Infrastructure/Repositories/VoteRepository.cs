@@ -1,112 +1,85 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class VoteRepository(ApplicationDbContext dbContext) : IVoteRepository
+    public class VoteRepository : IVoteRepository
     {
-        private readonly ApplicationDbContext _dbContext = dbContext;
+        private readonly ApplicationDbContext _context;
 
-        public async Task<Vote> AddVoteAsync(Vote vote, CancellationToken cancellationToken)
+        public VoteRepository(ApplicationDbContext context)
         {
-            await _dbContext.Votes.AddAsync(vote, cancellationToken);
-            return vote;
+            _context = context;
         }
 
-        public void Delete(Vote vote)
+        public void Add(Vote vote)
         {
-            _dbContext.Votes.Remove(vote); // soft deleted
+            _context.Votes.Add(vote);
         }
 
-      
-        public async Task<int> GetCountOfTotalVotesByElectionIdAsync(Guid ElectionId, CancellationToken cancellationToken)
+        public async Task<bool> IsVoteChoicesForVoteEqualFive(Vote vote)
         {
-            return await _dbContext.Votes.CountAsync(v => v.ElectionId == ElectionId, cancellationToken);
+            // Relies on VoteChoices being loaded or checking against the DB
+            return await _context.VoteChoices.CountAsync(vc => vc.VoteId == vote.Id) == 5;
         }
 
-
-    
-
-
-        public async Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateIdAsync(Guid electionId, char gender, int governorateId, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfTotalVotesByElectionIdAsync(int electionId)
         {
-            char normalizedGender = char.ToUpper(gender);
-            return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender && v.GovernorateId == governorateId, cancellationToken);
+            return await _context.Votes.CountAsync(v => v.ElectionId == electionId);
         }
 
-        public async Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateIdAsync(Guid electionId, int minAge, int maxAge, int governorateId, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfVotesByElectionIdAndGenderAsync(int electionId, char gender)
         {
-            return await _dbContext.Votes
+            return await _context.Votes.CountAsync(v => v.ElectionId == electionId && v.VoterGender == gender);
+        }
+
+        public async Task<int> GetCountOfVotesByElectionIdAndAgeRangeAsync(int electionId, int minAge, int maxAge)
+        {
+            return await _context.Votes
+                .CountAsync(v => v.ElectionId == electionId && v.VoterAge >= minAge && v.VoterAge <= maxAge);
+        }
+
+        public async Task<int> GetCountOfVotesByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate)
+        {
+            return await _context.Votes
+                .CountAsync(v => v.ElectionId == electionId && v.Governorate == governorate);
+        }
+
+        public async Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateAsync(int electionId, char gender, GovernorateIdEnum governorate)
+        {
+            return await _context.Votes
                 .CountAsync(v => v.ElectionId == electionId &&
-                                 v.VoterAge >= minAge && v.VoterAge <= maxAge &&
-                                 v.GovernorateId == governorateId, cancellationToken);
+                                 v.VoterGender == gender &&
+                                 v.Governorate == governorate);
         }
 
-        public async Task<int> GetCountOfVotesByElectionIdAndGenderAsync(Guid electionId, char gender, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateAsync(int electionId, int minAge, int maxAge, GovernorateIdEnum governorate)
         {
-            char normalizedGender = char.ToUpper(gender);
-            return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId && v.VoterGender == normalizedGender, cancellationToken);
-        }
-
-        public async Task<int> GetCountOfVotesByElectionIdAndAgeRangeAsync(Guid electionId, int minAge, int maxAge, CancellationToken cancellationToken)
-        {
-          return await _dbContext.Votes
+            
+            return await _context.Votes
                 .CountAsync(v => v.ElectionId == electionId &&
-                                 v.VoterAge >= minAge && v.VoterAge <= maxAge, cancellationToken);
+                                 v.VoterAge >= minAge &&
+                                 v.VoterAge <= maxAge &&
+                                 v.Governorate == governorate);
         }
 
-        public async Task<int> GetCountOfVotesByElectionIdAndGovernorateIdAsync(Guid electionId, int governorateId, CancellationToken cancellationToken)
+        public async Task<Vote?> GetByVoteId(Guid voteId)
         {
-            return await _dbContext.Votes
-                .CountAsync(v => v.ElectionId == electionId && v.GovernorateId == governorateId, cancellationToken);
+            return await _context.Votes.FindAsync(voteId);
         }
-        #region Soft Delete Demonstration
 
-        /*
-         // SCENARIO 1: The Standard Delete
-    // You call Remove, but the DbContext Interceptor converts it to Soft Delete
-    public void Delete(Vote vote)
-    {
-        _dbContext.Votes.Remove(vote);
-    }
-
-    // SCENARIO 2: Standard Get
-    // Automatically EXCLUDES deleted items because of Global Query Filter
-    public async Task<IReadOnlyList<Vote>> GetAllActiveVotesAsync(Guid electionId, CancellationToken ct)
-    {
-        return await _dbContext.Votes
-            .Where(v => v.ElectionId == electionId)
-            .AsNoTracking()
-            .ToListAsync(ct);
-        // SQL generated will include: "WHERE IsDeleted = 0 AND ElectionId = ..."
-    }
-
-    // SCENARIO 3: Admin/Audit Get
-    // We want to see EVERYTHING (Active + Deleted)
-    public async Task<IReadOnlyList<Vote>> GetAllVotesIncludingDeletedAsync(Guid electionId, CancellationToken ct)
-    {
-        return await _dbContext.Votes
-            .IgnoreQueryFilters() // <--- This disables the automatic "IsDeleted = 0" check
-            .Where(v => v.ElectionId == electionId)
-            .AsNoTracking()
-            .ToListAsync(ct);
-    }
-
-    // SCENARIO 4: Get ONLY Deleted items (e.g., for a "Recycle Bin" view)
-    public async Task<IReadOnlyList<Vote>> GetOnlyDeletedVotesAsync(Guid electionId, CancellationToken ct)
-    {
-        return await _dbContext.Votes
-            .IgnoreQueryFilters() // First, disable the automatic filter
-            .Where(v => v.ElectionId == electionId && v.IsDeleted == true) // Then explicitly ask for deleted
-            .AsNoTracking()
-            .ToListAsync(ct);
-    }
-         */
-
-        #endregion Soft Delete Demonstration
+        public async Task<List<Vote>> GetPagedByElectionIdAsync(int electionId, int pageNumber, int pageSize)
+        {
+            return await _context.Votes
+                .AsNoTracking()
+                .Where(v => v.ElectionId == electionId)
+                .OrderByDescending(v => v.TimestampUTC) // Assuming you want to order by timestamp
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }
 }

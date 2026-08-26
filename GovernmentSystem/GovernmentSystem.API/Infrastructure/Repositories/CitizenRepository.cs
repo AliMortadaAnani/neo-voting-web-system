@@ -38,10 +38,10 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
         {
             _logger.LogInformation("CitizenRepository: Fetching paged citizens - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
             return _dbContext.Citizens
+                .AsNoTracking()
                 .OrderBy(c => c.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .AsNoTracking()
                 .ToListAsync();
         }
 

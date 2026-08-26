@@ -6,62 +6,51 @@ using NeoVoting.Infrastructure.DbContext;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class ElectionRepository(ApplicationDbContext dbContext) : IElectionRepository
+    public class ElectionRepository : IElectionRepository
     {
-        private readonly ApplicationDbContext _dbContext = dbContext;
+        private readonly ApplicationDbContext _context;
 
-        public async Task<Election> AddElectionAsync(Election election, CancellationToken cancellationToken)
+        public ElectionRepository(ApplicationDbContext context)
         {
-            await _dbContext.Elections.AddAsync(election, cancellationToken);
-            return election;
+            _context = context;
         }
 
-        public async Task<IReadOnlyList<Election>> GetAllElectionsAsync(CancellationToken cancellationToken)
+        public void Add(Election election)
         {
-            return await _dbContext.Elections
-                .Include(e => e.ElectionStatus)
-                .OrderByDescending(e => e.VotingEndDate)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            _context.Elections.Add(election);
         }
 
-        public async Task<Election?> GetElectionByIdAsync(Guid electionId, CancellationToken cancellationToken)
+        public async Task<bool> IsActiveElectionExistsAsync()
         {
-            return await _dbContext.Elections
-                .Include(e => e.ElectionStatus)
-                .FirstOrDefaultAsync(e => e.Id == electionId, cancellationToken);
+            return await _context.Elections.AnyAsync(e => e.Status == StatusEnum.Voting);
         }
 
-        public void Update(Election election)
+        public async Task<List<Election>> GetPagedAsync(int pageNumber, int pageSize)
         {
-            _dbContext.Elections.Update(election);
-        }
- 
-
-        public async Task<Election?> GetLastUpcomingOrActiveElectionAsync(CancellationToken cancellationToken)
-        {
-            return await _dbContext.Elections
-                .Include(e => e.ElectionStatus)
-                .Where(e => e.ElectionStatusId != (int)StatusEnum.Completed)
-                .OrderByDescending(e => e.VotingEndDate)
-                .FirstOrDefaultAsync(cancellationToken);
+            return await _context.Elections
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
-
-        public async Task<bool> IsActiveElectionExistsAsync(CancellationToken cancellationToken)
+        public async Task<int> CountAsync()
         {
-            return await _dbContext.Elections
-               .AnyAsync(e => e.ElectionStatusId != (int)StatusEnum.Completed, cancellationToken);
+            return await _context.Elections.CountAsync();
         }
 
-        public async Task<IReadOnlyList<Election>> GetAllCompletedElectionsAsync(CancellationToken cancellationToken)
+        public async Task<Election?> GetByIdAsync(int electionId)
         {
-            return await _dbContext.Elections
-                .Include(e => e.ElectionStatus)
-                .Where(e => e.ElectionStatusId == (int)StatusEnum.Completed)
-                .OrderByDescending(e => e.VotingEndDate)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            return await _context.Elections.FindAsync(electionId);
+        }
+
+        public async Task<Election?> GetByNameAsync(string electionName)
+        {
+            return await _context.Elections.FirstOrDefaultAsync(e => e.Name == electionName);
+        }
+
+        public async Task<Election?> GetActiveElectionAsync()
+        {
+            return await _context.Elections.FirstOrDefaultAsync(e => e.Status == StatusEnum.Voting);
         }
     }
 }

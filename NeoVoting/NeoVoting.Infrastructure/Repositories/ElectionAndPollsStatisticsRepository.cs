@@ -2,27 +2,47 @@
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.Repositories
 {
-    public class ElectionAndPollsStatisticsRepository (ApplicationDbContext dbContext) : IElectionAndPollsStatisticsRepository
+    public class ElectionAndPollsStatisticsRepository : IElectionAndPollsStatisticsRepository
     {
-        private readonly ApplicationDbContext _dbContext = dbContext;
-        public async Task<ElectionAndPollStatistics> AddAsync(ElectionAndPollStatistics entity, CancellationToken cancellationToken)
+        private readonly ApplicationDbContext _context;
+
+        public ElectionAndPollsStatisticsRepository(ApplicationDbContext context)
         {
-           await _dbContext.ElectionRegisteredVotersPerGovernorates.AddAsync(entity, cancellationToken);
-            return entity;
+            _context = context;
         }
-        // governorateId is nullable because it can represent the total registered voters across all governorates when null
-        public async Task<ElectionAndPollStatistics?> GetByElectionIdAndGovernorateIdAsync(Guid electionId, int? governorateId, CancellationToken cancellationToken)
+
+        public async Task<ElectionAndPollStatistics?> GetByElectionIdAsync(int electionId)
         {
-            return await _dbContext.ElectionRegisteredVotersPerGovernorates
-                .FirstOrDefaultAsync(erpg => erpg.ElectionId == electionId && erpg.GovernorateId == governorateId, cancellationToken);
+            return await _context.ElectionRegisteredVotersPerGovernorates
+                .FirstOrDefaultAsync(eps => eps.ElectionId == electionId);
+        }
+
+        public async Task<ElectionAndPollStatistics?> GetByPollIdAsync(int pollId)
+        {
+            return await _context.ElectionRegisteredVotersPerGovernorates
+                .FirstOrDefaultAsync(eps => eps.PollId == pollId);
+        }
+
+        public async Task<ElectionAndPollStatistics?> GetByElectionNameAsync(string electionName)
+        {
+            return await _context.ElectionRegisteredVotersPerGovernorates
+                .Include(eps => eps.Election)
+                .FirstOrDefaultAsync(eps => eps.Election != null && eps.Election.Name == electionName);
+        }
+
+        public async Task<ElectionAndPollStatistics?> GetByPollNameAsync(string pollName)
+        {
+            return await _context.ElectionRegisteredVotersPerGovernorates
+                .Include(eps => eps.Poll)
+                .FirstOrDefaultAsync(eps => eps.Poll != null && eps.Poll.Name == pollName);
+        }
+
+        public void Add(ElectionAndPollStatistics electionAndPollStatistics)
+        {
+            _context.ElectionRegisteredVotersPerGovernorates.Add(electionAndPollStatistics);
         }
     }
 }
