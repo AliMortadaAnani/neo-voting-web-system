@@ -1,28 +1,20 @@
-﻿using NeoVoting.Application.AuthDTOs;
-using NeoVoting.Application.NeoVotingDTOs;
-using NeoVoting.Application.RequestDTOs;
+﻿using NeoVoting.Application.RequestDTOs;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.RepositoryContracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Services
 {
     public class AdminServices : IAdminServices
-    {   
+    {
         private readonly IElectionRepository _electionRepository;
         private readonly ISystemAuditLogRepository _systemAuditLogRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGovernmentSystemGateway _governmentSystemGateway;
 
-        public AdminServices(IElectionRepository electionRepository, ISystemAuditLogRepository systemAuditLogRepository,IUnitOfWork unitOfWork,IGovernmentSystemGateway governmentSystemGateway)
+        public AdminServices(IElectionRepository electionRepository, ISystemAuditLogRepository systemAuditLogRepository, IUnitOfWork unitOfWork, IGovernmentSystemGateway governmentSystemGateway)
         {
             _electionRepository = electionRepository;
             _systemAuditLogRepository = systemAuditLogRepository;
@@ -44,6 +36,7 @@ namespace NeoVoting.Application.Services
                 ElectionStatusName = election.ElectionStatus.Name
             };
         }
+
         private SystemAuditLog_ResponseDTO MapToResponseDTO(SystemAuditLog log)
         {
             return new SystemAuditLog_ResponseDTO
@@ -61,16 +54,15 @@ namespace NeoVoting.Application.Services
         }
 
         public async Task<Result<Election_ResponseDTO>> AddElectionAsync(ElectionAdd_RequestDTO requestDTO, CancellationToken cancellationToken)
-        {   
+        {
             var activeElectionExists = await _electionRepository.IsActiveElectionExistsAsync(cancellationToken);
-            
-            if(activeElectionExists)
+
+            if (activeElectionExists)
             {
                 return Result<Election_ResponseDTO>.Failure(Error.Conflict(nameof(ProblemDetails409ErrorTypes.Election_AlreadyActive),
                     "An active election already exists. Cannot create a new election while another is active."));
             }
 
-           
             var resetVotedFlagResult = await _governmentSystemGateway.ResetAllVotersVoteStatusAsync(cancellationToken);
 
             // If the network failed, or the API returned 404/400/500, we stop here.
@@ -88,22 +80,18 @@ namespace NeoVoting.Application.Services
             }
 
             Election election = requestDTO.ToElection();
-            
+
             var addedElection = await _electionRepository.AddElectionAsync(election, cancellationToken);
 
-            if(addedElection == null)
+            if (addedElection == null)
             {
-
                 return Result<Election_ResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Election_CreationFailed),
-                    "Failed to create election.") );
-                    
+                    "Failed to create election."));
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result<Election_ResponseDTO>.Success(MapToResponseDTO(election));
-
-
         }
 
         public async Task<Result<Election_ResponseDTO>> UpdateElectionStatusAsync(Guid electionId, StatusEnum newStatus, CancellationToken cancellationToken)
@@ -134,24 +122,27 @@ namespace NeoVoting.Application.Services
                     case StatusEnum.Nomination:
                         election.StartNominationPhase();
                         break;
+
                     case StatusEnum.PreVotingPhase:
                         election.StartPreVotingPhase();
                         break;
+
                     case StatusEnum.Voting:
                         election.StartVotingPhase();
                         break;
+
                     case StatusEnum.Completed:
                         {
                             election.CompleteElection();
                             //insert winners and statistics logic here
-
-
                         }
                         break;
+
                     case StatusEnum.Upcoming:
                         return Result<Election_ResponseDTO>.Failure(Error.Validation(
                             nameof(ProblemDetails400ErrorTypes.Election_InvalidStatusTransition),
                             "Cannot transition an election back to 'Upcoming' status."));
+
                     default:
                         return Result<Election_ResponseDTO>.Failure(Error.Validation(
                             nameof(ProblemDetails400ErrorTypes.Election_InvalidStatusTransition),

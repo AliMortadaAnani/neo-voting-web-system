@@ -1,10 +1,4 @@
 ﻿using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.IdentityEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Domain.Entities
 {
@@ -23,8 +17,7 @@ namespace NeoVoting.Domain.Entities
 
         public ApplicationUser User { get; private set; }
 
-      //  public bool HasVoted { get; private set; }
-
+        //  public bool HasVoted { get; private set; }
 
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
@@ -45,7 +38,6 @@ namespace NeoVoting.Domain.Entities
 
             )
         {
-
             return new Voter
             {
                 FirstName = firstName,
@@ -57,7 +49,6 @@ namespace NeoVoting.Domain.Entities
                 UserId = userId
             };
         }
-
 
         // when creating a new candidate or voter
         // user enter his private data (National ID + Token) to verify his identity

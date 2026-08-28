@@ -2,11 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -35,7 +30,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .HasMaxLength(4000); // adjust as needed
 
-
             builder.Property(e => e.Status)
                 .IsRequired()
                 .HasConversion<int>(); // Store enum as int in the database
@@ -60,7 +54,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 // Example: enforce that EndDate > StartDate
                 tb.HasCheckConstraint("CK_Poll_StartEndDates",
                     "[EndDate] > [StartDate]");
-
             });
         }
     }

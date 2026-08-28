@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.IdentityEntities;
+using NeoVoting.Domain.Entities;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -9,17 +8,14 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
-   
             builder.Property(u => u.RefreshToken)
                 .HasMaxLength(500)
                 .IsRequired(false)
                 ;
 
-
             builder.Property(u => u.RefreshTokenExpirationDateTime)
                 .IsRequired(false)
                 ;
-
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NeoVoting.Application.NeoVotingDTOs;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Domain.ErrorHandling;
-using System.Net;
+using NeoVoting.Domain.ResultErrorDomain;
 using System.Net.Http.Json; // Required for PostAsJsonAsync / PutAsJsonAsync
 using System.Text.Json;
 
@@ -24,115 +22,64 @@ namespace NeoVoting.Application.Services
 
         // --- VOTER CALLS ---
 
-        public async Task<Result<NeoVoting_VoterResponseDTO>> GetVoterAsync(NeoVoting_GetVoterRequestDTO request, CancellationToken ct)
+        public async Task<Result<VoterVerificationResponseDTO>> VerifyVoterAsync(GetVoterVerificationRequestDTO request)
         {
-            // Controller: [HttpPost("voters/get")]
-            return await SendRequestToGovernmentSystemAsync<NeoVoting_GetVoterRequestDTO, NeoVoting_VoterResponseDTO>(
+            //we append the api key in Registration in API layer
+            return await SendRequestToGovernmentSystemAsync<GetVoterVerificationRequestDTO, VoterVerificationResponseDTO>(
                 HttpMethod.Post,
-                "api/external/voters/get",
-                request,
-                ct);
-        }
-
-        public async Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsRegisteredAsync(NeoVoting_VoterIsRegisteredRequestDTO request, CancellationToken ct)
-        {
-            // Controller: [HttpPut("voters/register")]
-            return await SendRequestToGovernmentSystemAsync<NeoVoting_VoterIsRegisteredRequestDTO, NeoVoting_VoterResponseDTO>(
-                HttpMethod.Put,
-                "api/external/voters/register",
-                request,
-                ct);
-        }
-
-        public async Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsVotedAsync(NeoVoting_VoterHasVotedRequestDTO request, CancellationToken ct)
-        {
-            // Controller: [HttpPut("voters/vote")]
-            return await SendRequestToGovernmentSystemAsync<NeoVoting_VoterHasVotedRequestDTO, NeoVoting_VoterResponseDTO>(
-                HttpMethod.Put,
-                "api/external/voters/vote",
-                request,
-                ct);
+                "api/public/voter/verify",
+                request);
         }
 
         // --- CANDIDATE CALLS ---
 
-        public async Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateAsync(NeoVoting_GetCandidateRequestDTO request, CancellationToken ct)
+        public async Task<Result<CandidateVerificationResponseDTO>> VerifyCandidateAsync(GetCandidateVerificationRequestDTO request)
         {
-            // Controller: [HttpPost("candidates/get")]
-            return await SendRequestToGovernmentSystemAsync<NeoVoting_GetCandidateRequestDTO, NeoVoting_CandidateResponseDTO>(
+            //we append the api key in Registration in API layer
+            return await SendRequestToGovernmentSystemAsync<GetCandidateVerificationRequestDTO, CandidateVerificationResponseDTO>(
                 HttpMethod.Post,
-                "api/external/candidates/get",
-                request,
-                ct);
+                "api/public/candidate/verify",
+                request);
         }
-
-        public async Task<Result<NeoVoting_CandidateResponseDTO>> MarkCandidateAsRegisteredAsync(NeoVoting_CandidateIsRegisteredRequestDTO request, CancellationToken ct)
-        {
-            // Controller: [HttpPut("candidates/register")]
-            return await SendRequestToGovernmentSystemAsync<NeoVoting_CandidateIsRegisteredRequestDTO, NeoVoting_CandidateResponseDTO>(
-                HttpMethod.Put,
-                "api/external/candidates/register",
-                request,
-                ct);
-        }
-
-        // --- SYSTEM CALLS ---
-
-        public async Task<Result<bool>> ResetAllVotersVoteStatusAsync(CancellationToken ct)
-        {
-            // Controller: [HttpPost("reset-vote-status")]
-            // This endpoint takes NO body in the controller, but our generic method expects a request DTO.
-            // We can pass a dummy object or null if we handle it.
-            // Ideally, overload SendRequest... to handle no-body requests.
-            // For now, passing 'object' with null value:
-
-            return await SendRequestToGovernmentSystemAsync<object, bool>(
-                HttpMethod.Post,
-                "api/external/reset-vote-status",
-                new { }, // Empty JSON object as body
-                ct);
-        }
-
 
         // =========================================================================================
         // CORE LOGIC: HANDLES REQUESTS (POST/PUT), RESPONSES, ERRORS, AND DESERIALIZATION
         // =========================================================================================
 
         //public async Task<TResponse> HandleAsync<TRequest, TResponse>(TRequest request)
-        private async Task<Result<TResponse>> 
+        private async Task<Result<TResponse>>
             SendRequestToGovernmentSystemAsync<TRequest, TResponse>
-            
+
             (
-            HttpMethod method, 
+            HttpMethod method,
             string endpoint,
-            TRequest requestDto,
-            CancellationToken ct
+            TRequest requestDto
             )
 
         {
             HttpResponseMessage response;
 
             try
-            { 
+            {
                 if (method == HttpMethod.Post)
                 {
-                    response = await _httpClient.PostAsJsonAsync(endpoint, requestDto, _jsonOptions, ct);
+                    response = await _httpClient.PostAsJsonAsync(endpoint, requestDto, _jsonOptions);
                 }
-                else if (method == HttpMethod.Put)
-                {
-                    response = await _httpClient.PutAsJsonAsync(endpoint, requestDto, _jsonOptions, ct);
-                }
+                //else if (method == HttpMethod.Put)
+                //{
+                //    response = await _httpClient.PutAsJsonAsync(endpoint, requestDto, _jsonOptions);
+                //}
                 else
                 {
-                    // Defensive coding: In case a developer passes GET or DELETE by mistake
+                    // Defensive coding: In case a developer passes GET or DELETE or PUT by mistake
                     _logger.LogError("Unsupported HTTP Method {Method} for SendRequestToGovernmentSystemAsync", method);
-                    return Result<TResponse>.Failure(Error.Failure("System.InternalError", $"HTTP Method {method} not supported by Gateway."));
+                    return Result<TResponse>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error), $"HTTP Method {method} not supported by Gateway."));
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Network error calling Government System: {Endpoint} [{Method}]", endpoint, method);
-                return Result<TResponse>.Failure(Error.Failure("GovernmentSystem.Unreachable", "Government System is unreachable."));
+                return Result<TResponse>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error), "Government System is unreachable."));
             }
 
             // --- CASE 1: SUCCESS (200-299) ---
@@ -140,21 +87,12 @@ namespace NeoVoting.Application.Services
             {
                 try
                 {
-                    if (response.StatusCode == HttpStatusCode.NoContent)
-                    {
-                        // If TResponse is bool, return true. If it's an object, return default.
-                        // Usually, if we expect data but get 204, it might be an issue, 
-                        // but often 204 means "Success, nothing to see here".
-                        //Not in our case but kept for reference
-
-                        return Result<TResponse>.Success(default!);
-                    }
-                    var data = await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions, ct);
+                    var data = await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);
 
                     if (data == null)
                     {
                         _logger.LogWarning("Gov System returned success at {Endpoint}, but body was null.", endpoint);
-                        return Result<TResponse>.Failure(Error.Failure("GovernmentSystem.NullResponse", "Received empty response from GovernmentSystem."));
+                        return Result<TResponse>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error), "Received empty response from GovernmentSystem."));
                     }
 
                     return Result<TResponse>.Success(data);
@@ -162,7 +100,7 @@ namespace NeoVoting.Application.Services
                 catch (JsonException jsonEx)
                 {
                     _logger.LogError(jsonEx, "Gov System returned success at {Endpoint}, but JSON was invalid.", endpoint);
-                    return Result<TResponse>.Failure(Error.Failure("GovernmentSystem.BadData", "Government sent invalid data format."));
+                    return Result<TResponse>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error), "Government sent invalid data format."));
                 }
             }
 
@@ -171,7 +109,7 @@ namespace NeoVoting.Application.Services
             string content = string.Empty;
             try
             {
-                content = await response.Content.ReadAsStringAsync(ct);
+                content = await response.Content.ReadAsStringAsync();
             }
             catch { /* Ignore */ }
 

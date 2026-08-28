@@ -65,5 +65,23 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _context.Polls.AnyAsync(p => p.Name == pollName);
         }
+
+        public async Task<bool> IsPollUpcomingPhaseAsync(int pollId)
+        {
+            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Upcoming);
+        }
+
+        public async Task<bool> IsPollVotingPhaseAsync(int pollId)
+        {
+            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Voting);
+        }
+
+        public async Task<bool> IsPollCompletedPhaseAsync(int pollId)
+        {
+            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Completed);
+        }
+    }
+}
+        }
     }
 }

@@ -2,11 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -29,7 +24,6 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(v => v.DateOfBirth)
                 .IsRequired();
 
-
             builder.Property(v => v.Governorate)
                 .IsRequired()
                 .HasConversion<int>(); // Store enum as int in the database
@@ -47,7 +41,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 t.HasCheckConstraint("CK_Voter_Governorate", $"([Governorate] IN ({sqlValues}) )")
             );
 
-
             builder.Property(v => v.Gender)
               .IsRequired()
               .HasMaxLength(1);
@@ -55,12 +48,9 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.ToTable(tb =>
                tb.HasCheckConstraint("CK_Voter_Gender", "[Gender] IN ('M', 'F')"));
 
-
             builder.Property(v => v.VerificationHash)
                 .IsRequired()
                 .HasMaxLength(200); // adjust as needed
-
-
 
             builder.HasOne(ew => ew.User)
                 .WithOne(cp => cp.Voter)
@@ -69,8 +59,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasIndex(ew => new { ew.UserId }).IsUnique();
-
-
         }
     }
 }

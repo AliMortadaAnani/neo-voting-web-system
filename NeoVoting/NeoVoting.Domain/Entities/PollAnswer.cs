@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeoVoting.Domain.Entities
+﻿namespace NeoVoting.Domain.Entities
 {
     public class PollAnswer
     {
@@ -14,10 +8,12 @@ namespace NeoVoting.Domain.Entities
         public Poll Poll { get; private set; } = null!;
 
         public ICollection<PollVote> PollVotes { get; private set; } = new List<PollVote>();
+
         private PollAnswer()
         {
             // Required by EF Core
         }
+
         public static PollAnswer Create(string answerText, int pollId)
         {
             if (string.IsNullOrWhiteSpace(answerText))

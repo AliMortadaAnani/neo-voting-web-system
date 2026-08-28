@@ -1,9 +1,4 @@
 ﻿using NeoVoting.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Domain.Entities
 {
@@ -25,13 +20,13 @@ namespace NeoVoting.Domain.Entities
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
         public PollStatistics? PollStatistics { get; private set; }
+
         private Poll()
         {
             // Required by EF Core
         }
-       
-        
-        public static Poll Create(string name,string question, DateTime startDate, DateTime endDate)
+
+        public static Poll Create(string name, string question, DateTime startDate, DateTime endDate)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

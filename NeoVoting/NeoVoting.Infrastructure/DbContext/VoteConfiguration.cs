@@ -30,7 +30,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-
             // Table name and constraints
             builder.ToTable(tb =>
             {
@@ -41,9 +40,9 @@ namespace NeoVoting.Infrastructure.DbContext
                 tb.HasCheckConstraint("CK_Vote_VoterGender", "[VoterGender] IN ('M','F')");
             });
 
-           builder.Property(v => v.Governorate)
-                .IsRequired()
-                .HasConversion<int>(); // Store enum as int in the database
+            builder.Property(v => v.Governorate)
+                 .IsRequired()
+                 .HasConversion<int>(); // Store enum as int in the database
 
             // 1. Get all integer values from the Enum
             var enumValues = Enum.GetValues(typeof(GovernorateIdEnum))
@@ -57,8 +56,6 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.ToTable(t =>
                 t.HasCheckConstraint("CK_Vote_Governorate", $"([Governorate] IN ({sqlValues}) )")
             );
-
-           
         }
     }
 }

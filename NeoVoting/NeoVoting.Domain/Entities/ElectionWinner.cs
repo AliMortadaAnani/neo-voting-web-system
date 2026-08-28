@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace NeoVoting.Domain.Entities
+﻿namespace NeoVoting.Domain.Entities
 {
     /// <summary>
     /// Represents the winner of an election. This is a record created after an
@@ -11,11 +9,9 @@ namespace NeoVoting.Domain.Entities
         // --- Properties ---
 
         public int Id { get; private set; }
-        public int? VoteCount { get; private set; } 
+        public int? VoteCount { get; private set; }
 
         // --- Foreign Keys & Navigation Properties ---
-
-       
 
         public int CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
@@ -24,14 +20,13 @@ namespace NeoVoting.Domain.Entities
         {
             // Initialize non-nullable navigation properties to satisfy the C# compiler.
             // EF Core will populate these from the database.
-           
+
             CandidateProfile = null!;
         }
 
-
         public static ElectionWinner Create(int candidateProfileId, int? voteCount)
         {
-            if(voteCount.HasValue && voteCount < 0)
+            if (voteCount.HasValue && voteCount < 0)
             {
                 throw new ArgumentException("Vote count cannot be negative.", nameof(voteCount));
             }
@@ -61,7 +56,5 @@ namespace NeoVoting.Domain.Entities
             }
             this.VoteCount = newVoteCount;
         }
-
-        
     }
 }

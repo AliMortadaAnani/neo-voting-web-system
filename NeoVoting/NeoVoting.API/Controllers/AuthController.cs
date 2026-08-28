@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ErrorHandling;
+using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.API.Controllers
 {
-    /// <summary>
-    /// Handles authentication operations for voters and candidates.
-    /// </summary>
-   
+    
+    [EnableRateLimiting("AuthLimiter")]
+
     public class AuthController : ApiController
     {
         private readonly IAuthServices _authService;
@@ -20,15 +20,8 @@ namespace NeoVoting.API.Controllers
             _authService = authService;
         }
 
-        /// <summary>
-        /// Authenticates a user and returns access and refresh tokens.
-        /// </summary>
-        /// <remarks>
-        /// **Rules:**
-        /// - Requires valid username and password.
-        /// - Returns 401 if credentials are invalid.
-        /// - Returns 403 if account is locked due to multiple failed attempts.
-        /// </remarks>
+       
+       
         [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(typeof(Authentication_ResponseDTO), StatusCodes.Status200OK)]

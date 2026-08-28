@@ -6,7 +6,7 @@ namespace NeoVoting.Domain.Entities
     /// Represents a single, immutable vote cast in an election.
 
     /// </summary>
-    public class Vote 
+    public class Vote
     {
         // --- Properties ---
 
@@ -23,13 +23,10 @@ namespace NeoVoting.Domain.Entities
 
         public ICollection<VoteChoice> VoteChoices { get; private set; } = new List<VoteChoice>();
 
-
         private Vote()
         {
             Election = null!;
-          
         }
-
 
         public static Vote Create(int electionId, GovernorateIdEnum governorate, int voterAge, char voterGender)
         {
@@ -47,6 +44,5 @@ namespace NeoVoting.Domain.Entities
         }
 
         // A Vote, once created, is immutable. There are no "Update" methods.
-
     }
 }

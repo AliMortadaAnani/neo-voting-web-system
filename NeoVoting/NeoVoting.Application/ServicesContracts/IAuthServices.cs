@@ -1,20 +1,19 @@
 ﻿using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ErrorHandling;
+using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.ServicesContracts
 {
     public interface IAuthServices
     {
-        Task<Result<Authentication_ResponseDTO>> LoginAsync(Login_RequestDTO loginDTO, CancellationToken cancellationToken = default);
+        Task<Result<Authentication_ResponseDTO>> LoginAsync(Login_RequestDTO loginDTO);
 
-        Task<Result<bool>> LogoutAsync(CancellationToken cancellationToken = default);
+        Task<Result<bool>> LogoutAsync();
 
-        Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterOrCandidateAsync(Register_ResetPassword_VoterOrCandidate_RequestDTO registrationDTO,RoleTypesEnum role, CancellationToken cancellationToken = default);
+        Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterOrCandidateAsync(Register_ResetPassword_VoterOrCandidate_RequestDTO registrationDTO, RoleTypesEnum role);
 
-        Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterOrCandidatePasswordAsync(Register_ResetPassword_VoterOrCandidate_RequestDTO resetPasswordDTO, CancellationToken cancellationToken = default);
+        Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterOrCandidatePasswordAsync(Register_ResetPassword_VoterOrCandidate_RequestDTO resetPasswordDTO);
 
-
-        Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO refreshTokenRequestDTO, CancellationToken cancellationToken = default);
+        Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO refreshTokenRequestDTO);
     }
 }

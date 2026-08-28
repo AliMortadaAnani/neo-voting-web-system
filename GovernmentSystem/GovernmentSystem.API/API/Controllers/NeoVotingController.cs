@@ -28,7 +28,7 @@ namespace GovernmentSystem.API.API.Controllers
         }
 
         [HttpPost("voter/verify")]
-        [ProducesResponseType(typeof(VoterVerifyResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(VoterVerificationResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyVoter([FromBody] GetVoterVerificationRequestDTO request)
@@ -43,7 +43,7 @@ namespace GovernmentSystem.API.API.Controllers
         }
 
         [HttpPost("candidate/verify")]
-        [ProducesResponseType(typeof(CandidateVerifyResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CandidateVerificationResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> VerifyCandidate([FromBody] GetCandidateVerificationRequestDTO request)

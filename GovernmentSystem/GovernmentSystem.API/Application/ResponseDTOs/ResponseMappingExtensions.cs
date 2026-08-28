@@ -39,9 +39,9 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
             };
         }
 
-        public static VoterVerifyResponseDTO ToNeoVoting_VoterResponse(this Voter voter)
+        public static VoterVerificationResponseDTO ToNeoVoting_VoterResponse(this Voter voter)
         {
-            return new VoterVerifyResponseDTO
+            return new VoterVerificationResponseDTO
             {
                 HashedData = voter.HashedData,
                 Governorate = voter.Citizen.Governorate,
@@ -71,9 +71,9 @@ namespace GovernmentSystem.API.Application.ResponseDTOs
             };
         }
 
-        public static CandidateVerifyResponseDTO ToNeoVoting_CandidateResponse(this Candidate candidate)
+        public static CandidateVerificationResponseDTO ToNeoVoting_CandidateResponse(this Candidate candidate)
         {
-            return new CandidateVerifyResponseDTO
+            return new CandidateVerificationResponseDTO
             {
                 HashedData = candidate.HashedData,
                 Governorate = candidate.Citizen.Governorate,

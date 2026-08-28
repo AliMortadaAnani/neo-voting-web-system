@@ -1,10 +1,4 @@
 ﻿using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.IdentityEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Domain.Entities
 {
@@ -23,8 +17,8 @@ namespace NeoVoting.Domain.Entities
 
         public ApplicationUser User { get; private set; }
 
-       public ICollection<CandidateProfile> CandidateProfiles { get; private set; } 
-            = new List<CandidateProfile>();
+        public ICollection<CandidateProfile> CandidateProfiles { get; private set; }
+             = new List<CandidateProfile>();
 
         private Candidate()
         {
@@ -43,7 +37,6 @@ namespace NeoVoting.Domain.Entities
 
             )
         {
-
             return new Candidate
             {
                 FirstName = firstName,
@@ -53,7 +46,6 @@ namespace NeoVoting.Domain.Entities
                 Governorate = governorate,
                 VerificationHash = verificationHash,
                 UserId = userId
-               
             };
         }
 
@@ -84,8 +76,5 @@ namespace NeoVoting.Domain.Entities
             Governorate = governorate;
             VerificationHash = verificationHash;
         }
-
-       
-
     }
 }

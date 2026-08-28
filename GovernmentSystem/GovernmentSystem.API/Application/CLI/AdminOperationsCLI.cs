@@ -6,8 +6,7 @@ namespace GovernmentSystem.API.Application.CLI
 {
     public class AdminOperationsCLI
     {
-        // Note: We added 'adminPassword' as a parameter instead of fetching it from configuration
-        // This allows passing the password securely from the CLI argument
+        
         public static async Task SeedAdminUser(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();

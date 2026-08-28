@@ -1,9 +1,4 @@
 ﻿using NeoVoting.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
@@ -14,13 +9,21 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<bool> IsActivePollExistsAsync();
 
         Task<bool> IsPollNameExistsAsync(string pollName);
+
         Task<int> CountAsync();
 
         Task<List<Poll>> GetPagedAsync(int pageNumber, int pageSize);
 
         Task<Poll?> GetByIdAsync(int pollId);
+
         Task<Poll?> GetByNameAsync(string pollName);
 
         Task<Poll?> GetActivePollAsync();
+
+        Task<bool> IsPollUpcomingPhaseAsync(int pollId);
+
+        Task<bool> IsPollVotingPhaseAsync(int pollId);
+
+        Task<bool> IsPollCompletedPhaseAsync(int pollId);
     }
 }

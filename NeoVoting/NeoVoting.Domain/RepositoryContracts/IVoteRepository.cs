@@ -7,8 +7,7 @@ namespace NeoVoting.Domain.RepositoryContracts
     {
         void Add(Vote vote);
 
-    
-        Task<bool> IsVoteChoicesForVoteEqualFive(Vote vote); 
+        Task<bool> IsVoteChoicesForVoteEqualFive(Vote vote);
 
         Task<Vote?> GetByVoteId(Guid voteId);
 
@@ -25,7 +24,5 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<int> GetCountOfVotesByElectionIdAndGenderAndGovernorateAsync(int electionId, char gender, GovernorateIdEnum governorate);
 
         Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateAsync(int electionId, int minAge, int maxAge, GovernorateIdEnum governorate);
-
-
     }
 }

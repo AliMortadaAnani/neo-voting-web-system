@@ -20,18 +20,18 @@ namespace NeoVoting.Domain.Entities
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
         public ICollection<ElectionStatistics> ElectionStatisticsList { get; private set; } = new List<ElectionStatistics>();
-        // each election can have many election statistics, global and per governorate 
+        // each election can have many election statistics, global and per governorate
 
-        private Election()  {}
+        private Election()
+        { }
 
-        
         public static Election Create(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
         {
             // --- Centralized Validation Logic ---
             Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate, isCreating: true);
 
             var election = new Election
-            { 
+            {
                 Name = name,
                 NominationStartDate = nominationStartDate,
                 NominationEndDate = nominationEndDate,
@@ -52,7 +52,6 @@ namespace NeoVoting.Domain.Entities
             Status = StatusEnum.Voting;
         }
 
-        
         public void EndVotingPhase()
         {
             if (Status != StatusEnum.Voting)
@@ -61,7 +60,6 @@ namespace NeoVoting.Domain.Entities
             }
             Status = StatusEnum.Completed;
         }
-
 
         /// <summary>
         /// Private helper method to contain all validation rules for creating an election.

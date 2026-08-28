@@ -1,22 +1,12 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using NeoVoting.Application.NeoVotingDTOs;
-using NeoVoting.Application.RequestDTOs;
+﻿using NeoVoting.Application.RequestDTOs;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ErrorHandling;
 using NeoVoting.Domain.RepositoryContracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Services
 {
     public class VoterServices : IVoterServices
-    {   
+    {
         private readonly IElectionRepository _electionRepository;
         private readonly ICandidateProfileRepository _candidateProfileRepository;
         private readonly ICurrentUserServices _currentUserServices;
@@ -52,7 +42,7 @@ namespace NeoVoting.Application.Services
             throw new NotImplementedException();
         }
 
-        public  Task<Result<IReadOnlyList<CandidateProfile_ResponseDTO>>> GetPagedCandidatesByElectionIdAsync(Guid electionId, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public Task<Result<IReadOnlyList<CandidateProfile_ResponseDTO>>> GetPagedCandidatesByElectionIdAsync(Guid electionId, int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

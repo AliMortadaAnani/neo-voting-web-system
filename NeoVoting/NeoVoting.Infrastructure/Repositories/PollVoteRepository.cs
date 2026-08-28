@@ -28,7 +28,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<PollVote?> GetByPollVoteIdAsync(Guid pollVoteId)
         {
             return await _context.PollVotes
-          
+
                 .FindAsync(pollVoteId);
         }
 

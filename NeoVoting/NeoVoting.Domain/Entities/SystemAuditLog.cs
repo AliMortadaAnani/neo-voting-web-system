@@ -8,11 +8,11 @@ namespace NeoVoting.Domain.Entities
         public DateTime TimestampUTC { get; private set; }
         public SystemActionTypesEnum ActionType { get; private set; }
         public string? Details { get; private set; } // will contain a small description of the action, e.g., "Election created with ID: {electionId}" ....
-        public int AdminId { get; private set; }      
+        public int AdminId { get; private set; }
         public string Username { get; private set; } = string.Empty;
-        
 
-        private SystemAuditLog() { }
+        private SystemAuditLog()
+        { }
 
         public static SystemAuditLog Create(
             int adminId,
@@ -34,7 +34,6 @@ namespace NeoVoting.Domain.Entities
 
         private static void Validate(string userName, SystemActionTypesEnum actionType)
         {
-
             if (string.IsNullOrWhiteSpace(userName))
                 throw new ArgumentException("Username is required.", nameof(userName));
 

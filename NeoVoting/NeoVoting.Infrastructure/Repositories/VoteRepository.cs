@@ -58,7 +58,6 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<int> GetCountOfVotesByElectionIdAndAgePhaseAndGovernorateAsync(int electionId, int minAge, int maxAge, GovernorateIdEnum governorate)
         {
-            
             return await _context.Votes
                 .CountAsync(v => v.ElectionId == electionId &&
                                  v.VoterAge >= minAge &&
@@ -69,7 +68,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<Vote?> GetByVoteId(Guid voteId)
         {
             return await _context.Votes
-               
+
                 .FindAsync(voteId);
         }
 

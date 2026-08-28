@@ -6,7 +6,7 @@ using NeoVoting.Infrastructure.DbContext;
 namespace NeoVoting.Infrastructure.Repositories
 {
     // Interface is named IEventParticipation, so implementing exactly that
-    public class EventParticipationRepository : IEventParticipation
+    public class EventParticipationRepository : IEventParticipationRepository
     {
         private readonly ApplicationDbContext _context;
 

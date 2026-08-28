@@ -13,7 +13,7 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(entity => entity.Id).ValueGeneratedOnAdd();
             // Relationships
             builder.HasOne(vc => vc.Vote)
-                .WithMany(v => v.VoteChoices) 
+                .WithMany(v => v.VoteChoices)
                 .HasForeignKey(vc => vc.VoteId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
@@ -27,8 +27,6 @@ namespace NeoVoting.Infrastructure.DbContext
 
             builder.HasIndex(vc => new { vc.VoteId, vc.CandidateProfileId })
               .IsUnique();
-
-            
         }
     }
 }

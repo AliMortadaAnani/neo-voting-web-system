@@ -3,7 +3,7 @@ using GovernmentSystem.API.Application.ResponseDTOs.VoterDTOs;
 
 namespace GovernmentSystem.API.Application.Validators.VoterDTOs
 {
-    public class VoterVerifyResponseDTOValidator : AbstractValidator<VoterVerifyResponseDTO>
+    public class VoterVerifyResponseDTOValidator : AbstractValidator<VoterVerificationResponseDTO>
     {
         public VoterVerifyResponseDTOValidator()
         {

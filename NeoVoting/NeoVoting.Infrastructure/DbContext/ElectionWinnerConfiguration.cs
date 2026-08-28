@@ -15,8 +15,6 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(ew => ew.VoteCount)
                 .IsRequired(false); // nullable, allows recounts or non-applicable
 
-
-
             // RELATIONSHIP: ElectionWinner HAS ONE CandidateProfile
             builder.HasOne(ew => ew.CandidateProfile)       // Navigation property on ElectionWinner
                 .WithOne(cp => cp.ElectionWinner)           // Navigation property on CandidateProfile (if you add it)

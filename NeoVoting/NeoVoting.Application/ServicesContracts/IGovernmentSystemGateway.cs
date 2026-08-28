@@ -1,5 +1,5 @@
-﻿using NeoVoting.Application.NeoVotingDTOs;
-using NeoVoting.Domain.ErrorHandling;
+﻿using NeoVoting.Domain.Enums;
+using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.ServicesContracts
 {
@@ -12,17 +12,42 @@ namespace NeoVoting.Application.ServicesContracts
 
     public interface IGovernmentSystemGateway
     {
-        Task<Result<NeoVoting_VoterResponseDTO>> GetVoterAsync(NeoVoting_GetVoterRequestDTO request, CancellationToken ct);
+        Task<Result<VoterVerificationResponseDTO>> VerifyVoterAsync(GetVoterVerificationRequestDTO request);
 
-        Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsRegisteredAsync(NeoVoting_VoterIsRegisteredRequestDTO request, CancellationToken ct);
+        Task<Result<CandidateVerificationResponseDTO>> VerifyCandidateAsync(GetCandidateVerificationRequestDTO request);
+    }
 
-        Task<Result<NeoVoting_CandidateResponseDTO>> GetCandidateAsync(NeoVoting_GetCandidateRequestDTO request, CancellationToken ct);
+    public class GetCandidateVerificationRequestDTO
+    {
+        public string NationalId { get; set; } = string.Empty;
 
-        Task<Result<NeoVoting_CandidateResponseDTO>> MarkCandidateAsRegisteredAsync(NeoVoting_CandidateIsRegisteredRequestDTO request, CancellationToken ct);
+        public string NominationToken { get; set; } = string.Empty;
+    }
 
-        Task<Result<NeoVoting_VoterResponseDTO>> MarkVoterAsVotedAsync(NeoVoting_VoterHasVotedRequestDTO request, CancellationToken ct);
+    public class GetVoterVerificationRequestDTO
+    {
+        public string NationalId { get; set; } = string.Empty;
 
+        public string VotingToken { get; set; } = string.Empty;
+    }
 
-        Task<Result<bool>> ResetAllVotersVoteStatusAsync(CancellationToken ct);
+    public class CandidateVerificationResponseDTO
+    {
+        public string HashedData { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public DateOnly DateOfBirth { get; set; }
+        public GovernorateIdEnum Governorate { get; set; }
+        public char Gender { get; set; }
+    }
+
+    public class VoterVerificationResponseDTO
+    {
+        public string HashedData { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public DateOnly DateOfBirth { get; set; }
+        public GovernorateIdEnum Governorate { get; set; }
+        public char Gender { get; set; }
     }
 }

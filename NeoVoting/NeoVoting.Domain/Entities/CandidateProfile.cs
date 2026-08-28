@@ -1,5 +1,4 @@
-﻿using NeoVoting.Domain.IdentityEntities;
-using System.Text;
+﻿using System.Text;
 
 namespace NeoVoting.Domain.Entities
 {
@@ -49,7 +48,6 @@ namespace NeoVoting.Domain.Entities
 
             var profile = new CandidateProfile
             {
-                
                 CandidateId = candidateId,
                 ElectionId = electionId,
                 Goals = goals,
@@ -97,8 +95,6 @@ namespace NeoVoting.Domain.Entities
         {
             ProfilePhotoFilename = null;
         }
-
-        
 
         private static void ValidateFields(string goals, string nominationReasons)
         {

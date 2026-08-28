@@ -1,11 +1,6 @@
 ﻿using NeoVoting.Application.RequestDTOs;
 using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Domain.ErrorHandling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.ServicesContracts
 {
@@ -16,15 +11,14 @@ namespace NeoVoting.Application.ServicesContracts
         Task<Result<IReadOnlyList<CandidateProfile_ResponseDTO>>> GetPagedCandidatesByElectionIdAsync(Guid electionId, int pageNumber, int pageSize, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<CandidateProfile_ResponseDTO>>> GetPagedCandidatesByElectionIdAndGovernorateIdAsync
-            (Guid electionId,int governorateId, int pageNumber, int pageSize, CancellationToken cancellationToken);
+            (Guid electionId, int governorateId, int pageNumber, int pageSize, CancellationToken cancellationToken);
 
-        Task<Result<PublicVoteLog_ResponseDTO>> GetPublicVoteLogByVoteIdAsync(Guid electionId,Guid voteId,CancellationToken cancellationToken);
+        Task<Result<PublicVoteLog_ResponseDTO>> GetPublicVoteLogByVoteIdAsync(Guid electionId, Guid voteId, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<PublicVoteLog_ResponseDTO>>> GetPagedPublicVoteLogsByElectionIdAsync
-            (Guid electionId,int pageNumber,int pageSize,CancellationToken cancellationToken);
+            (Guid electionId, int pageNumber, int pageSize, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<PublicVoteLog_ResponseDTO>>> GetPagedPublicVoteLogsByElectionIdAndGovernorateIdAsync
             (Guid electionId, int governorateId, int pageNumber, int pageSize, CancellationToken cancellationToken);
-
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 using System.Text;
 
-namespace NeoVoting.Domain.IdentityEntities
+namespace NeoVoting.Domain.Entities
 {
     public class ApplicationUser : IdentityUser<int>
     {
@@ -15,10 +13,10 @@ namespace NeoVoting.Domain.IdentityEntities
         public Candidate? Candidate { get; private set; }
 
         public Voter? Voter { get; private set; }
+
         private ApplicationUser()
         { }
 
-        
         public static ApplicationUser CreateAccount(string userName)
         {
             if (string.IsNullOrWhiteSpace(userName))
@@ -33,7 +31,7 @@ namespace NeoVoting.Domain.IdentityEntities
 
             return user;
         }
- 
+
         // --- Token Management Methods ---
 
         /// <summary>

@@ -1,5 +1,4 @@
 using NeoVoting.API.StartupExtensions;
-using NeoVoting.Application.SeederServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,21 +26,22 @@ app.UseExceptionHandler(); // Custom Exception Handler Middleware : Global Excep
 //in Application layer , registered in StartupExtensions/ServiceExtensions.cs
 
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseHsts();
-//}
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
 
-//app.UseCors("FrontendPolicy");
+app.UseCors("FrontendPolicy");
 
-//app.UseMiddleware<IpWhitelistMiddleware>(); // IP Whitelisting Middleware in API layer
+app.UseRateLimiter();
 
-//app.UseAuthentication();
-//app.UseAuthorization();
 
-//app.UseStaticFiles();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.MapControllers();
 

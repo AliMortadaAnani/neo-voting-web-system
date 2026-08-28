@@ -5,11 +5,13 @@ namespace NeoVoting.Domain.Entities
 {
     public class ApplicationRole : IdentityRole<int>
     {
-       
-        private ApplicationRole() : base() { }
+        private ApplicationRole() : base()
+        {
+        }
 
-        
-        private ApplicationRole(string roleName) : base(roleName) { }
+        private ApplicationRole(string roleName) : base(roleName)
+        {
+        }
 
         public static ApplicationRole CreateAdminRole()
         {

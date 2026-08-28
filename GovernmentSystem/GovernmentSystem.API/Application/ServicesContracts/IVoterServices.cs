@@ -10,7 +10,7 @@ namespace GovernmentSystem.API.Application.ServicesContracts
 
         Task<Result<PagedResult<VoterResponseDTO>>> GetVotersPagedAsync(int pageNumber, int pageSize);
 
-        Task<Result<VoterVerifyResponseDTO>> VerifyVoterCredentialsAsync(GetVoterVerificationRequestDTO request);
+        Task<Result<VoterVerificationResponseDTO>> VerifyVoterCredentialsAsync(GetVoterVerificationRequestDTO request);
 
         Task<Result<VoterResponseDTO>> AddVoterAsync(CreateVoterRequestDTO request);
 

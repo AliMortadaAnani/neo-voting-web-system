@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -27,25 +26,19 @@ namespace NeoVoting.Infrastructure.DbContext
 
             // Relationships
             builder.HasOne(cp => cp.Candidate)
-                .WithMany(c => c.CandidateProfiles) 
+                .WithMany(c => c.CandidateProfiles)
                 .HasForeignKey(cp => cp.CandidateId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-
 
             builder.HasOne(cp => cp.Election)
                 .WithMany(e => e.CandidateProfiles)
                 .HasForeignKey(cp => cp.ElectionId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-            
 
-            
-
-            builder.HasIndex(cp => new { cp.ElectionId , cp.CandidateId })
+            builder.HasIndex(cp => new { cp.ElectionId, cp.CandidateId })
               .IsUnique();
-
-            
         }
     }
 }

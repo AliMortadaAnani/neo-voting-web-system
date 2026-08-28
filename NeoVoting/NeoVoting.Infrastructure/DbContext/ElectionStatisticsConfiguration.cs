@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -9,8 +8,6 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<ElectionStatistics> builder)
         {
-           
-
             // Primary key
             builder.HasKey(e => e.Id);
 
@@ -18,19 +15,11 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .ValueGeneratedOnAdd();
 
-
-
-
             builder.HasOne(e => e.Election)
                 .WithMany(e => e.ElectionStatisticsList)
                 .HasForeignKey(e => e.ElectionId)
-                .IsRequired() 
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-
-         
-
-            
-            
         }
     }
 }

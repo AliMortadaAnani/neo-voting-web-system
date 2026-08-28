@@ -89,7 +89,7 @@ namespace GovernmentSystem.API.Application.Services
             return Result<PagedResult<CandidateResponseDTO>>.Success(pagedResult);
         }
 
-        public async Task<Result<CandidateVerifyResponseDTO>> VerifyCandidateCredentialsAsync(GetCandidateVerificationRequestDTO request)
+        public async Task<Result<CandidateVerificationResponseDTO>> VerifyCandidateCredentialsAsync(GetCandidateVerificationRequestDTO request)
         {
             _logger.LogInformation("VerifyCandidateCredentials operation initiated");
             string encryptedNationalId = _sensitiveDataHelper.Encrypt(request.NationalId!);
@@ -101,12 +101,12 @@ namespace GovernmentSystem.API.Application.Services
             if (candidate == null)
             {
                 _logger.LogWarning("Candidate verification failed - invalid credentials");
-                return Result<CandidateVerifyResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Candidate_InvalidCredentials), "Candidate invalid credentials."));
+                return Result<CandidateVerificationResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Candidate_InvalidCredentials), "Candidate invalid credentials."));
             }
 
             _logger.LogInformation("Candidate verification successful");
             var response = candidate.ToNeoVoting_CandidateResponse();
-            return Result<CandidateVerifyResponseDTO>.Success(response);
+            return Result<CandidateVerificationResponseDTO>.Success(response);
         }
 
         public async Task<Result<CandidateResponseDTO>> AddCandidateAsync(CreateCandidateRequestDTO request)

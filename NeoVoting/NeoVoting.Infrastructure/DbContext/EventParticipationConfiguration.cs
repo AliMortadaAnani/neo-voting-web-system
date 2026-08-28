@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -16,7 +11,6 @@ namespace NeoVoting.Infrastructure.DbContext
             // Primary key
             builder.HasKey(v => v.Id);
             builder.Property(entity => entity.Id).ValueGeneratedOnAdd();
-
 
             builder.HasOne(ew => ew.Poll)
                .WithMany(cp => cp.EventParticipations)
@@ -31,11 +25,8 @@ namespace NeoVoting.Infrastructure.DbContext
                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasIndex(v => new { v.VoterId, v.ElectionId }).IsUnique().HasFilter("[ElectionId] IS NOT NULL");
-            
+
             builder.HasIndex(v => new { v.VoterId, v.PollId }).IsUnique().HasFilter("[PollId] IS NOT NULL");
-
-
-
         }
     }
 }

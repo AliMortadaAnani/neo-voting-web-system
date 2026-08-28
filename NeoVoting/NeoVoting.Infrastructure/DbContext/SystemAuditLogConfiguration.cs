@@ -9,7 +9,6 @@ namespace NeoVoting.Infrastructure.DbContext
     {
         public void Configure(EntityTypeBuilder<SystemAuditLog> builder)
         {
-           
             // --- Primary Key ---
             builder.HasKey(sal => sal.Id);
             builder.Property(entity => entity.Id)
@@ -25,7 +24,6 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(sal => sal.Username)
                 .IsRequired()
                 .HasMaxLength(100); // Standard Identity Username length
-
 
             // Details (JSON or Text)
             builder.Property(sal => sal.Details)
@@ -52,8 +50,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 "CK_SystemAuditLog_ActionType",
                 $"[ActionType] IN ({enumActionValues})"
             ));
-
-            
         }
     }
 }

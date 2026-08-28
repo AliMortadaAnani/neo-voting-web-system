@@ -22,7 +22,6 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<bool> IsVoteChoiceExistsByVoteIdAndCandidateProfileIdAsync(Guid voteId, int candidateProfileId)
         {
-            
             return await _context.VoteChoices
                 .AnyAsync(vc => vc.VoteId == voteId && vc.CandidateProfileId == candidateProfileId);
         }
@@ -41,7 +40,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 // 1. First, sort by vote count descending (highest votes come first)
                 .OrderByDescending(cp => cp.VoteChoices.Count)
 
-                // 2. Then, if multiple candidates share the exact same vote count (e.g., a tie at 0 or 5 votes), 
+                // 2. Then, if multiple candidates share the exact same vote count (e.g., a tie at 0 or 5 votes),
                 // randomize their positions using a Guid.
                 .ThenBy(cp => Guid.NewGuid())
 

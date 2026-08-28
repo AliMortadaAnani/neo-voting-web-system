@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Domain.ErrorHandling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Services
 {
@@ -59,7 +53,7 @@ namespace NeoVoting.Application.Services
         }
 
         /*
-         try 
+         try
  {
      // 1. Save NEW image FIRST
      // If this fails, nothing changes. User is safe.
@@ -75,17 +69,17 @@ namespace NeoVoting.Application.Services
      await _context.SaveChangesAsync();
 
      // 4. NOW it is safe to delete the old file
-     // We wrap this in a separate try/catch because if this fails, 
-     // we don't want to crash the request. The user updated successfully, 
+     // We wrap this in a separate try/catch because if this fails,
+     // we don't want to crash the request. The user updated successfully,
      // we just failed to clean up garbage.
      if (!string.IsNullOrEmpty(oldImageUrl))
      {
-         try 
-         { 
-             _fileService.DeleteFile(oldImageUrl); 
-         } 
-         catch 
-         { 
+         try
+         {
+             _fileService.DeleteFile(oldImageUrl);
+         }
+         catch
+         {
              // Log this: "Failed to delete old file: {oldImageUrl}"
              // Do NOT throw error to client.
          }
@@ -97,7 +91,7 @@ namespace NeoVoting.Application.Services
  {
      // If Step 1 or 3 failed, we return error, and the user's old profile is still valid.
      return BadRequest(ex.Message);
- } 
+ }
 
          */
     }

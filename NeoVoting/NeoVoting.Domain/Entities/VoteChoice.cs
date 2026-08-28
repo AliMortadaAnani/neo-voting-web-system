@@ -4,7 +4,7 @@
     /// Represents the link between a single Vote and a single CandidateProfile.
     /// A collection of these objects represents a single voter's choices.
     /// </summary>
-    public class VoteChoice 
+    public class VoteChoice
     {
         // --- Properties ---
 
@@ -17,8 +17,6 @@
 
         public int CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
-
-    
 
         private VoteChoice()
         {
@@ -37,11 +35,8 @@
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
         public static VoteChoice Create(Guid voteId, int candidateProfileId)
         {
-           
-
             var voteChoice = new VoteChoice
             {
-                
                 VoteId = voteId,
                 CandidateProfileId = candidateProfileId
             };
@@ -50,7 +45,5 @@
         }
 
         // Like a Vote, a VoteChoice is immutable. Once created, it should not be changed.
-
-        
     }
 }

@@ -33,7 +33,6 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.Property(e => e.VotingEndDate)
                 .IsRequired();
 
-
             builder.Property(e => e.Status)
                 .IsRequired()
                 .HasConversion<int>(); // Store enum as int in the database
@@ -66,8 +65,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 // Example: enforce that VotingStartDate >= NominationEndDate
                 tb.HasCheckConstraint("CK_Election_VotingAfterNomination",
                     "[VotingStartDate] >= [NominationEndDate]");
-
-               
             });
         }
     }

@@ -1,11 +1,4 @@
-﻿using NeoVoting.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeoVoting.Domain.Entities
+﻿namespace NeoVoting.Domain.Entities
 {
     public class PollVote
     {
@@ -21,14 +14,11 @@ namespace NeoVoting.Domain.Entities
         public int PollAnswerId { get; private set; }
         public PollAnswer PollAnswer { get; private set; }
 
-
         private PollVote()
         {
             Poll = null!;
             PollAnswer = null!;
-
         }
-
 
         public static PollVote Create(int pollId, int pollAnswerId)
         {
@@ -37,7 +27,7 @@ namespace NeoVoting.Domain.Entities
                 Id = Guid.NewGuid(),
                 PollId = pollId,
                 PollAnswerId = pollAnswerId,
-  
+
                 TimestampUTC = DateTime.UtcNow // The timestamp is always set at the moment of creation.
             };
 
