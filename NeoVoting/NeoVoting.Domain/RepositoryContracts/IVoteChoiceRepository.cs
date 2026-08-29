@@ -14,10 +14,12 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<int> GetCountOfTotalVoteChoicesByCandidateProfileIdAsync(int candidateProfileId);
 
         // winners per governorate id per election id
-        Task<List<CandidateResultResponseDTO>> GetTop5CandidatesProfilesPerGovernorate(int electionId, GovernorateIdEnum governorate);
+        Task<List<CandidateResultResponseEF_DTO>> GetTop5CandidatesProfilesPerGovernorateAsync(int electionId, GovernorateIdEnum governorate);
 
-        Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResultsPerGovernorate(int electionId, GovernorateIdEnum governorate, int pageNumber, int pageSize);
+        Task<List<CandidateResultResponseEF_DTO>> GetPagedCandidatesProfilesResultsAsync(int electionId, GovernorateIdEnum? governorate, int pageNumber, int pageSize);
 
-        Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResults(int electionId, int pageNumber, int pageSize);
+        Task<int> CountCandidatesProfilesResultsAsync(
+            int electionId,
+            GovernorateIdEnum? governorate);
     }
 }

@@ -11,14 +11,15 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<bool> IsCandidateProfileExistsByCandidateIdAndElectionIdAsync(int candidateId, int electionId);
 
-        Task<List<CandidateProfile>> GetPagedByElectionIdAndGovernorateAsync
-            (int electionId, GovernorateIdEnum governorate, int pageNumber, int pageSize);
+        Task<int> CountByElectionIdAsync(
+            int electionId,
+            GovernorateIdEnum? governorate);
 
-        Task<int> CountByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate);
-
-        // for stats
-
-        Task<int> CountByElectionIdAsync(int electionId);
+        Task<List<CandidateProfile>> GetPagedByElectionIdAsync(
+     int electionId,
+     GovernorateIdEnum? governorate,
+     int pageNumber,
+     int pageSize);
 
         // Task<int> CountByGovernorateAsync(GovernorateIdEnum governorate); done above
         Task<int> CountByElectionIdAndGenderAsync(int electionId, char gender);

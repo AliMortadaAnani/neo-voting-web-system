@@ -15,6 +15,12 @@ namespace NeoVoting.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<bool> IsCandidateProfileExistsByCandidateIdAndElectionIdAsync(int candidateId, int electionId)
+        {
+            return await _context.CandidateProfiles
+                .AnyAsync(cp => cp.CandidateId == candidateId && cp.ElectionId == electionId);
+        }
+
         public void Add(CandidateProfile candidateProfile)
         {
             _context.CandidateProfiles.Add(candidateProfile);
@@ -27,32 +33,44 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(cp => cp.CandidateId == candidateId && cp.ElectionId == electionId);
         }
 
-        public async Task<bool> IsCandidateProfileExistsByCandidateIdAndElectionIdAsync(int candidateId, int electionId)
-        {
-            return await _context.CandidateProfiles
-                .AnyAsync(cp => cp.CandidateId == candidateId && cp.ElectionId == electionId);
-        }
 
-        public async Task<List<CandidateProfile>> GetPagedByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate, int pageNumber, int pageSize)
+
+        public async Task<List<CandidateProfile>> GetPagedByElectionIdAsync(
+     int electionId,
+     GovernorateIdEnum? governorate,
+     int pageNumber,
+     int pageSize)
         {
-            return await _context.CandidateProfiles
+            var query = _context.CandidateProfiles
                 .Include(cp => cp.Candidate)
                 .AsNoTracking()
-                .Where(cp => cp.ElectionId == electionId && cp.Candidate.Governorate == governorate)
+                .Where(cp => cp.ElectionId == electionId);
+
+            // Apply governorate filter conditionally if provided
+            if (governorate.HasValue)
+            {
+                query = query.Where(cp => cp.Candidate.Governorate == governorate.Value);
+            }
+
+            return await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<int> CountByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate)
+        public async Task<int> CountByElectionIdAsync(
+            int electionId,
+            GovernorateIdEnum? governorate)
         {
-            return await _context.CandidateProfiles
-                .CountAsync(cp => cp.ElectionId == electionId && cp.Candidate.Governorate == governorate);
-        }
+            var query = _context.CandidateProfiles
+                .Where(cp => cp.ElectionId == electionId);
 
-        public async Task<int> CountByElectionIdAsync(int electionId)
-        {
-            return await _context.CandidateProfiles.CountAsync(cp => cp.ElectionId == electionId);
+            if (governorate.HasValue)
+            {
+                query = query.Where(cp => cp.Candidate.Governorate == governorate.Value);
+            }
+
+            return await query.CountAsync();
         }
 
         public async Task<int> CountByElectionIdAndGenderAsync(int electionId, char gender)

@@ -15,23 +15,26 @@ namespace NeoVoting.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<ElectionStatistics?> GetByElectionIdAsync(int electionId)
-        {
-            return await _context.Election_Statistics
-                .Include(eps => eps.Election)
-                .FirstOrDefaultAsync(eps => eps.ElectionId == electionId);
-        }
-
         public void Add(ElectionStatistics electionStatistics)
         {
             _context.Election_Statistics.Add(electionStatistics);
         }
 
-        public async Task<ElectionStatistics?> GetByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate)
+        // Single unified method supporting optional governorate lookup
+        public async Task<ElectionStatistics?> GetByElectionIdAsync(int electionId, GovernorateIdEnum? governorate)
         {
-            return await _context.Election_Statistics
+            var query = _context.Election_Statistics
                 .Include(eps => eps.Election)
-                .FirstOrDefaultAsync(eps => eps.ElectionId == electionId && eps.Governorate == governorate);
+                .Where(eps => eps.ElectionId == electionId);
+
+            if (!governorate.HasValue)
+            {
+                // If governorate is null, return the first record (Global/Overall)
+                return await query.FirstOrDefaultAsync();
+            }
+
+            // If governorate has a value, return the record for that specific governorate
+            return await query.FirstOrDefaultAsync(eps => eps.Governorate == governorate.Value);
         }
     }
 }

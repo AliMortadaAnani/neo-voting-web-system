@@ -12,7 +12,7 @@ namespace NeoVoting.Application.Validators.AdminDTOs
     {
         public ElectionCreate_RequestDTOValidator()
         {
-            RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
             RuleFor(x => x.NominationStartDate).NotNull();
             RuleFor(x => x.NominationEndDate).NotNull();
             RuleFor(x => x.VotingStartDate).NotNull();
@@ -29,8 +29,8 @@ namespace NeoVoting.Application.Validators.AdminDTOs
                 .When(x => x.VotingStartDate.HasValue && x.VotingEndDate.HasValue);
 
             RuleFor(x => x)
-                .Must(x => x.NominationEndDate < x.VotingStartDate)
-                .WithMessage("NominationEndDate must be before VotingStartDate")
+                .Must(x => x.NominationEndDate <= x.VotingStartDate)
+                .WithMessage("NominationEndDate must be before or equal to VotingStartDate")
                 .When(x => x.NominationEndDate.HasValue && x.VotingStartDate.HasValue);
         }
     }

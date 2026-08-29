@@ -15,7 +15,7 @@ namespace NeoVoting.Application.Validators.CandidateDTOs
             RuleFor(x => x.CandidateProfileId).NotNull();
             RuleFor(x => x.Goals).NotEmpty();
             RuleFor(x => x.NominationReasons).NotEmpty();
-            RuleFor(x => x.ProfilePhotoFilename).NotEmpty();
+            //RuleFor(x => x.ProfilePhotoFilename).NotEmpty();
             RuleFor(x => x.ApplicationUserId).NotNull();
             RuleFor(x => x.CandidateId).NotNull();
             RuleFor(x => x.Username).NotEmpty();

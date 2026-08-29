@@ -15,14 +15,24 @@ namespace NeoVoting.Infrastructure.Repositories
             _context = context;
         }
 
-        public void Add(Election election)
+        public async Task<Election?> GetByIdAsync(int electionId)
         {
-            _context.Elections.Add(election);
+            return await _context.Elections.FindAsync(electionId);
         }
 
         public async Task<bool> IsActiveElectionExistsAsync()
         {
             return await _context.Elections.AnyAsync(e => e.Status != StatusEnum.Completed);
+        }
+
+        public async Task<bool> IsElectionNameExistsAsync(string electionName)
+        {
+            return await _context.Elections.AnyAsync(e => e.Name == electionName);
+        }
+
+        public void Add(Election election)
+        {
+            _context.Elections.Add(election);
         }
 
         public async Task<List<Election>> GetPagedAsync(int pageNumber, int pageSize)
@@ -39,24 +49,9 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.Elections.CountAsync();
         }
 
-        public async Task<Election?> GetByIdAsync(int electionId)
-        {
-            return await _context.Elections.FindAsync(electionId);
-        }
-
-        public async Task<Election?> GetByNameAsync(string electionName)
-        {
-            return await _context.Elections.FirstOrDefaultAsync(e => e.Name == electionName);
-        }
-
         public async Task<Election?> GetActiveElectionAsync()
         {
             return await _context.Elections.FirstOrDefaultAsync(e => e.Status != StatusEnum.Completed);
-        }
-
-        public async Task<bool> IsElectionNameExistsAsync(string electionName)
-        {
-            return await _context.Elections.AnyAsync(e => e.Name == electionName);
         }
 
         public async Task<bool> IsElectionUpcomingPhaseAsync(int electionId)

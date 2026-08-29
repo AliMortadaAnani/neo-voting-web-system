@@ -47,12 +47,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == pollId);
         }
 
-        public async Task<Poll?> GetByNameAsync(string pollName)
-        {
-            return await _context.Polls
-                .Include(p => p.PollAnswers)
-                .SingleOrDefaultAsync(p => p.Name == pollName);
-        }
+        
 
         public async Task<Poll?> GetActivePollAsync()
         {

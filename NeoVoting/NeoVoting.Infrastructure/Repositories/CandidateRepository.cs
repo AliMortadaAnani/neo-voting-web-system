@@ -18,6 +18,16 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _context.Candidates.AnyAsync(c => c.VerificationHash == verificationHash);
         }
+        public void Add(Candidate candidate)
+        {
+            _context.Candidates.Add(candidate);
+        }
+        public async Task<Candidate?> GetByUserIdAsync(int userId)
+        {
+            return await _context.Candidates
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+        }
 
         public async Task<Candidate?> GetByVerificationHashAsync(string verificationHash)
         {
@@ -26,16 +36,6 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.VerificationHash == verificationHash);
         }
 
-        public async Task<Candidate?> GetByUserIdAsync(int userId)
-        {
-            return await _context.Candidates
-                .Include(c => c.User)
-                .FirstOrDefaultAsync(c => c.UserId == userId);
-        }
 
-        public void Add(Candidate candidate)
-        {
-            _context.Candidates.Add(candidate);
-        }
     }
 }

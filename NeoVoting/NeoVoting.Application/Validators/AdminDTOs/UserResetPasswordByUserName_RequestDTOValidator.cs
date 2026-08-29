@@ -12,8 +12,8 @@ namespace NeoVoting.Application.Validators.AdminDTOs
     {
         public UserResetPasswordByUserName_RequestDTOValidator()
         {
-            RuleFor(x => x.UserName).NotEmpty();
-            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(6);
+            RuleFor(x => x.UserName).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(3);
             RuleFor(x => x.ConfirmPassword).NotEmpty();
 
             RuleFor(x => x)

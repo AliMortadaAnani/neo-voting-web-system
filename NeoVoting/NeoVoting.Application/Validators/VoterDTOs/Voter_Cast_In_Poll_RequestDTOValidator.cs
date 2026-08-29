@@ -13,8 +13,8 @@ namespace NeoVoting.Application.Validators.VoterDTOs
         public Voter_Cast_In_Poll_RequestDTOValidator()
         {
             RuleFor(x => x)
-                .Must(x => x.SelectedPollAnswerId.HasValue || !string.IsNullOrEmpty(x.SelectedPollAnswer))
-                .WithMessage("Either SelectedPollAnswerId or SelectedPollAnswer must be provided");
+                .Must(x => x.SelectedPollAnswerId.HasValue && !string.IsNullOrEmpty(x.SelectedPollAnswer))
+                .WithMessage("Either SelectedPollAnswerId and SelectedPollAnswer must be provided");
         }
     }
 }

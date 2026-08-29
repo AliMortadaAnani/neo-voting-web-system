@@ -12,8 +12,9 @@ namespace NeoVoting.Application.Validators.CandidateDTOs
     {
         public CandidateProfile_Create_Update_RequestDTOValidator()
         {
-            RuleFor(x => x.Goals).NotEmpty();
-            RuleFor(x => x.NominationReasons).NotEmpty();
+            RuleFor(x => x.Goals).NotEmpty().MaximumLength(2000);
+            RuleFor(x => x.NominationReasons).NotEmpty().MaximumLength(2000);
+            
         }
     }
 }

@@ -7,16 +7,14 @@ namespace NeoVoting.Domain.RepositoryContracts
     {
         void Add(SystemAuditLog log);
 
-        Task<List<SystemAuditLog>> GetPagedSystemAuditLogsAsync(int pageNumber, int pageSize);
+        Task<List<SystemAuditLog>> GetPagedAsync(
+            SystemActionTypesEnum? actionType, int? adminId,
+            int pageNumber, int pageSize);
 
-        Task<int> CountAsync();
+        Task<int> CountAsync(
+            SystemActionTypesEnum? actionType, int? adminId
+            );
 
-        Task<List<SystemAuditLog>> GetPagedByActionTypeAsync(SystemActionTypesEnum systemAction, int pageNumber, int pageSize, CancellationToken cancellationToken);
-
-        Task<int> CountByActionTypeAsync(SystemActionTypesEnum systemAction);
-
-        Task<List<SystemAuditLog>> GetPagedByAdminIdAsync(int adminId, int pageNumber, int pageSize);
-
-        Task<int> CountByAdminIdAsync(int adminId);
+        
     }
 }

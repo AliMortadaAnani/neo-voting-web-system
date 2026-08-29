@@ -33,26 +33,42 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FindAsync(voteId);
         }
 
-        public async Task<List<Vote>> GetPagedByElectionIdAsync(int electionId, int pageNumber, int pageSize)
+        public async Task<List<Vote>> GetPagedByElectionIdAsync(
+    int electionId,
+    GovernorateIdEnum? governorate,
+    int pageNumber,
+    int pageSize)
         {
-            return await _context.Votes
+            var query = _context.Votes
                 .AsNoTracking()
-                .Where(v => v.ElectionId == electionId)
-                .OrderByDescending(v => v.TimestampUTC) // Assuming you want to order by timestamp
+                .Where(v => v.ElectionId == electionId);
+
+            // If governorate is provided, filter by it. If null, it gets all votes for the election.
+            if (governorate.HasValue)
+            {
+                query = query.Where(v => v.Governorate == governorate.Value);
+            }
+
+            return await query
+                .OrderByDescending(v => v.TimestampUTC)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<List<Vote>> GetPagedByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate, int pageNumber, int pageSize)
+        public async Task<int> CountByElectionIdAsync(
+            int electionId,
+            GovernorateIdEnum? governorate)
         {
-            return await _context.Votes
-                .AsNoTracking()
-                .Where(v => v.ElectionId == electionId && v.Governorate == governorate)
-                .OrderByDescending(v => v.TimestampUTC) // Assuming you want to order by timestamp
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var query = _context.Votes
+                .Where(v => v.ElectionId == electionId);
+
+            if (governorate.HasValue)
+            {
+                query = query.Where(v => v.Governorate == governorate.Value);
+            }
+
+            return await query.CountAsync();
         }
 
     }

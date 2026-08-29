@@ -6,86 +6,58 @@ namespace NeoVoting.Domain.ResultErrorDomain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails400ErrorTypes // Validation / Bad Request
     {
-        Paging_InvalidInput,
-        Voter_InvalidUsername,//Government System
-        Candidate_InvalidUsername,//Government System
-        Password_Mismatch,
-        Election_AlreadyInStatus,
-        Election_InvalidStatusTransition
+        Active_Election_AlreadyExists,
+        Cannot_Update_CompletedElection,
+
+        Active_Poll_AlreadyExists,
+        Cannot_Update_CompletedPoll
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum ProblemDetails401ErrorTypes // Unauthorized (Auth & Credentials)
+    public enum ProblemDetails401ErrorTypes // Unauthorized 
     {
-        // Admin Auth
-        Admin_InvalidCredentials,
+        User_InvalidCredentials, // any user in system
 
-        User_InvalidCredentials,
+        Voter_InvalidCredentials,//Government System
 
-        Voter_NotEligible,//Government System
+        Candidate_InvalidCredentials,//Government System
 
-        Voter_InvalidToken,//Government System
-        Voter_NotRegistered,//Government System
-
-        Candidate_NotEligible,//Government System
-
-        Candidate_InvalidToken,//Government System
-
-        Auth_UnauthorizedAccess,
-
-        Auth_InvalidApiKey,//Government System
-        Auth_TokenMissing,//Government System
-        Auth_InvalidToken
+        Auth_InvalidToken // JWT Token is invalid or expired
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails403ErrorTypes // Forbidden
     {
-        Auth_ForbiddenAccess,
-        IpWhitelist_ForbiddenIP,//Government System
-        IpWhitelist_RestrictedEndpoint,//Government System
-        User_LockedOut,
-        CandidateProfile_NotInNominationPhase,
-        Voter_NotInVotingPhase
+        Auth_ForbiddenAccess // JWT Token is valid but user does not have permission to access the resource
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails404ErrorTypes // Not Found
     {
-        Voter_NotFound,//Government System
-        Candidate_NotFound,//Government System
-        Paging_OutOfBounds,
-        Election_NotFound
+        Poll_NotFound,
+        Election_NotFound,
+        CandidateProfile_NotFound
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails409ErrorTypes // Conflict
     {
-        Voter_AlreadyRegistered,//Government System
-        Voter_AlreadyVoted,//Government System
-        Candidate_AlreadyRegistered,//Government System
+        Voter_AlreadyRegistered,
+        Voter_AlreadyVoted,
+        Candidate_AlreadyRegistered,
+        CandidateProfile_AlreadyExisted,
         User_DuplicateUsername,
-        Election_AlreadyActive,
-        CandidateProfile_AlreadyExisted
+        Election_DuplicateName,
+
+        Poll_DuplicateName
+        
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails500ErrorTypes // Server Failure
     {
-        Server_Error,
-        Server_ConfigurationError,//Government System
-        Voter_OperationFailed,//Government System
-        Candidate_OperationFailed,//Government System
-        Login_Failed,
-        Logout_Failed,
-        RefreshToken_Failed,
-        Role_CreationFailed,
-        UserCreation_Failed,
-        UserRoleAssignment_Failed,
-        GovernmentSystemGateway_Error,
-        PasswordReset_Failed,
-        Election_CreationFailed,
-        CandidateProfile_CreationFailed
+        Server_Error, // NeoVoting Server Error
+        GovernmentSystemGateway_Error // Government System Gateway Error
     }
 
     public enum ProblemDetails429ErrorTypes // Too Many Requests

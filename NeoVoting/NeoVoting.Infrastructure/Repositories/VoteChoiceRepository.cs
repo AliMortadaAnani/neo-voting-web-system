@@ -34,7 +34,7 @@ namespace NeoVoting.Infrastructure.Repositories
         }
 
         // to specify winners and add them to ElectionWinners table, we need to get the top 5 candidates profiles per governorate based on their vote count => insert them into ElectionWinners table
-        public async Task<List<CandidateResultResponseDTO>> GetTop5CandidatesProfilesPerGovernorate(int electionId, GovernorateIdEnum governorate)
+        public async Task<List<CandidateResultResponseEF_DTO>> GetTop5CandidatesProfilesPerGovernorateAsync(int electionId, GovernorateIdEnum governorate)
         {
             return await _context.CandidateProfiles
                 .AsNoTracking()
@@ -47,7 +47,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ThenBy(cp => Guid.NewGuid())
 
                 .Take(5)
-                .Select(cp => new CandidateResultResponseDTO
+                .Select(cp => new CandidateResultResponseEF_DTO
                 {
                     CandidateProfileId = cp.Id,
                     FirstName = cp.Candidate.FirstName,
@@ -60,62 +60,56 @@ namespace NeoVoting.Infrastructure.Repositories
         }
 
 
-        // in case vote count was a tie , results will show different order each time the page is refreshed, because of the randomization using Guid
-        // although Winners are determined only 1 time after the election ends, and they are stored in the ElectionWinners table, so they will not change
-        public async Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResultsPerGovernorate(int electionId, GovernorateIdEnum governorate,
-            int pageNumber, int pageSize)
+        public async Task<List<CandidateResultResponseEF_DTO>> GetPagedCandidatesProfilesResultsAsync(
+    int electionId,
+    GovernorateIdEnum? governorate,
+    int pageNumber,
+    int pageSize)
         {
-            return await _context.CandidateProfiles
+            var query = _context.CandidateProfiles
                 .AsNoTracking()
-                .Where(cp => cp.ElectionId == electionId && cp.Candidate.Governorate == governorate)
+                .Where(cp => cp.ElectionId == electionId);
+
+            // Apply governorate filter conditionally if provided
+            if (governorate.HasValue)
+            {
+                query = query.Where(cp => cp.Candidate.Governorate == governorate.Value);
+            }
+
+            return await query
                 // 1. First, sort by vote count descending (highest votes come first)
                 .OrderByDescending(cp => cp.VoteChoices.Count)
 
-                // 2. Then, if multiple candidates share the exact same vote count (e.g., a tie at 0 or 5 votes),
-                // randomize their positions using a Guid.
+                // 2. Then, if multiple candidates share the exact same vote count, randomize using Guid.
                 .ThenBy(cp => Guid.NewGuid())
 
-               .Select(cp => new CandidateResultResponseDTO
-               {
-                   CandidateProfileId = cp.Id,
-                   FirstName = cp.Candidate.FirstName,
-                   LastName = cp.Candidate.LastName,
-                   ProfilePhotoFilename = cp.ProfilePhotoFilename ?? string.Empty,
-                   Governorate = cp.Candidate.Governorate,
-                   VoteCount = cp.VoteChoices.Count // Evaluated efficiently by EF Core as a SQL COUNT aggregate
-               })
+                .Select(cp => new CandidateResultResponseEF_DTO
+                {
+                    CandidateProfileId = cp.Id,
+                    FirstName = cp.Candidate.FirstName,
+                    LastName = cp.Candidate.LastName,
+                    ProfilePhotoFilename = cp.ProfilePhotoFilename ?? string.Empty,
+                    Governorate = cp.Candidate.Governorate,
+                    VoteCount = cp.VoteChoices.Count
+                })
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        // in case vote count was a tie , results will show different order each time the page is refreshed, because of the randomization using Guid
-        // although Winners are determined only 1 time after the election ends, and they are stored in the ElectionWinners table, so they will not change
-        public async Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResults(int electionId,
-           int pageNumber, int pageSize)
+        public async Task<int> CountCandidatesProfilesResultsAsync(
+            int electionId,
+            GovernorateIdEnum? governorate)
         {
-            return await _context.CandidateProfiles
-                .AsNoTracking()
-                .Where(cp => cp.ElectionId == electionId)
-                // 1. First, sort by vote count descending (highest votes come first)
-                .OrderByDescending(cp => cp.VoteChoices.Count)
+            var query = _context.CandidateProfiles
+                .Where(cp => cp.ElectionId == electionId);
 
-                // 2. Then, if multiple candidates share the exact same vote count (e.g., a tie at 0 or 5 votes),
-                // randomize their positions using a Guid.
-                .ThenBy(cp => Guid.NewGuid())
+            if (governorate.HasValue)
+            {
+                query = query.Where(cp => cp.Candidate.Governorate == governorate.Value);
+            }
 
-               .Select(cp => new CandidateResultResponseDTO
-               {
-                   CandidateProfileId = cp.Id,
-                   FirstName = cp.Candidate.FirstName,
-                   LastName = cp.Candidate.LastName,
-                   ProfilePhotoFilename = cp.ProfilePhotoFilename ?? string.Empty,
-                   Governorate = cp.Candidate.Governorate,
-                   VoteCount = cp.VoteChoices.Count // Evaluated efficiently by EF Core as a SQL COUNT aggregate
-               })
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            return await query.CountAsync();
         }
     }
 }

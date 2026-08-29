@@ -11,8 +11,8 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<Vote?> GetByVoteId(Guid voteId);
 
-        Task<List<Vote>> GetPagedByElectionIdAsync(int electionId, int pageNumber, int pageSize);
+        Task<List<Vote>> GetPagedByElectionIdAsync(int electionId,GovernorateIdEnum? governorate, int pageNumber, int pageSize);
 
-        Task<List<Vote>> GetPagedByElectionIdAndGovernorateAsync(int electionId,GovernorateIdEnum governorate, int pageNumber, int pageSize);
+        Task<int> CountByElectionIdAsync (int electionId, GovernorateIdEnum? governorate);
     }
 }

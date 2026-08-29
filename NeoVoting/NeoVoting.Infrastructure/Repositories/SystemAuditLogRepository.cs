@@ -20,51 +20,52 @@ namespace NeoVoting.Infrastructure.Repositories
             _context.SystemAuditLogs.Add(log);
         }
 
-        public async Task<List<SystemAuditLog>> GetPagedSystemAuditLogsAsync(int pageNumber, int pageSize)
+        // Unified Paged Method (Handles All, by Action, by Admin, or both)
+        public async Task<List<SystemAuditLog>> GetPagedAsync(
+            SystemActionTypesEnum? actionType,
+            int? adminId,
+            int pageNumber,
+            int pageSize)
         {
-            return await _context.SystemAuditLogs
-                .AsNoTracking()
+            var query = _context.SystemAuditLogs.AsNoTracking();
+
+            // Apply optional ActionType filter if provided
+            if (actionType.HasValue)
+            {
+                query = query.Where(s => s.ActionType == actionType.Value);
+            }
+
+            // Apply optional AdminId filter if provided
+            if (adminId.HasValue)
+            {
+                query = query.Where(s => s.AdminId == adminId.Value);
+            }
+
+            return await query
                 .OrderByDescending(s => s.TimestampUTC)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<int> CountAsync()
+        // Unified Count Method (Handles All, by Action, by Admin, or both)
+        public async Task<int> CountAsync(
+            SystemActionTypesEnum? actionType,
+            int? adminId)
         {
-            return await _context.SystemAuditLogs.CountAsync();
-        }
+            var query = _context.SystemAuditLogs.AsQueryable();
 
-        public async Task<List<SystemAuditLog>> GetPagedByActionTypeAsync(SystemActionTypesEnum systemAction, int pageNumber, int pageSize, CancellationToken cancellationToken)
-        {
-            return await _context.SystemAuditLogs
-                .AsNoTracking()
-                .Where(s => s.ActionType == systemAction)
-                .OrderByDescending(s => s.TimestampUTC)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync(cancellationToken);
-        }
+            if (actionType.HasValue)
+            {
+                query = query.Where(s => s.ActionType == actionType.Value);
+            }
 
-        public async Task<int> CountByActionTypeAsync(SystemActionTypesEnum systemAction)
-        {
-            return await _context.SystemAuditLogs.CountAsync(s => s.ActionType == systemAction);
-        }
+            if (adminId.HasValue)
+            {
+                query = query.Where(s => s.AdminId == adminId.Value);
+            }
 
-        public async Task<List<SystemAuditLog>> GetPagedByAdminIdAsync(int adminId, int pageNumber, int pageSize)
-        {
-            return await _context.SystemAuditLogs
-                .AsNoTracking()
-                .Where(s => s.AdminId == adminId)
-                .OrderByDescending(s => s.TimestampUTC)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-
-        public async Task<int> CountByAdminIdAsync(int adminId)
-        {
-            return await _context.SystemAuditLogs.CountAsync(s => s.AdminId == adminId);
+            return await query.CountAsync();
         }
     }
 }

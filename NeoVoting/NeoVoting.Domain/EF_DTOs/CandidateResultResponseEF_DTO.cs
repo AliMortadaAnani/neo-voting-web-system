@@ -2,7 +2,7 @@
 
 namespace NeoVoting.Domain.EF_DTOs
 {
-    public class CandidateResultResponseDTO
+    public class CandidateResultResponseEF_DTO
     {
         public int CandidateProfileId { get; set; }
         public string FirstName { get; set; } = string.Empty;

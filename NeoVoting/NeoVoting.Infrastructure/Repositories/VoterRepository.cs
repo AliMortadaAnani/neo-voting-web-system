@@ -15,6 +15,32 @@ namespace NeoVoting.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<bool> IsVoterExistByVerificationHashAsync(string verificationHash)
+        {
+            return await _context.Voters.AnyAsync(v => v.VerificationHash == verificationHash);
+        }
+
+        public void Add(Voter voter)
+        {
+            _context.Voters.Add(voter);
+        }
+
+
+        public async Task<Voter?> GetByUserIdAsync(int userId)
+        {
+            return await _context.Voters
+                .Include(v => v.User)
+                .FirstOrDefaultAsync(v => v.UserId == userId);
+        }
+        public async Task<Voter?> GetByVerificationHashAsync(string verificationHash)
+        {
+            return await _context.Voters
+                .Include(v => v.User)
+                .FirstOrDefaultAsync(v => v.VerificationHash == verificationHash);
+        }
+        
+
+
         public async Task<int> CountAsync()
         {
             return await _context.Voters.CountAsync();
@@ -56,28 +82,10 @@ namespace NeoVoting.Infrastructure.Repositories
                                  v.DateOfBirth <= maxDate);
         }
 
-        public async Task<bool> IsVoterExistByVerificationHashAsync(string verificationHash)
-        {
-            return await _context.Voters.AnyAsync(v => v.VerificationHash == verificationHash);
-        }
 
-        public async Task<Voter?> GetByVerificationHashAsync(string verificationHash)
-        {
-            return await _context.Voters
-                .Include(v => v.User)
-                .FirstOrDefaultAsync(v => v.VerificationHash == verificationHash);
-        }
+        
 
-        public async Task<Voter?> GetByUserIdAsync(int userId)
-        {
-            return await _context.Voters
-                .Include(v => v.User)
-                .FirstOrDefaultAsync(v => v.UserId == userId);
-        }
+        
 
-        public void Add(Voter voter)
-        {
-            _context.Voters.Add(voter);
-        }
     }
 }

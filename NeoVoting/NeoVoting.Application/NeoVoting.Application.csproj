@@ -19,10 +19,6 @@
 
   <ItemGroup>
     <Folder Include="RequestDTOs\GeneralDTOs\" />
-    <Folder Include="Validators\AuthDTOs\" />
-    <Folder Include="Validators\CandidateDTOs\" />
-    <Folder Include="Validators\GeneralDTOs\" />
-    <Folder Include="Validators\VoterDTOs\" />
   </ItemGroup>
 
 </Project>

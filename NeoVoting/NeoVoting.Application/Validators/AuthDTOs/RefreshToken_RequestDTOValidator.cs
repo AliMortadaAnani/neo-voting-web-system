@@ -12,8 +12,11 @@ namespace NeoVoting.Application.Validators.AuthDTOs
     {
         public RefreshToken_RequestDTOValidator()
         {
-            // Both are optional since they can come from cookies or body
-            // No required rules needed
+
+            RuleFor(x => x.AccessToken).NotEmpty().WithMessage("Access token is required.");
+
+            //RuleFor(x => x.RefreshToken).NotEmpty().WithMessage("Refresh token is required.");
+            // we will extract the refresh token from the cookie, so we don't need to validate it here
         }
     }
 }

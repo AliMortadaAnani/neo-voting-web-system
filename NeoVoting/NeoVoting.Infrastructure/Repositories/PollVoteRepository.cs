@@ -47,6 +47,8 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.PollAnswers
                 .AsNoTracking()
                 .Where(pa => pa.PollId == pollId)
+                .OrderByDescending(pa => pa.PollVotes.Count)
+                .ThenBy(cp => Guid.NewGuid()) // Randomize order for answers with the same vote count
                 .Select(pa => new PollResultBucketDto
                 {
                     Answer = pa,
@@ -58,6 +60,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<PollAnswer?> GetWinnerAnswerByPollIdAsync(int pollId)
         {
             return await _context.PollAnswers
+                .AsNoTracking()
                 .Where(pa => pa.PollId == pollId)
                 .OrderByDescending(pa => pa.PollVotes.Count)
                 .ThenBy(cp => Guid.NewGuid())
