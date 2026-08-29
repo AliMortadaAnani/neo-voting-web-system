@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
@@ -32,7 +33,8 @@ namespace NeoVoting.Infrastructure.Repositories
                 .CountAsync(vc => vc.CandidateProfileId == candidateProfileId);
         }
 
-        public async Task<List<CandidateProfile>> GetTop5CandidatesProfilesPerGovernorate(int electionId, GovernorateIdEnum governorate)
+        // to specify winners and add them to ElectionWinners table, we need to get the top 5 candidates profiles per governorate based on their vote count
+        public async Task<List<CandidateResultResponseDTO>> GetTop5CandidatesProfilesPerGovernorate(int electionId, GovernorateIdEnum governorate)
         {
             return await _context.CandidateProfiles
                 .AsNoTracking()
@@ -45,6 +47,70 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ThenBy(cp => Guid.NewGuid())
 
                 .Take(5)
+                .Select(cp => new CandidateResultResponseDTO
+                {
+                    CandidateProfileId = cp.Id,
+                    FirstName = cp.Candidate.FirstName,
+                    LastName = cp.Candidate.LastName,
+                    ProfilePhotoFilename = cp.ProfilePhotoFilename ?? string.Empty,
+                    Governorate = cp.Candidate.Governorate,
+                    VoteCount = cp.VoteChoices.Count // Evaluated efficiently by EF Core as a SQL COUNT aggregate
+                })
+                .ToListAsync();
+        }
+
+        // for results page, we need to get all candidates profiles per governorate based on their vote count
+        public async Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResultsPerGovernorate(int electionId, GovernorateIdEnum governorate,
+            int pageNumber, int pageSize)
+        {
+            return await _context.CandidateProfiles
+                .AsNoTracking()
+                .Where(cp => cp.ElectionId == electionId && cp.Candidate.Governorate == governorate)
+                // 1. First, sort by vote count descending (highest votes come first)
+                .OrderByDescending(cp => cp.VoteChoices.Count)
+
+                // 2. Then, if multiple candidates share the exact same vote count (e.g., a tie at 0 or 5 votes),
+                // randomize their positions using a Guid.
+                .ThenBy(cp => Guid.NewGuid())
+
+               .Select(cp => new CandidateResultResponseDTO
+               {
+                   CandidateProfileId = cp.Id,
+                   FirstName = cp.Candidate.FirstName,
+                   LastName = cp.Candidate.LastName,
+                   ProfilePhotoFilename = cp.ProfilePhotoFilename ?? string.Empty,
+                   Governorate = cp.Candidate.Governorate,
+                   VoteCount = cp.VoteChoices.Count // Evaluated efficiently by EF Core as a SQL COUNT aggregate
+               })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResults(int electionId,
+           int pageNumber, int pageSize)
+        {
+            return await _context.CandidateProfiles
+                .AsNoTracking()
+                .Where(cp => cp.ElectionId == electionId)
+                // 1. First, sort by vote count descending (highest votes come first)
+                .OrderByDescending(cp => cp.VoteChoices.Count)
+
+                // 2. Then, if multiple candidates share the exact same vote count (e.g., a tie at 0 or 5 votes),
+                // randomize their positions using a Guid.
+                .ThenBy(cp => Guid.NewGuid())
+
+               .Select(cp => new CandidateResultResponseDTO
+               {
+                   CandidateProfileId = cp.Id,
+                   FirstName = cp.Candidate.FirstName,
+                   LastName = cp.Candidate.LastName,
+                   ProfilePhotoFilename = cp.ProfilePhotoFilename ?? string.Empty,
+                   Governorate = cp.Candidate.Governorate,
+                   VoteCount = cp.VoteChoices.Count // Evaluated efficiently by EF Core as a SQL COUNT aggregate
+               })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
     }

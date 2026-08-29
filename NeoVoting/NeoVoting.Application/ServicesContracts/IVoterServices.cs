@@ -1,12 +1,10 @@
-﻿using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Domain.ResultErrorDomain;
+﻿using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.ServicesContracts
 {
     public interface IVoterServices
     {
-        Task<Result<VoterCastVote_ResponseDTO>> VoterCastVoteAsync(Guid electionId, VoterCastVote_RequestDTO request, CancellationToken cancellationToken);
+        Task<Result<Voter_Cast_Track_Vote_ResponseDTO>> VoterCastVoteAsync(Guid electionId, VoterCastVote_RequestDTO request, CancellationToken cancellationToken);
 
         Task<Result<IReadOnlyList<CandidateProfile_ResponseDTO>>> GetPagedCandidatesByElectionIdAsync(Guid electionId, int pageNumber, int pageSize, CancellationToken cancellationToken);
 

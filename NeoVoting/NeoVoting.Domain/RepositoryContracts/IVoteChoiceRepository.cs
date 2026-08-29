@@ -1,4 +1,5 @@
-﻿using NeoVoting.Domain.Entities;
+﻿using NeoVoting.Domain.EF_DTOs;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
@@ -13,6 +14,10 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<int> GetCountOfTotalVoteChoicesByCandidateProfileIdAsync(int candidateProfileId);
 
         // winners per governorate id per election id
-        Task<List<CandidateProfile>> GetTop5CandidatesProfilesPerGovernorate(int electionId, GovernorateIdEnum governorate);
+        Task<List<CandidateResultResponseDTO>> GetTop5CandidatesProfilesPerGovernorate(int electionId, GovernorateIdEnum governorate);
+
+        Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResultsPerGovernorate(int electionId, GovernorateIdEnum governorate, int pageNumber, int pageSize);
+
+        Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResults(int electionId, int pageNumber, int pageSize);
     }
 }

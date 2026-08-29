@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
@@ -20,7 +21,7 @@ namespace NeoVoting.Infrastructure.Repositories
             _context.ElectionWinners.Add(winner);
         }
 
-        public async Task<List<ElectionWinner>> GetAllWinnersByElectionIdAsync(int electionId)
+        public async Task<List<CandidateResultResponseDTO>> GetAllWinnersByElectionIdAsync(int electionId)
         {
             return await _context.ElectionWinners
                 .AsNoTracking()
@@ -32,10 +33,20 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Include(ew => ew.CandidateProfile)
                     .ThenInclude(profile => profile.Election)
                 .Where(ew => ew.CandidateProfile.ElectionId == electionId)
+                .OrderByDescending(ew => ew.VoteCount ?? ew.CandidateProfile.VoteChoices.Count) // Order by VoteCount, using the count of VoteChoices as a fallback
+                .Select(ew => new CandidateResultResponseDTO
+                {
+                    CandidateProfileId = ew.CandidateProfileId,
+                    FirstName = ew.CandidateProfile.Candidate.FirstName,
+                    LastName = ew.CandidateProfile.Candidate.LastName,
+                    ProfilePhotoFilename = ew.CandidateProfile.ProfilePhotoFilename ?? string.Empty,
+                    Governorate = ew.CandidateProfile.Candidate.Governorate,
+                    VoteCount = ew.VoteCount ?? ew.CandidateProfile.VoteChoices.Count // Evaluated efficiently by EF Core as a SQL COUNT aggregate
+                })
                 .ToListAsync();
         }
 
-        public async Task<List<ElectionWinner>> GetAllWinnersByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate)
+        public async Task<List<CandidateResultResponseDTO>> GetAllWinnersByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate)
         {
             return await _context.ElectionWinners
                 .AsNoTracking()
@@ -48,6 +59,16 @@ namespace NeoVoting.Infrastructure.Repositories
                     .ThenInclude(profile => profile.Election)
                 .Where(ew => ew.CandidateProfile.ElectionId == electionId &&
                             ew.CandidateProfile.Candidate.Governorate == governorate)
+                               .OrderByDescending(ew => ew.VoteCount ?? ew.CandidateProfile.VoteChoices.Count) // Order by VoteCount, using the count of VoteChoices as a fallback
+                .Select(ew => new CandidateResultResponseDTO
+                {
+                    CandidateProfileId = ew.CandidateProfileId,
+                    FirstName = ew.CandidateProfile.Candidate.FirstName,
+                    LastName = ew.CandidateProfile.Candidate.LastName,
+                    ProfilePhotoFilename = ew.CandidateProfile.ProfilePhotoFilename ?? string.Empty,
+                    Governorate = ew.CandidateProfile.Candidate.Governorate,
+                    VoteCount = ew.VoteCount ?? ew.CandidateProfile.VoteChoices.Count // Evaluated efficiently by EF Core as a SQL COUNT aggregate
+                })
                 .ToListAsync();
         }
 

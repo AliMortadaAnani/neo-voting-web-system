@@ -11,8 +11,6 @@ namespace NeoVoting.Domain.Entities
         // --- Properties ---
 
         public Guid Id { get; private set; }
-        public int VoterAge { get; private set; }
-        public char VoterGender { get; private set; }
         public GovernorateIdEnum Governorate { get; private set; }
         public DateTime TimestampUTC { get; private set; }
 
@@ -28,15 +26,14 @@ namespace NeoVoting.Domain.Entities
             Election = null!;
         }
 
-        public static Vote Create(int electionId, GovernorateIdEnum governorate, int voterAge, char voterGender)
+        public static Vote Create(int electionId, GovernorateIdEnum governorate)
         {
             var vote = new Vote
             {
                 Id = Guid.NewGuid(),
                 ElectionId = electionId,
                 Governorate = governorate,
-                VoterAge = voterAge,
-                VoterGender = char.ToUpper(voterGender),
+
                 TimestampUTC = DateTime.UtcNow // The timestamp is always set at the moment of creation.
             };
 

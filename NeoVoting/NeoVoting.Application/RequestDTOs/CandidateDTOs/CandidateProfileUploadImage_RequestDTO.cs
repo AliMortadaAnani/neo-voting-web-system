@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace NeoVoting.Application.RequestDTOs
+namespace NeoVoting.Application.RequestDTOs.CandidateDTOs
 {
     public class CandidateProfileUploadImage_RequestDTO
     {

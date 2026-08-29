@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.API.Controllers
 {
@@ -37,7 +32,6 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
-        
         [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddElection([FromBody] ElectionAdd_RequestDTO request, CancellationToken ct)
@@ -86,7 +80,6 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [HttpGet("audit-logs/paged")]
         [ProducesResponseType(typeof(IReadOnlyList<SystemAuditLog_ResponseDTO>), StatusCodes.Status200OK)]
-
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
@@ -94,7 +87,6 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPagedAuditLogs([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
-            
             var result = await _adminServices.GetPagedSystemAuditLogsAsync(pageNumber, pageSize, ct);
             return HandleResult(result);
         }
@@ -123,7 +115,6 @@ namespace NeoVoting.API.Controllers
             [FromQuery] int pageSize = 10,
             CancellationToken ct = default)
         {
-            
             var result = await _adminServices.GetPagedSystemAuditLogsByActionTypeAsync(actionType, pageNumber, pageSize, ct);
             return HandleResult(result);
         }
@@ -151,7 +142,6 @@ namespace NeoVoting.API.Controllers
             [FromQuery] int pageSize = 10,
             CancellationToken ct = default)
         {
-           
             var result = await _adminServices.GetPagedSystemAuditLogsByElectionIdAsync(electionId, pageNumber, pageSize, ct);
             return HandleResult(result);
         }
@@ -172,7 +162,7 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAuditLogsByUserId(
-            
+
            [FromQuery] Guid userId, CancellationToken ct)
         {
             var result = await _adminServices.GetSystemAuditLogsByUserIdAsync(userId, ct);

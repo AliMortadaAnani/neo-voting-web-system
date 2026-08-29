@@ -1,9 +1,8 @@
 using FluentValidation;
-using NeoVoting.Application.AuthDTOs;
 
 namespace NeoVoting.Application.Validators.AdminDTOs
 {
-    public class Registration_ResetPassword_ResponseDTO_Validator : AbstractValidator<Registration_ResetPassword_ResponseDTO>
+    public class Registration_ResetPassword_ResponseDTO_Validator : AbstractValidator<RegisterVoterOrCandidate_ResponseDTO>
     {
         public Registration_ResetPassword_ResponseDTO_Validator()
         {

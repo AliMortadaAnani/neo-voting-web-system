@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.API.Controllers
 {
@@ -36,7 +32,7 @@ namespace NeoVoting.API.Controllers
         /// - Returns 409 if voter has already voted.
         /// </remarks>
         [HttpPost("elections/{electionId:guid}/vote")]
-        [ProducesResponseType(typeof(VoterCastVote_ResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Voter_Cast_Track_Vote_ResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]

@@ -1,6 +1,4 @@
-﻿using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Domain.Enums;
+﻿using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.ServicesContracts

@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 namespace NeoVoting.Domain.ResultErrorDomain
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    //Government System comments indicate enums specific to government-related functionalities.
     public enum ProblemDetails400ErrorTypes // Validation / Bad Request
     {
         Paging_InvalidInput,
@@ -20,20 +19,18 @@ namespace NeoVoting.Domain.ResultErrorDomain
     {
         // Admin Auth
         Admin_InvalidCredentials,
-        User_InvalidCredentials,
 
+        User_InvalidCredentials,
 
         Voter_NotEligible,//Government System
 
         Voter_InvalidToken,//Government System
         Voter_NotRegistered,//Government System
 
-        
         Candidate_NotEligible,//Government System
 
         Candidate_InvalidToken,//Government System
 
-        
         Auth_UnauthorizedAccess,
 
         Auth_InvalidApiKey,//Government System

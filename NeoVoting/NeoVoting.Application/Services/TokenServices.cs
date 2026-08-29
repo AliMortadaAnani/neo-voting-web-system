@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -119,7 +118,7 @@ namespace NeoVoting.Application.Services
                 UserName = user.UserName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                GovernorateId = user.GovernorateId,
+                Governorate = user.GovernorateId,
                 DateOfBirth = user.DateOfBirth,
                 Gender = user.Gender
             };

@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.API.Controllers
 {
@@ -43,7 +39,7 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails409ErrorTypes), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddProfile([FromRoute] Guid electionId, [FromBody] CandidateProfileAdd_RequestDTO request, CancellationToken ct)
+        public async Task<IActionResult> AddProfile([FromRoute] Guid electionId, [FromBody] CandidateProfile_Create_Update_RequestDTO request, CancellationToken ct)
         {
             var result = await _candidateServices.AddCandidateProfileByElectionIdAsync(electionId, request, ct);
             return HandleResult(result, Created: true);

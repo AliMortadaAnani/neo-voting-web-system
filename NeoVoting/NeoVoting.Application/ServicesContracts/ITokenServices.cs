@@ -1,5 +1,4 @@
-﻿using NeoVoting.Application.AuthDTOs;
-using NeoVoting.Domain.Entities;
+﻿using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.ResultErrorDomain;
 using System.Security.Claims;
 

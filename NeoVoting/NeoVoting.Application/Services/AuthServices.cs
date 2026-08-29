@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
@@ -37,7 +36,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<Authentication_ResponseDTO>> LoginAsync(Login_RequestDTO loginDTO, CancellationToken cancellationToken = default)
         {
-            var user = await _userManager.FindByNameAsync(loginDTO.UserName!);
+            var user = await _userManager.FindByNameAsync(loginDTO.Username!);
 
             if (user == null)
             {
@@ -163,9 +162,9 @@ namespace NeoVoting.Application.Services
             return Result<Authentication_ResponseDTO>.Success(newAuthResponse);
         }
 
-        private static Registration_ResetPassword_ResponseDTO MapToResponseDTO(ApplicationUser user, string role)
+        private static RegisterVoterOrCandidate_ResponseDTO MapToResponseDTO(ApplicationUser user, string role)
         {
-            return new Registration_ResetPassword_ResponseDTO
+            return new RegisterVoterOrCandidate_ResponseDTO
             {
                 Id = user.Id,
                 UserName = user.UserName,
@@ -178,7 +177,7 @@ namespace NeoVoting.Application.Services
             };
         }
 
-        public async Task<Result<Registration_ResetPassword_ResponseDTO>> RegisterVoterOrCandidateAsync(
+        public async Task<Result<RegisterVoterOrCandidate_ResponseDTO>> RegisterVoterOrCandidateAsync(
     Register_ResetPassword_VoterOrCandidate_RequestDTO dto,
     RoleTypesEnum role,
     CancellationToken ct = default)
@@ -190,11 +189,11 @@ namespace NeoVoting.Application.Services
             // and don't modify the database.
 
             if (dto.NewPassword != dto.ConfirmPassword)
-                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.Password_Mismatch), "Passwords do not match."));
 
             if (await _userManager.FindByNameAsync(dto.UserName!) != null)
-                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Conflict(nameof(ProblemDetails409ErrorTypes.User_DuplicateUsername), "This username is already taken."));
 
             // Ensure "Voter" Role Exists
@@ -205,7 +204,7 @@ namespace NeoVoting.Application.Services
                 var roleResult = await _roleManager.CreateAsync(voterRole);
                 if (!roleResult.Succeeded)
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Failure(nameof(ProblemDetails500ErrorTypes.Role_CreationFailed), roleResult.Errors.First().Description));
                 }
             }
@@ -218,7 +217,7 @@ namespace NeoVoting.Application.Services
                 var roleResult = await _roleManager.CreateAsync(candidateRole);
                 if (!roleResult.Succeeded)
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Failure(nameof(ProblemDetails500ErrorTypes.Role_CreationFailed), roleResult.Errors.First().Description));
                 }
             }
@@ -242,7 +241,7 @@ namespace NeoVoting.Application.Services
                 // If the network failed, or the API returned 404/400/500, we stop here.
                 if (verifyResult.IsFailure)
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(verifyResult.Error);
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(verifyResult.Error);
                 }
 
                 var govData = verifyResult.Value; // This contains Name, DOB, Eligibility, etc.
@@ -262,11 +261,11 @@ namespace NeoVoting.Application.Services
                         Error.Failure("Voter.InvalidToken", "Voting token is invalid."));*/
 
                 if (govData.IsRegistered)
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyRegistered), "Voter account already exists."));
 
                 if (govData.Voted)
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyVoted),
                         "Voter has already cast a vote."));
 
@@ -289,7 +288,7 @@ namespace NeoVoting.Application.Services
                 var createResult = await _userManager.CreateAsync(newUser, dto.NewPassword!);
 
                 if (!createResult.Succeeded)
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Failure(nameof(ProblemDetails500ErrorTypes.UserCreation_Failed), createResult.Errors.First().Description));
 
                 // await _userManager.AddToRoleAsync(newUser, RoleTypesEnum.Voter.ToString());
@@ -299,7 +298,7 @@ namespace NeoVoting.Application.Services
                 {
                     // Optional: Cleanup user if role assignment fails
                     await _userManager.DeleteAsync(newUser);
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.UserRoleAssignment_Failed),
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.UserRoleAssignment_Failed),
                         "Failed to assign voter role."));
                 }
 
@@ -365,7 +364,7 @@ namespace NeoVoting.Application.Services
                         : Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error),
                         "Government System failed to confirm registration.");
 
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(errorToReturn);
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(errorToReturn);
                 }
 
                 // -----------------------------------------------------------------------
@@ -398,7 +397,7 @@ namespace NeoVoting.Application.Services
                     _logger.LogError("SaveChangesAsync returned 0 after adding audit log for voter {VoterId}", newUser.Id);
                 }
 
-                return Result<Registration_ResetPassword_ResponseDTO>.Success(MapToResponseDTO(newUser, RoleTypesEnum.Voter.ToString()));
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(MapToResponseDTO(newUser, RoleTypesEnum.Voter.ToString()));
             }
             else
                 if (role == RoleTypesEnum.Candidate)
@@ -417,7 +416,7 @@ namespace NeoVoting.Application.Services
 
                     if (verifyResult.IsFailure)
                     {
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(verifyResult.Error);
+                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(verifyResult.Error);
                     }
 
                     var govData = verifyResult.Value;
@@ -427,7 +426,7 @@ namespace NeoVoting.Application.Services
                     // -----------------------------------------------------------------------
 
                     if (govData.IsRegistered)
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                             Error.Conflict(nameof(ProblemDetails409ErrorTypes.Candidate_AlreadyRegistered),
                             "Candidate account already exists."));
 
@@ -447,7 +446,7 @@ namespace NeoVoting.Application.Services
                     var createResult = await _userManager.CreateAsync(newUser, dto.NewPassword!);
 
                     if (!createResult.Succeeded)
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                             Error.Failure(nameof(ProblemDetails500ErrorTypes.UserCreation_Failed), createResult.Errors.First().Description));
 
                     var assignRoleResult = await _userManager.AddToRoleAsync(newUser, RoleTypesEnum.Candidate.ToString());
@@ -455,7 +454,7 @@ namespace NeoVoting.Application.Services
                     if (!assignRoleResult.Succeeded)
                     {
                         await _userManager.DeleteAsync(newUser);
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                             Error.Failure(nameof(ProblemDetails500ErrorTypes.UserRoleAssignment_Failed),
                             "Failed to assign candidate role."));
                     }
@@ -515,7 +514,7 @@ namespace NeoVoting.Application.Services
                             : Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error),
                             "Government System failed to confirm registration.");
 
-                        return Result<Registration_ResetPassword_ResponseDTO>.Failure(errorToReturn);
+                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(errorToReturn);
                     }
 
                     // -----------------------------------------------------------------------
@@ -544,17 +543,17 @@ namespace NeoVoting.Application.Services
                         _logger.LogError("SaveChangesAsync returned 0 after adding audit log for candidate {CandidateId}", newUser.Id);
                     }
 
-                    return Result<Registration_ResetPassword_ResponseDTO>.Success(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(
                         MapToResponseDTO(newUser, RoleTypesEnum.Candidate.ToString()));
                 }
                 else
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Forbidden(nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess), "This account type cannot be created via this portal."));
                 }
         }
 
-        public async Task<Result<Registration_ResetPassword_ResponseDTO>> ResetVoterOrCandidatePasswordAsync(
+        public async Task<Result<RegisterVoterOrCandidate_ResponseDTO>> ResetVoterOrCandidatePasswordAsync(
             Register_ResetPassword_VoterOrCandidate_RequestDTO dto,
             CancellationToken ct = default)
         {
@@ -563,13 +562,13 @@ namespace NeoVoting.Application.Services
             // -----------------------------------------------------------------------
 
             if (dto.NewPassword != dto.ConfirmPassword)
-                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.Password_Mismatch), "Passwords do not match."));
 
             // Find existing user by username
             var user = await _userManager.FindByNameAsync(dto.UserName!);
             if (user == null)
-                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Forbidden(nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess), "User account not available for resetting password.Check the data entered or Contact Support."));
 
             // -----------------------------------------------------------------------
@@ -597,7 +596,7 @@ namespace NeoVoting.Application.Services
 
                 if (verifyResult.IsFailure)
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(verifyResult.Error);
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(verifyResult.Error);
                 }
 
                 var govData = verifyResult.Value;
@@ -616,7 +615,7 @@ namespace NeoVoting.Application.Services
 
                 // Verify the username matches what's recorded in Gov System
                 if (!string.Equals(govData.RegisteredUsername, dto.UserName, StringComparison.OrdinalIgnoreCase))
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Forbidden(nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess), "User account not available for resetting password.Check the data entered or Contact Support."));
 
                 // -----------------------------------------------------------------------
@@ -631,7 +630,7 @@ namespace NeoVoting.Application.Services
 
                 if (!resetResult.Succeeded)
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Failure(nameof(ProblemDetails500ErrorTypes.PasswordReset_Failed), resetResult.Errors.First().Description));
                 }
 
@@ -641,7 +640,7 @@ namespace NeoVoting.Application.Services
                 if (!updateResult.Succeeded)
                 {
                     var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Failure(nameof(ProblemDetails500ErrorTypes.PasswordReset_Failed), updateResult.Errors.First().Description));
                 }
                 // -----------------------------------------------------------------------
@@ -649,7 +648,7 @@ namespace NeoVoting.Application.Services
                 // -----------------------------------------------------------------------
                 // No distributed commit needed for password reset - it's a local-only operation
 
-                return Result<Registration_ResetPassword_ResponseDTO>.Success(
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(
                     MapToResponseDTO(user, RoleTypesEnum.Voter.ToString()));
             }
             // OPTION B: Logic for CANDIDATE
@@ -670,7 +669,7 @@ namespace NeoVoting.Application.Services
 
                 if (verifyResult.IsFailure)
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(verifyResult.Error);
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(verifyResult.Error);
                 }
 
                 var govData = verifyResult.Value;
@@ -689,7 +688,7 @@ namespace NeoVoting.Application.Services
 
                 // Verify the username matches what's recorded in Gov System
                 if (!string.Equals(govData.RegisteredUsername, dto.UserName, StringComparison.OrdinalIgnoreCase))
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Forbidden(nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess), "User account not available for resetting password.Check the data entered or Contact Support."));
 
                 // -----------------------------------------------------------------------
@@ -704,7 +703,7 @@ namespace NeoVoting.Application.Services
 
                 if (!resetResult.Succeeded)
                 {
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Failure(nameof(ProblemDetails500ErrorTypes.PasswordReset_Failed), resetResult.Errors.First().Description));
                 }
 
@@ -714,7 +713,7 @@ namespace NeoVoting.Application.Services
                 if (!updateResult.Succeeded)
                 {
                     var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Failure(nameof(ProblemDetails500ErrorTypes.PasswordReset_Failed), updateResult.Errors.First().Description));
                 }
                 // -----------------------------------------------------------------------
@@ -722,14 +721,14 @@ namespace NeoVoting.Application.Services
                 // -----------------------------------------------------------------------
                 // No distributed commit needed for password reset - it's a local-only operation
 
-                return Result<Registration_ResetPassword_ResponseDTO>.Success(
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(
                     MapToResponseDTO(user, RoleTypesEnum.Candidate.ToString()));
             }
             else
             {
                 // OPTION C: Security Fallback (User exists but has neither role, e.g., an Admin)
                 // We block them here to prevent unauthorized role resets via this public endpoint.
-                return Result<Registration_ResetPassword_ResponseDTO>.Failure(
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Forbidden(nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess), "This account type cannot be reset via this portal."));
             }
         }

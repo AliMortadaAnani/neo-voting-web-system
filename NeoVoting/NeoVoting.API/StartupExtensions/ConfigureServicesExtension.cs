@@ -101,8 +101,6 @@ namespace NeoVoting.API.StartupExtensions
                     ValidAudience = configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
-
-                    
                 };
 
                 options.Events = new JwtBearerEvents
@@ -168,7 +166,7 @@ namespace NeoVoting.API.StartupExtensions
                       options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                   });
             builder.Services.AddEndpointsApiExplorer();
-           
+
             builder.Services.AddProblemDetails();
 
             return builder;
@@ -249,8 +247,8 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Repositories
-            builder.Services.AddScoped<ICandidateProfileRepository,CandidateProfileRepository>();
-            builder.Services.AddScoped<ICandidateRepository,CandidateRepository>();
+            builder.Services.AddScoped<ICandidateProfileRepository, CandidateProfileRepository>();
+            builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
             builder.Services.AddScoped<IVoterRepository, VoterRepository>();
             builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
             builder.Services.AddScoped<IElectionStatisticsRepository, ElectionStatisticsRepository>();
@@ -262,8 +260,6 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<IPollAnswerRepository, PollAnswerRepository>();
             builder.Services.AddScoped<IEventParticipationRepository, EventParticipationRepository>();
             builder.Services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
-
-
 
             // Services
             builder.Services.AddScoped<ICurrentUserServices, CurrentUserServices>();
@@ -365,7 +361,6 @@ namespace NeoVoting.API.StartupExtensions
                                 QueueLimit = 0,                   // Reject instantly (no waiting queue)
                                 AutoReplenishment = true          // Automatically release expired segments
                             });
-
                 });
             });
 

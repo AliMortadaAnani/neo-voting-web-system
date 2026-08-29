@@ -1,4 +1,4 @@
-﻿namespace NeoVoting.Application.AuthDTOs
+﻿namespace NeoVoting.Application.RequestDTOs.AuthDTOs
 {
     public class Login_RequestDTO
     {

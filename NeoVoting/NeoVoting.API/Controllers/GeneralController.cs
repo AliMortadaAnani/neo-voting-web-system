@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Domain.ErrorHandling;
 
 namespace NeoVoting.API.Controllers
 {
@@ -29,7 +27,6 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [HttpGet("elections/all")]
         [ProducesResponseType(typeof(IReadOnlyList<Election_ResponseDTO>), StatusCodes.Status200OK)]
-        
         public async Task<IActionResult> GetAllElections(CancellationToken ct)
         {
             var result = await _generalServices.GetAllElectionsAsync(ct);
@@ -46,7 +43,6 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [HttpGet("elections/completed")]
         [ProducesResponseType(typeof(IReadOnlyList<Election_ResponseDTO>), StatusCodes.Status200OK)]
-        
         public async Task<IActionResult> GetCompletedElections(CancellationToken ct)
         {
             var result = await _generalServices.GetAllCompletedElectionsAsync(ct);
@@ -146,9 +142,8 @@ namespace NeoVoting.API.Controllers
              [FromQuery] int governorateId,
             CancellationToken ct)
         {
-            var result = await _generalServices.GetCurrentActiveElectionStatsPerGovernorateIdAsync(governorateId,ct);
+            var result = await _generalServices.GetCurrentActiveElectionStatsPerGovernorateIdAsync(governorateId, ct);
             return HandleResult(result);
         }
-
     }
 }

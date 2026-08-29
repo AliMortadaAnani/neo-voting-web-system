@@ -1,6 +1,4 @@
-﻿using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Application.ServicesContracts;
+﻿using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
@@ -31,7 +29,7 @@ namespace NeoVoting.Application.Services
             _electionRepository = electionRepository;
         }
 
-        public async Task<Result<CandidateProfile_ResponseDTO>> AddCandidateProfileByElectionIdAsync(Guid electionId, CandidateProfileAdd_RequestDTO request, CancellationToken cancellationToken)
+        public async Task<Result<CandidateProfile_ResponseDTO>> AddCandidateProfileByElectionIdAsync(Guid electionId, CandidateProfile_Create_Update_RequestDTO request, CancellationToken cancellationToken)
         {
             // In your service or controller
             var election = await _electionRepository.GetElectionByIdAsync(electionId, cancellationToken);

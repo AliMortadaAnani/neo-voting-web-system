@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using NeoVoting.Application.AuthDTOs;
 
 namespace NeoVoting.Application.Validators.AdminDTOs
 {

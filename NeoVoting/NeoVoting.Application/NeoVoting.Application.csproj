@@ -10,12 +10,19 @@
     <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NeoVoting.Domain\NeoVoting.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="RequestDTOs\GeneralDTOs\" />
+    <Folder Include="Validators\AuthDTOs\" />
+    <Folder Include="Validators\CandidateDTOs\" />
+    <Folder Include="Validators\GeneralDTOs\" />
+    <Folder Include="Validators\VoterDTOs\" />
   </ItemGroup>
 
 </Project>

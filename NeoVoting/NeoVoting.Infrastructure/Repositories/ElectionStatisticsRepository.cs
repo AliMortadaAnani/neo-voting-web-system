@@ -22,13 +22,6 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(eps => eps.ElectionId == electionId);
         }
 
-        public async Task<ElectionStatistics?> GetByElectionNameAsync(string electionName)
-        {
-            return await _context.Election_Statistics
-                .Include(eps => eps.Election)
-                .FirstOrDefaultAsync(eps => eps.Election.Name == electionName);
-        }
-
         public void Add(ElectionStatistics electionStatistics)
         {
             _context.Election_Statistics.Add(electionStatistics);
@@ -39,13 +32,6 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.Election_Statistics
                 .Include(eps => eps.Election)
                 .FirstOrDefaultAsync(eps => eps.ElectionId == electionId && eps.Governorate == governorate);
-        }
-
-        public async Task<ElectionStatistics?> GetByElectionNameAndGovernorateAsync(string electionName, GovernorateIdEnum governorate)
-        {
-            return await _context.Election_Statistics
-                .Include(eps => eps.Election)
-                .FirstOrDefaultAsync(eps => eps.Election.Name == electionName && eps.Governorate == governorate);
         }
     }
 }

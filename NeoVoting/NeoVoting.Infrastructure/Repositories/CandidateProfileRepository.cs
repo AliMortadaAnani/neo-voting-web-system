@@ -63,8 +63,10 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<int> CountsByElectionIdAndAgeRangeAsync(int electionId, int minAge, int maxAge)
         {
-            var maxDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-minAge));
-            var minDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-(maxAge + 1)).AddDays(1));
+            // Use DateTime.Today to align with local calendar dates rather than UTC shifts
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var maxDate = today.AddYears(-minAge);
+            var minDate = today.AddYears(-(maxAge + 1)).AddDays(1);
 
             return await _context.CandidateProfiles
                 .CountAsync(cp => cp.ElectionId == electionId &&
@@ -82,8 +84,10 @@ namespace NeoVoting.Infrastructure.Repositories
 
         public async Task<int> CountByElectionIdAndGovernorateAndAgeRangeAsync(int electionId, GovernorateIdEnum governorate, int minAge, int maxAge)
         {
-            var maxDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-minAge));
-            var minDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-(maxAge + 1)).AddDays(1));
+            // Use DateTime.Today to align with local calendar dates rather than UTC shifts
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var maxDate = today.AddYears(-minAge);
+            var minDate = today.AddYears(-(maxAge + 1)).AddDays(1);
 
             return await _context.CandidateProfiles
                 .CountAsync(cp => cp.ElectionId == electionId &&

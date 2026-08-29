@@ -1,6 +1,4 @@
-﻿using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Application.ServicesContracts;
+﻿using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.RepositoryContracts;
 
 namespace NeoVoting.Application.Services
@@ -62,7 +60,7 @@ namespace NeoVoting.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result<VoterCastVote_ResponseDTO>> VoterCastVoteAsync(Guid electionId, VoterCastVote_RequestDTO request, CancellationToken cancellationToken)
+        public Task<Result<Voter_Cast_Track_Vote_ResponseDTO>> VoterCastVoteAsync(Guid electionId, VoterCastVote_RequestDTO request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

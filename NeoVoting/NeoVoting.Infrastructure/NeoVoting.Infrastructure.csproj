@@ -24,8 +24,4 @@
     <ProjectReference Include="..\NeoVoting.Domain\NeoVoting.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="kukukkk\" />
-  </ItemGroup>
-
 </Project>

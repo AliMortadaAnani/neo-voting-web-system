@@ -75,6 +75,3 @@ namespace NeoVoting.Infrastructure.Repositories
         }
     }
 }
-        }
-    }
-}

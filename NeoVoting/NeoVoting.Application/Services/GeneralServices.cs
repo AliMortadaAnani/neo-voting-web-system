@@ -1,5 +1,4 @@
-﻿using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Application.ServicesContracts;
+﻿using NeoVoting.Application.ServicesContracts;
 
 namespace NeoVoting.Application.Services
 {

@@ -26,13 +26,5 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ThenInclude(p => p.PollAnswers)
                 .FirstOrDefaultAsync(ps => ps.PollId == pollId);
         }
-
-        public async Task<PollStatistics?> GetByPollNameAsync(string pollName)
-        {
-            return await _context.Poll_Statistics
-                .Include(ps => ps.Poll)
-                .ThenInclude(p => p.PollAnswers)
-                .FirstOrDefaultAsync(ps => ps.Poll.Name == pollName);
-        }
     }
 }

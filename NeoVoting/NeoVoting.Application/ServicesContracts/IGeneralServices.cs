@@ -1,5 +1,4 @@
-﻿using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Domain.ResultErrorDomain;
+﻿using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.ServicesContracts
 {

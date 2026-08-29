@@ -6,8 +6,6 @@ namespace NeoVoting.Domain.RepositoryContracts
     {
         Task<PollStatistics?> GetByPollIdAsync(int pollId);
 
-        Task<PollStatistics?> GetByPollNameAsync(string pollName);
-
         void Add(PollStatistics pollStatistics);
     }
 }

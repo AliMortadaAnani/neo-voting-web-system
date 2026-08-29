@@ -1,12 +1,10 @@
-﻿using NeoVoting.Application.RequestDTOs;
-using NeoVoting.Application.ResponseDTOs;
-using NeoVoting.Domain.ResultErrorDomain;
+﻿using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.ServicesContracts
 {
     public interface ICandidateServices
     {
-        Task<Result<CandidateProfile_ResponseDTO>> AddCandidateProfileByElectionIdAsync(Guid electionId, CandidateProfileAdd_RequestDTO request, CancellationToken cancellationToken);
+        Task<Result<CandidateProfile_ResponseDTO>> AddCandidateProfileByElectionIdAsync(Guid electionId, CandidateProfile_Create_Update_RequestDTO request, CancellationToken cancellationToken);
 
         Task<Result<CandidateProfile_ResponseDTO>> UpdateCandidateProfileByElectionIdAsync(Guid electionId, CandidateProfileUpdate_RequestDTO request, CancellationToken cancellationToken);
 

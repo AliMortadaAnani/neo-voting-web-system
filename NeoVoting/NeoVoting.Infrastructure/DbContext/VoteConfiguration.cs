@@ -12,13 +12,6 @@ namespace NeoVoting.Infrastructure.DbContext
             // Primary key
             builder.HasKey(v => v.Id);
             builder.Property(entity => entity.Id).ValueGeneratedNever();
-            // Properties
-            builder.Property(v => v.VoterAge)
-                .IsRequired();
-
-            builder.Property(v => v.VoterGender)
-                .IsRequired()
-                .HasMaxLength(1);
 
             builder.Property(v => v.TimestampUTC)
                 .IsRequired();

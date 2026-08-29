@@ -1,5 +1,4 @@
 using FluentValidation;
-using NeoVoting.Application.AuthDTOs;
 
 namespace NeoVoting.Application.Validators.AdminDTOs
 {
@@ -7,7 +6,7 @@ namespace NeoVoting.Application.Validators.AdminDTOs
     {
         public Login_RequestDTO_Validator()
         {
-            RuleFor(x => x.UserName)
+            RuleFor(x => x.Username)
                 .NotEmpty().WithMessage("Username is required.")
                 .MaximumLength(100).WithMessage("Username cannot exceed 100 characters.");
 

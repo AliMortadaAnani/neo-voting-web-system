@@ -1,9 +1,8 @@
 using FluentValidation;
-using NeoVoting.Application.RequestDTOs;
 
 namespace NeoVoting.Application.Validators.AdminDTOs
 {
-    public class CandidateProfileAdd_RequestDTO_Validator : AbstractValidator<CandidateProfileAdd_RequestDTO>
+    public class CandidateProfileAdd_RequestDTO_Validator : AbstractValidator<CandidateProfile_Create_Update_RequestDTO>
     {
         public CandidateProfileAdd_RequestDTO_Validator()
         {

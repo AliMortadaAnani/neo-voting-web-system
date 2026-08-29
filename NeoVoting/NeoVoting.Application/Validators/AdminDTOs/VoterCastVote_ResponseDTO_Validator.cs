@@ -1,9 +1,8 @@
 using FluentValidation;
-using NeoVoting.Application.ResponseDTOs;
 
 namespace NeoVoting.Application.Validators.AdminDTOs
 {
-    public class VoterCastVote_ResponseDTO_Validator : AbstractValidator<VoterCastVote_ResponseDTO>
+    public class VoterCastVote_ResponseDTO_Validator : AbstractValidator<Voter_Cast_Track_Vote_ResponseDTO>
     {
         public VoterCastVote_ResponseDTO_Validator()
         {

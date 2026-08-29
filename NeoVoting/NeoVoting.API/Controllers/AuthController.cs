@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using NeoVoting.Application.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.API.Controllers
 {
-    
     [EnableRateLimiting("AuthLimiter")]
-
     public class AuthController : ApiController
     {
         private readonly IAuthServices _authService;
@@ -20,13 +17,11 @@ namespace NeoVoting.API.Controllers
             _authService = authService;
         }
 
-       
-       
         [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(typeof(Authentication_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails400ErrorTypes),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
@@ -50,7 +45,7 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [AllowAnonymous]
         [HttpPost("register/voter")]
-        [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RegisterVoterOrCandidate_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
@@ -76,7 +71,7 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [AllowAnonymous]
         [HttpPost("register/candidate")]
-        [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RegisterVoterOrCandidate_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
@@ -102,9 +97,8 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [AllowAnonymous]
         [HttpPost("reset-password")]
-        [ProducesResponseType(typeof(Registration_ResetPassword_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RegisterVoterOrCandidate_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
@@ -128,7 +122,6 @@ namespace NeoVoting.API.Controllers
         [AllowAnonymous]
         [HttpPost("refresh")]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
@@ -151,10 +144,8 @@ namespace NeoVoting.API.Controllers
         /// </remarks>
         [Authorize]
         [HttpPost("logout")]
-
         [ProducesResponseType(typeof(ProblemDetails401ErrorTypes), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails403ErrorTypes), StatusCodes.Status403Forbidden)]
-
 
         [ProducesResponseType(typeof(ProblemDetails500ErrorTypes), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Logout(CancellationToken ct)
