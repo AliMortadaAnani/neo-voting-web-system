@@ -33,7 +33,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .CountAsync(vc => vc.CandidateProfileId == candidateProfileId);
         }
 
-        // to specify winners and add them to ElectionWinners table, we need to get the top 5 candidates profiles per governorate based on their vote count
+        // to specify winners and add them to ElectionWinners table, we need to get the top 5 candidates profiles per governorate based on their vote count => insert them into ElectionWinners table
         public async Task<List<CandidateResultResponseDTO>> GetTop5CandidatesProfilesPerGovernorate(int electionId, GovernorateIdEnum governorate)
         {
             return await _context.CandidateProfiles
@@ -59,7 +59,9 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        // for results page, we need to get all candidates profiles per governorate based on their vote count
+
+        // in case vote count was a tie , results will show different order each time the page is refreshed, because of the randomization using Guid
+        // although Winners are determined only 1 time after the election ends, and they are stored in the ElectionWinners table, so they will not change
         public async Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResultsPerGovernorate(int electionId, GovernorateIdEnum governorate,
             int pageNumber, int pageSize)
         {
@@ -87,6 +89,8 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        // in case vote count was a tie , results will show different order each time the page is refreshed, because of the randomization using Guid
+        // although Winners are determined only 1 time after the election ends, and they are stored in the ElectionWinners table, so they will not change
         public async Task<List<CandidateResultResponseDTO>> GetPagedCandidatesProfilesResults(int electionId,
            int pageNumber, int pageSize)
         {

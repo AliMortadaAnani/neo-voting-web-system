@@ -4,7 +4,7 @@ namespace NeoVoting.Application.ResponseDTOs.CandidateDTOs
 {
     public class CandidateProfile_ResponseDTO
     {
-        public int? Id { get; set; }
+        public int? CandidateProfileId { get; set; }
         public string? Goals { get; set; }
         public string? NominationReasons { get; set; }
         public string? ProfilePhotoFilename { get; set; }

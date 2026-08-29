@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
@@ -42,5 +43,17 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public async Task<List<Vote>> GetPagedByElectionIdAndGovernorateAsync(int electionId, GovernorateIdEnum governorate, int pageNumber, int pageSize)
+        {
+            return await _context.Votes
+                .AsNoTracking()
+                .Where(v => v.ElectionId == electionId && v.Governorate == governorate)
+                .OrderByDescending(v => v.TimestampUTC) // Assuming you want to order by timestamp
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
     }
 }

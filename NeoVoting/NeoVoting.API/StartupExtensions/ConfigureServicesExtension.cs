@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NeoVoting.API.Filters;
 using NeoVoting.Application.Exceptions;
+using NeoVoting.Application.RequestDTOs.AuthDTOs;
 using NeoVoting.Application.Services;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Application.Validators.AdminDTOs;
@@ -277,7 +278,7 @@ namespace NeoVoting.API.StartupExtensions
         public static WebApplicationBuilder ConfigureValidation(this WebApplicationBuilder builder)
         {
             builder.Services.AddFluentValidationAutoValidation();
-            builder.Services.AddValidatorsFromAssemblyContaining<Authentication_ResponseDTO_Validator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<Login_RequestDTO>();
             builder.Services.AddFluentValidationRulesToSwagger();
 
             return builder;
