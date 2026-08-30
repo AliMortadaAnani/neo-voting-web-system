@@ -28,7 +28,8 @@ namespace NeoVoting.Domain.ResultErrorDomain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ProblemDetails403ErrorTypes // Forbidden
     {
-        Auth_ForbiddenAccess // JWT Token is valid but user does not have permission to access the resource
+        Auth_ForbiddenAccess, // JWT Token is valid but user does not have permission to access the resource
+        User_Lockedout
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

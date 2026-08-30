@@ -158,7 +158,7 @@ namespace NeoVoting.API.StartupExtensions
 
         public static WebApplicationBuilder ConfigureApiAndControllers(this WebApplicationBuilder builder)
         {
-            //builder.Services.AddHttpContextAccessor();
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddControllers()
                   .AddJsonOptions(options =>
@@ -270,7 +270,7 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<ICandidateServices, CandidateServices>();
             builder.Services.AddScoped<IVoterServices, VoterServices>();
             builder.Services.AddScoped<IGeneralServices, GeneralServices>();
-            builder.Services.AddScoped<IFileService, LocalFileService>();
+            builder.Services.AddScoped<IFileServices, LocalFileServices>();
 
             return builder;
         }

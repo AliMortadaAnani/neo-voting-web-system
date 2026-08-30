@@ -1,4 +1,5 @@
-﻿using NeoVoting.Domain.Entities;
+﻿using NeoVoting.Application.ResponseDTOs.AuthDTOs;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.ResultErrorDomain;
 using System.Security.Claims;
 
@@ -6,18 +7,13 @@ namespace NeoVoting.Application.ServicesContracts
 {
     public interface ITokenServices
     {
-        /*
-      * Practical recommendation
+        Task<Authentication_ResponseDTO> CreateAdminTokensAsync(ApplicationUser user);
 
-    Keep this service without CancellationToken; it’s primarily token generation and a single quick Identity call.
-    Make sure higher-level repos/services/controllers accept and pass a CancellationToken, since those layers talk to the database.
+        Task<Authentication_ResponseDTO> CreateCandidateTokensAsync(ApplicationUser user, Candidate candidate);
 
-      */
+        Task<Authentication_ResponseDTO> CreateVoterTokensAsync(ApplicationUser user, Voter voter);
 
-        // Generates the Access Token (JWT) and a raw Refresh Token
-        Task<Authentication_ResponseDTO> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default);
+        Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token);
 
-        // Extracts the user principal (claims) from a token, even if it is expired
-        Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default);
     }
 }

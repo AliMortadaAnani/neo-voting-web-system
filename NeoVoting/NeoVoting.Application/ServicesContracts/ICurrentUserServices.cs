@@ -1,13 +1,20 @@
-﻿namespace NeoVoting.Application.ServicesContracts
+﻿using NeoVoting.Domain.Enums;
+using System;
+using System.Collections.Generic;
+
+namespace NeoVoting.Application.ServicesContracts
 {
+
+
     public interface ICurrentUserServices
     {
-        Guid? UserId { get; }
-        string? Username { get; }
+        int? ApplicationUserId { get; }
+        int? AccountId { get; }
+        string? UserName { get; }
+        GovernorateIdEnum? Governorate { get; }
+        bool IsAuthenticated { get; }
 
-        Guid GetAuthenticatedUserId();
-
-        // Make sure you added this line:
-        string GetAuthenticatedUsername();
+        // Optional helper to fetch raw claims if needed later
+        string? GetClaim(string claimType);
     }
 }

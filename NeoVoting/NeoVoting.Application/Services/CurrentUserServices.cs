@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NeoVoting.Application.ServicesContracts;
-using System.IdentityModel.Tokens.Jwt;
+using NeoVoting.Domain.Enums;
+using System;
+using System.Linq;
 using System.Security.Claims;
+
 
 namespace NeoVoting.Application.Services
 {
@@ -14,57 +17,70 @@ namespace NeoVoting.Application.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Guid? UserId
+        private ClaimsPrincipal? User => _httpContextAccessor.HttpContext?.User;
+
+        public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
+        // [Authorize] attribute ensures that the user is authenticated, but this property can be used for additional checks if needed.
+
+        public int? ApplicationUserId
         {
             get
             {
-                var userIdClaim = _httpContextAccessor.HttpContext?.User
-                    ?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                return Guid.TryParse(userIdClaim, out var id) ? id : null;
+                // Check both standard NameIdentifier (sub) and custom claim name if applicable
+                var value = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                            ?? User?.FindFirst("applicationUserId")?.Value;
+
+                return int.TryParse(value, out var result) ? result : null;
             }
         }
 
-        public string? Username
+        public int? AccountId
         {
             get
             {
-                var user = _httpContextAccessor.HttpContext?.User;
-                if (user == null) return null;
+                var value = User?.FindFirst("accountId")?.Value;
+                return int.TryParse(value, out var result) ? result : null;
+            }
+        }
 
-                // PRIORITY 1: Check standard ASP.NET mapping (ClaimTypes.Name)
-                // ASP.NET Core automatically maps "unique_name" -> ClaimTypes.Name
-                var name = user.FindFirst(ClaimTypes.Name)?.Value;
+        public string? UserName
+        {
+            get
+            {
+                // Checks standard Name claim (or 'unique_name' / 'preferred_username')
+                return User?.FindFirst(ClaimTypes.Name)?.Value
+                       ?? User?.FindFirst("name")?.Value
+                       ?? User?.Identity?.Name;
+            }
+        }
 
-                // PRIORITY 2: Check raw JWT claim ("unique_name")
-                // In case automatic mapping is disabled in Program.cs
-                if (string.IsNullOrEmpty(name))
+        public GovernorateIdEnum? Governorate
+        {
+            get
+            {
+                var value = User?.FindFirst("governorate")?.Value;
+
+                // Handles if the token stores it as an integer string (e.g., "3") or Enum Name (e.g., "Beirut")
+                //if (string.IsNullOrEmpty(value))
+                //    return null;
+
+                if (int.TryParse(value, out var intVal) && Enum.IsDefined(typeof(GovernorateIdEnum), intVal))
                 {
-                    name = user.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
+                    return (GovernorateIdEnum)intVal;
                 }
 
-                return name;
+                //if (Enum.TryParse<GovernorateIdEnum>(value, ignoreCase: true, out var enumVal))
+                //{
+                //    return enumVal;
+                //}
+
+                return null;
             }
         }
 
-        public Guid GetAuthenticatedUserId()
+        public string? GetClaim(string claimType)
         {
-            if (!UserId.HasValue || UserId.Value == Guid.Empty)
-            {
-                throw new UnauthorizedAccessException(
-                    "User must be authenticated to perform this operation.");
-            }
-            return UserId.Value;
-        }
-
-        public string GetAuthenticatedUsername()
-        {
-            var username = Username;
-            if (string.IsNullOrEmpty(username))
-            {
-                throw new UnauthorizedAccessException(
-                    "User must be authenticated with a username to perform this operation.");
-            }
-            return username;
+            return User?.FindFirst(claimType)?.Value;
         }
     }
 }

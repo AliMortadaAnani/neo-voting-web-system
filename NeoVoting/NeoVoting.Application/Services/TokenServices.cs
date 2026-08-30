@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using NeoVoting.Application.ResponseDTOs.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
+using NeoVoting.Domain.Entities;
+using NeoVoting.Domain.Enums;
+using NeoVoting.Domain.ResultErrorDomain;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -12,84 +17,25 @@ namespace NeoVoting.Application.Services
     public class TokenServices : ITokenServices
     {
         private readonly IConfiguration _configuration;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public TokenServices(IConfiguration configuration, UserManager<ApplicationUser> userManager)
+        public TokenServices(IConfiguration configuration)
         {
             _configuration = configuration;
-            _userManager = userManager;
         }
 
-        /*
-     * Practical recommendation
-
-   Keep this service without CancellationToken; it’s primarily token generation and a single quick Identity call.
-   Make sure higher-level repos/services/controllers accept and pass a CancellationToken, since those layers talk to the database.
-   We can keep the cancellation token in signature in case we use it in future.
-     */
-
-        public async Task<Authentication_ResponseDTO> CreateTokensAsync(ApplicationUser? user, CancellationToken cancellationToken = default)
+        // ==========================================
+        // 1. THE SHARED TOKEN CREATOR (Core Engine)
+        // ==========================================
+        private string CreateJWT_AccessToken(List<Claim> claims)
         {
-            // 1. Define Basic Claims
-            var claims = new List<Claim>
-    {
-        // Standard JWT Claims
-        new Claim(JwtRegisteredClaimNames.Sub, user!.Id.ToString()), // Subject (User ID)
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // Unique Token ID
-        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()), // Issued At
-        // App Specific Standard Claims
-        new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),
-        new Claim(ClaimTypes.NameIdentifier, user!.Id.ToString())
-    };
-
-            // 2. Add Personal Details (Only if they are not null)
-            // admin will have null personal details
-
-            // First Name -> "given_name"
-            if (!string.IsNullOrWhiteSpace(user.FirstName))
-            {
-                claims.Add(new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName));
-            }
-
-            // Last Name -> "family_name"
-            if (!string.IsNullOrWhiteSpace(user.LastName))
-            {
-                claims.Add(new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName));
-            }
-
-            // Date of Birth -> "birthdate" (Standard format: YYYY-MM-DD)
-            if (user.DateOfBirth.HasValue)
-            {
-                claims.Add(new Claim(JwtRegisteredClaimNames.Birthdate, user.DateOfBirth.Value.ToString("yyyy-MM-dd")));
-            }
-
-            // Gender -> "gender"
-            if (user.Gender.HasValue)
-            {
-                claims.Add(new Claim(JwtRegisteredClaimNames.Gender, user.Gender.Value.ToString()));
-            }
-
-            // Governorate -> Custom Claim "governorateId" (No standard JWT claim for this)
-            if (user.GovernorateId.HasValue)
-            {
-                claims.Add(new Claim("governorateId", user.GovernorateId.Value.ToString()));
-            }
-
-            // 3. Add Roles
-            var roles = await _userManager.GetRolesAsync(user);
-            var userRole = roles.Single(); // throws if not exactly one role
-                                           // foreach (var role in roles)
-                                           // {
-                                           // .NET requires "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" to recognize roles automatically
-                                           // using 'ClaimTypes.Role' ensures this mapping.
-            claims.Add(new Claim(ClaimTypes.Role, userRole));
-            // }
-
-            // 4. Create Credentials & Token
+            // Convert secret key config to bytes
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            // Calculate token lifetime expiry
             var expiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
 
+            // Bundle descriptor settings
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
@@ -99,34 +45,173 @@ namespace NeoVoting.Application.Services
                 Audience = _configuration["JwtSettings:Audience"]
             };
 
+            // Generate token string
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            var accessToken = tokenHandler.WriteToken(token);
+            return tokenHandler.WriteToken(token);
+        }
 
-            // 5. Generate Refresh Token (Random String)
+
+        // ==========================================
+        // 2. SPECIFIC CLAIM BUILDERS
+        // ==========================================
+
+        private List<Claim> CreateAdminClaims(ApplicationUser user)
+        {
+            return new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim("applicationUserId", user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.UserName!),
+        new Claim(ClaimTypes.Role, RoleTypesEnum.Admin.ToString()) // Role claim ("Admin")
+    };
+        }
+
+        private List<Claim> CreateCandidateClaims(ApplicationUser user,Candidate candidate)
+        {
+            return new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim("applicationUserId", user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.UserName!),
+        new Claim(ClaimTypes.Role, RoleTypesEnum.Candidate.ToString()), // Role claim ("Candidate")
+        
+        // Candidate-specific custom claims mapped to your CurrentUserService expectations
+        new Claim("accountId", candidate.Id.ToString()),
+        new Claim("governorate", ((int)candidate.Governorate).ToString())
+    };
+        }
+
+        private List<Claim> CreateVoterClaims(ApplicationUser user,Voter voter)
+        {
+            return new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim("applicationUserId", user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.UserName!),
+        new Claim(ClaimTypes.Role, RoleTypesEnum.Voter.ToString()), // Role claim ("Voter")
+        
+        // Voter-specific custom claims mapped to your CurrentUserService expectations
+        new Claim("accountId", voter.Id.ToString()),
+        new Claim("governorate", ((int)voter.Governorate).ToString())
+    };
+        }
+
+
+        // ==========================================
+        // 3. WRAPPER / ORCHESTRATOR METHODS
+        // ==========================================
+
+        public async Task<Authentication_ResponseDTO> CreateAdminTokensAsync(ApplicationUser user)
+        {
+            var claims = CreateAdminClaims(user);
+            
+            var accessTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
+           
+            var accessToken = CreateJWT_AccessToken(claims);
+
+            // 8. Generate a cryptographically secure random sequence for the refresh token
             var refreshToken = GenerateRefreshToken();
+
+            // 9. Calculate the absolute expiration timestamp for the refresh token (usually much longer than access token)
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
+
 
             return new Authentication_ResponseDTO
             {
                 AccessToken = accessToken,
+                AccessTokenExpiration = accessTokenExpiry,
                 RefreshToken = refreshToken,
-                AccessTokenExpiration = expiry,
                 RefreshTokenExpiration = refreshTokenExpiry,
-                Role = userRole,
-                Id = user.Id,
+
+                ApplicationUserId = user.Id,
                 UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Governorate = user.GovernorateId,
-                DateOfBirth = user.DateOfBirth,
-                Gender = user.Gender
+                Role = RoleTypesEnum.Admin
             };
         }
 
-        // This method extracts claims from an expired JWT token without validating its lifetime.
-        public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token, CancellationToken cancellationToken = default)
+        public async Task<Authentication_ResponseDTO> CreateCandidateTokensAsync(ApplicationUser user, Candidate candidate)
         {
+            var claims = CreateCandidateClaims(user, candidate);
+
+            var accessTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
+
+            var accessToken = CreateJWT_AccessToken(claims);
+
+            // 8. Generate a cryptographically secure random sequence for the refresh token
+            var refreshToken = GenerateRefreshToken();
+
+            // 9. Calculate the absolute expiration timestamp for the refresh token (usually much longer than access token)
+            var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
+
+
+            return new Authentication_ResponseDTO
+            {
+                AccessToken = accessToken,
+                AccessTokenExpiration = accessTokenExpiry,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiration = refreshTokenExpiry,
+
+                ApplicationUserId = user.Id,
+                UserName = user.UserName,
+                Role = RoleTypesEnum.Candidate,
+
+                AccountId = candidate.Id,
+                Governorate = candidate.Governorate,
+                FirstName = candidate.FirstName,
+                LastName = candidate.LastName,
+                Gender = candidate.Gender,
+                DateOfBirth = candidate.DateOfBirth
+            };
+        }
+
+        public async Task<Authentication_ResponseDTO> CreateVoterTokensAsync(ApplicationUser user, Voter voter)
+        {
+            var claims = CreateVoterClaims(user, voter);
+
+            var accessTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
+
+            var accessToken = CreateJWT_AccessToken(claims);
+
+            // 8. Generate a cryptographically secure random sequence for the refresh token
+            var refreshToken = GenerateRefreshToken();
+
+            // 9. Calculate the absolute expiration timestamp for the refresh token (usually much longer than access token)
+            var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
+
+
+            return new Authentication_ResponseDTO
+            {
+                AccessToken = accessToken,
+                AccessTokenExpiration = accessTokenExpiry,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiration = refreshTokenExpiry,
+
+                ApplicationUserId = user.Id,
+                UserName = user.UserName,
+                Role = RoleTypesEnum.Voter,
+
+                AccountId = voter.Id,
+                Governorate = voter.Governorate,
+                FirstName = voter.FirstName,
+                LastName = voter.LastName,
+                Gender = voter.Gender,
+                DateOfBirth = voter.DateOfBirth
+            };
+        }
+
+
+
+        // 11. Method to read and verify claims from an access token even if its lifetime has lapsed
+        public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token)
+        {
+            // 12. Setup strict validation rules, explicitly turning off lifetime checks
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
@@ -135,40 +220,37 @@ namespace NeoVoting.Application.Services
                 ValidAudience = _configuration["JwtSettings:Audience"],
                 ValidIssuer = _configuration["JwtSettings:Issuer"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!)),
-
-                // IMPORTANT: We want to read the claims even if the token is expired (to validate refresh)
-                ValidateLifetime = false
+                ValidateLifetime = false // Bypasses expiration check so we can extract data from expired tokens safely
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
             try
             {
-                // This line throws an Exception if the token is garbage, modified, or has wrong key
-
+                // 13. Attempt to validate the signature and extract user claims principal layout
                 var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
-                // Check if the token was actually signed with HmacSha256
+                // 14. Ensure the token was signed with the exact expected algorithm to block spoofing/tampering
                 if (securityToken is not JwtSecurityToken jwtSecurityToken ||
                     !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return Result<ClaimsPrincipal>.Failure(
-                Error.Unauthorized
-                (nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
-                "Invalid token security algorithm."));
+                        Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
+                        "Invalid token security algorithm."));
                 }
 
+                // 15. Return the successfully extracted claims principal wrapper
                 return Result<ClaimsPrincipal>.Success(principal);
             }
             catch
             {
-                // We catch the library exception here and convert it to a Domain Result.
-                // This prevents the Controller from needing try/catch blocks.
+                // 16. Intercept unexpected parsing/signature crashes and convert them to a clean domain error
                 return Result<ClaimsPrincipal>.Failure(
                     Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
                     "Token is invalid or malformed."));
             }
         }
 
+        // 17. Helper utility to generate a secure random byte stream for refresh tokens
         private static string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -178,3 +260,4 @@ namespace NeoVoting.Application.Services
         }
     }
 }
+

@@ -22,5 +22,7 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<Voter?> GetByVerificationHashAsync(string verificationHash);
 
         void Add(Voter voter);
+
+        Task<Voter?> GetByUserIdAsync(int userId);
     }
 }
