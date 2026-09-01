@@ -23,15 +23,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Table name and constraints
-            builder.ToTable(tb =>
-            {
-                // VoterAge must be >= 18
-                tb.HasCheckConstraint("CK_Vote_VoterAge", "[VoterAge] >= 18");
-
-                // VoterGender must be 'M' or 'F'
-                tb.HasCheckConstraint("CK_Vote_VoterGender", "[VoterGender] IN ('M','F')");
-            });
+           
 
             builder.Property(v => v.Governorate)
                  .IsRequired()

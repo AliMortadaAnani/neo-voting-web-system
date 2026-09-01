@@ -2,7 +2,7 @@
 {
     public class RegisterVoterOrCandidate_RequestDTO
     {
-        public string? Username { get; set; }
+        public string? UserName { get; set; }
         public string? NewPassword { get; set; }
         public string? ConfirmPassword { get; set; }
 

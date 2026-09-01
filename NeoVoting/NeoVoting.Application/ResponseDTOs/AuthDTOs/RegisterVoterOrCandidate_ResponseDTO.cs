@@ -18,7 +18,6 @@ namespace NeoVoting.Application.ResponseDTOs.AuthDTOs
 
         public char? Gender { get; set; }
         public RoleTypesEnum? Role { get; set; }
-
         public string? Message { get; set; } = "User registered successfully, please login to continue.";
     }
 }

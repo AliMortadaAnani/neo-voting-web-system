@@ -58,7 +58,7 @@ namespace NeoVoting.Application.Services
                 return Result<Authentication_ResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.User_InvalidCredentials),
                     "Invalid user credentials."));
             }
-
+            
             // IMPROVEMENT: Use CheckPasswordSignInAsync instead of CheckPasswordAsync
             // This enables "LockoutOnFailure" (the 'true' parameter).
             // It protects against brute force attacks.
@@ -153,7 +153,7 @@ namespace NeoVoting.Application.Services
                 return Result<Authentication_ResponseDTO>.Failure(
                     Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), $"Failed to update refresh token: {errors}"));
             }
-
+            // we will send the refresh token in a secure http-only cookie in AuthController
             return Result<Authentication_ResponseDTO>.Success(authResponse);
         }
 
@@ -193,10 +193,34 @@ namespace NeoVoting.Application.Services
             return Result<bool>.Success(true);
         }
 
-        public async Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO refreshTokenRequestDTO)
+        public async Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO? refreshTokenRequestDTO , string? refreshTokenFromCookie, string? accessTokenFromHeader)
         {
+            // 1. Determine which refresh token to use based on your precedence rules:
+            //    - If cookie is present, use it.
+            //    - Otherwise, fall back to the body token (which might be null/empty).
+            string? activeRefreshToken = !string.IsNullOrEmpty(refreshTokenFromCookie)
+                ? refreshTokenFromCookie
+                : refreshTokenRequestDTO?.RefreshToken;
+
+            // 2. If both were missing/null/empty, then fail.
+            if (string.IsNullOrEmpty(activeRefreshToken))
+            {
+                return Result<Authentication_ResponseDTO>.Failure(
+                    Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken), "Refresh token is missing."));
+            }
+
+            string? activeAccessToken = !string.IsNullOrEmpty(accessTokenFromHeader)
+                ? accessTokenFromHeader
+                : refreshTokenRequestDTO?.AccessToken;
+
+            if (string.IsNullOrEmpty(activeAccessToken)) {
+                return Result<Authentication_ResponseDTO>.Failure(
+                    Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken), "Access token is missing."));
+            }
+
+            // Now you can use 'activeRefreshToken' for the rest of your business logic
             // 1. Validate the old Access Token
-            var principalResult = _tokenServices.GetPrincipalFromExpiredToken(refreshTokenRequestDTO.AccessToken);
+            var principalResult = _tokenServices.GetPrincipalFromExpiredToken(activeAccessToken);
 
             // 2. CHECK FAILURE (Clean check, no try/catch needed)
             if (principalResult.IsFailure)
@@ -219,7 +243,7 @@ namespace NeoVoting.Application.Services
             // 2. Validate the Refresh Token (from DB)
             var user = await _userManager.FindByIdAsync(userId!);
 
-            if (user == null || user.RefreshToken != refreshTokenRequestDTO.RefreshToken || user.RefreshTokenExpirationDateTime <= DateTime.UtcNow)
+            if (user == null || user.RefreshToken != activeRefreshToken || user.RefreshTokenExpirationDateTime <= DateTime.UtcNow)
             {
                 return Result<Authentication_ResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken), "Invalid token, please login")); // Invalid or Expired Refresh Token
             }
@@ -301,6 +325,7 @@ namespace NeoVoting.Application.Services
                     Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), $"Failed to update refresh token: {errors}"));
             }
 
+            // we will send the refresh token in a secure http-only cookie in AuthController
             return Result<Authentication_ResponseDTO>.Success(authResponse);
         }
         
@@ -308,45 +333,11 @@ namespace NeoVoting.Application.Services
     RegisterVoterOrCandidate_RequestDTO dto,
     RoleTypesEnum role)
         {
-            // -----------------------------------------------------------------------
-            // PHASE 1: PRE-FLIGHT CHECKS (Fast & Cheap)
-            // -----------------------------------------------------------------------
-            // We check these first because they don't cost money (no external API calls)
-            // and don't modify the database.
-
-            if (dto.NewPassword != dto.ConfirmPassword)
-                return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                    Error.Validation(nameof(ProblemDetails400ErrorTypes.Password_Mismatch), "Passwords do not match."));
-
             if (await _userManager.FindByNameAsync(dto.UserName!) != null)
                 return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                    Error.Conflict(nameof(ProblemDetails409ErrorTypes.User_DuplicateUsername), "This username is already taken."));
+                    Error.Conflict(nameof(ProblemDetails409ErrorTypes.User_DuplicateUsername), "This username is already taken. Please choose a different username."));
 
-            // Ensure "Voter" Role Exists
-            if (await _roleManager.FindByNameAsync(RoleTypesEnum.Voter.ToString()) is null)
-            {
-                ApplicationRole voterRole = ApplicationRole.CreateVoterRole();
-
-                var roleResult = await _roleManager.CreateAsync(voterRole);
-                if (!roleResult.Succeeded)
-                {
-                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                        Error.Failure(nameof(ProblemDetails500ErrorTypes.Role_CreationFailed), roleResult.Errors.First().Description));
-                }
-            }
-
-            // Ensure "Candidate" Role Exists
-            if (await _roleManager.FindByNameAsync(RoleTypesEnum.Candidate.ToString()) is null)
-            {
-                ApplicationRole candidateRole = ApplicationRole.CreateCandidateRole();
-
-                var roleResult = await _roleManager.CreateAsync(candidateRole);
-                if (!roleResult.Succeeded)
-                {
-                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                        Error.Failure(nameof(ProblemDetails500ErrorTypes.Role_CreationFailed), roleResult.Errors.First().Description));
-                }
-            }
+           
 
             if (role == RoleTypesEnum.Voter)
             {
@@ -355,14 +346,14 @@ namespace NeoVoting.Application.Services
                 // -----------------------------------------------------------------------
                 // We rely on the Government System as the "Source of Truth" for user details.
 
-                var verifyRequest = new NeoVoting_VerifyVoterRequestDTO
+                var verifyRequest = new GetVoterVerificationRequestDTO
                 {
-                    NationalId = dto.NationalId,
-                    VotingToken = dto.VotingOrNominationToken
+                    NationalId = dto.NationalId!,
+                    VotingToken = dto.VotingOrNominationToken!
                 };
 
                 // CALL GATEWAY: This handles the HTTP Post, Try/Catch, and JSON Parsing.
-                var verifyResult = await _govGateway.VerifyVoterAsync(verifyRequest, ct);
+                var verifyResult = await _govGateway.VerifyVoterAsync(verifyRequest);
 
                 // If the network failed, or the API returned 404/400/500, we stop here.
                 if (verifyResult.IsFailure)
@@ -370,52 +361,33 @@ namespace NeoVoting.Application.Services
                     return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(verifyResult.Error);
                 }
 
-                var govData = verifyResult.Value; // This contains Name, DOB, Eligibility, etc.
+                VoterVerificationResponseDTO govData = verifyResult.Value; // This contains Name, DOB, Eligibility, etc.
 
                 // -----------------------------------------------------------------------
                 // PHASE 3: APPLY BUSINESS RULES
                 // -----------------------------------------------------------------------
                 // The API call succeeded, but does the data satisfy our rules?
 
-                //Already checked in Gov System during GetVoter
-                /*if (!govData.EligibleForElection)
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
-                        Error.Failure("Voter.Ineligible", "Voter is not eligible for election."));
-
-                if (!govData.ValidToken)
-                    return Result<Registration_ResetPassword_ResponseDTO>.Failure(
-                        Error.Failure("Voter.InvalidToken", "Voting token is invalid."));*/
-
-                if (govData.IsRegistered)
+                if(await _voterRepository.IsVoterExistByVerificationHashAsync(govData.HashedData)) // Check if the voter is already registered in our system
+                {
                     return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyRegistered), "Voter account already exists."));
-
-                if (govData.Voted)
-                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                        Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyVoted),
-                        "Voter has already cast a vote."));
+                }
 
                 // -----------------------------------------------------------------------
                 // PHASE 4: LOCAL COMMIT (Create the Account)
                 // -----------------------------------------------------------------------
-                // We instantiate the user using data from 'govData' (Verified), NOT 'dto' (User input).
-                // This prevents a user from registering as "Batman" when their ID says "Bruce Wayne".
 
-                ApplicationUser newUser = ApplicationUser.CreateVoterOrCandidateAccount(
-                   dto.UserName!,
-                   govData.FirstName,
-                   govData.LastName,
-                   govData.DateOfBirth.ToDateTime(TimeOnly.MinValue), // DateOnly -> DateTime
-                   govData.Gender,
-                   (int)govData.GovernorateId
-               );
+
+                ApplicationUser newUser = ApplicationUser
+                    .CreateAccount(dto.UserName!);
 
                 // SAVE TO DB
                 var createResult = await _userManager.CreateAsync(newUser, dto.NewPassword!);
 
                 if (!createResult.Succeeded)
                     return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                        Error.Failure(nameof(ProblemDetails500ErrorTypes.UserCreation_Failed), createResult.Errors.First().Description));
+                        Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), createResult.Errors.First().Description));
 
                 // await _userManager.AddToRoleAsync(newUser, RoleTypesEnum.Voter.ToString());
                 var assignVoterRoleResult = await _userManager.AddToRoleAsync(newUser, RoleTypesEnum.Voter.ToString());
@@ -424,106 +396,37 @@ namespace NeoVoting.Application.Services
                 {
                     // Optional: Cleanup user if role assignment fails
                     await _userManager.DeleteAsync(newUser);
-                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.UserRoleAssignment_Failed),
-                        "Failed to assign voter role."));
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), "Failed to assign voter role."));
                 }
+                // Now create voter account in our local database with the details from the Government System.
+                Voter voter = Voter.Create(
+                    govData.FirstName,
+                    govData.LastName,
+                    govData.DateOfBirth,
+                    govData.Gender,
+                    govData.Governorate,
+                    govData.HashedData,
+                    newUser.Id);
 
-                // -----------------------------------------------------------------------
-                // PHASE 5: DISTRIBUTED COMMIT (The Sync)
-                // -----------------------------------------------------------------------
-                // We successfully created the local account. Now we MUST tell the Government.
+                _voterRepository.Add(voter);
 
-                var confirmRequest = new NeoVoting_VoterIsRegisteredRequestDTO
+                await _unitOfWork.SaveChangesAsync();
+
+
+                var response = new RegisterVoterOrCandidate_ResponseDTO
                 {
-                    NationalId = dto.NationalId,
-                    VotingToken = dto.VotingOrNominationToken,
-                    RegisteredUsername = dto.UserName
+                    ApplicationUserId = newUser.Id,
+                    AccountId = voter.Id,
+                    UserName = newUser.UserName,
+                    FirstName = voter.FirstName,
+                    LastName = voter.LastName,
+                    DateOfBirth = voter.DateOfBirth,
+                    Gender = voter.Gender,
+                    Governorate = voter.Governorate,
+                    Role = RoleTypesEnum.Voter
                 };
 
-                var confirmResult = await _govGateway.MarkVoterAsRegisteredAsync(confirmRequest, ct);
-
-                // -----------------------------------------------------------------------
-                // PHASE 6: THE COMPENSATING TRANSACTION (The Rollback)
-                // -----------------------------------------------------------------------
-                // CRITICAL: If the Government says "No" (or crashes) at this specific moment,
-                // we have a local user but the Government thinks they aren't registered.
-                // We must DELETE the local user to restore consistency.
-
-                if (confirmResult.IsFailure || !confirmResult.Value.IsRegistered)
-                {
-                    var logError = SystemAuditLog.Create(
-                    newUser.Id,
-                    newUser.UserName!,
-                    SystemActionTypesEnum.ERROR_VOTER_NOT_REGISTERED,
-                    $"Voter '{newUser.UserName}' registration failed.",
-                    null,
-                    null,
-                    null
-                );
-
-                    var addedErrorLog = await _systemAuditLogRepository.AddSystemAuditLogAsync(logError, ct);
-                    if (addedErrorLog == null)
-                    {
-                        _logger.LogError("Failed to add system audit log for voter {VoterId}", newUser.Id);
-                    }
-
-                    var rowsErrorAdded = await _unitOfWork.SaveChangesAsync(ct);
-                    if (rowsErrorAdded == 0)
-                    {
-                        _logger.LogError("SaveChangesAsync returned 0 after adding audit log for voter {VoterId}", newUser.Id);
-                    }
-
-                    try
-                    {
-                        // UNDO Phase 4
-                        await _userManager.DeleteAsync(newUser);
-                    }
-                    catch (Exception ex)
-                    {
-                        // ADDED: Critical logging for "Zombie User" scenario
-                        _logger.LogCritical(ex, "CRITICAL: Failed to rollback user creation for NationalID {NationalId}. User exists in NeoVoting but not valid in Gov System.", dto.NationalId);
-                        // We still return failure to the client, but the Admin needs to see this log.
-                    }
-
-                    var errorToReturn = confirmResult.IsFailure
-                        ? confirmResult.Error
-                        : Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error),
-                        "Government System failed to confirm registration.");
-
-                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(errorToReturn);
-                }
-
-                // -----------------------------------------------------------------------
-                // PHASE 7: SUCCESS & AUDIT
-                // -----------------------------------------------------------------------
-                // If we get here:
-                // 1. User is in Identity DB.
-                // 2. User is marked Registered in Gov DB.
-                // Everything is consistent.
-
-                var log = SystemAuditLog.Create(
-                    newUser.Id,
-                    newUser.UserName!,
-                    SystemActionTypesEnum.VOTER_REGISTERED,
-                    $"Voter '{newUser.UserName}' registered successfully.",
-                    null,
-                    null,
-                    null
-                );
-
-                var addedLog = await _systemAuditLogRepository.AddSystemAuditLogAsync(log, ct);
-                if (addedLog == null)
-                {
-                    _logger.LogError("Failed to add system audit log for voter {VoterId}", newUser.Id);
-                }
-
-                var rowsAdded = await _unitOfWork.SaveChangesAsync(ct);
-                if (rowsAdded == 0)
-                {
-                    _logger.LogError("SaveChangesAsync returned 0 after adding audit log for voter {VoterId}", newUser.Id);
-                }
-
-                return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(MapToResponseDTO(newUser, RoleTypesEnum.Voter.ToString()));
+                return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(response);
             }
             else
                 if (role == RoleTypesEnum.Candidate)
@@ -531,156 +434,93 @@ namespace NeoVoting.Application.Services
                     // -----------------------------------------------------------------------
                     // PHASE 2: GET THE TRUTH (The Gateway Call)
                     // -----------------------------------------------------------------------
+                    // We rely on the Government System as the "Source of Truth" for user details.
 
-                    var verifyRequest = new NeoVoting_VerifyCandidateRequestDTO
+                    var verifyRequest = new GetCandidateVerificationRequestDTO
                     {
-                        NationalId = dto.NationalId,
-                        NominationToken = dto.VotingOrNominationToken
+                        NationalId = dto.NationalId!,
+                        NominationToken = dto.VotingOrNominationToken!
                     };
 
-                    var verifyResult = await _govGateway.VerifyCandidateAsync(verifyRequest, ct);
+                    // CALL GATEWAY: This handles the HTTP Post, Try/Catch, and JSON Parsing.
+                    var verifyResult = await _govGateway.VerifyCandidateAsync(verifyRequest);
 
+                    // If the network failed, or the API returned 404/400/500, we stop here.
                     if (verifyResult.IsFailure)
                     {
                         return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(verifyResult.Error);
                     }
 
-                    var govData = verifyResult.Value;
+                    CandidateVerificationResponseDTO govData = verifyResult.Value; // This contains Name, DOB, Eligibility, etc.
 
                     // -----------------------------------------------------------------------
                     // PHASE 3: APPLY BUSINESS RULES
                     // -----------------------------------------------------------------------
+                    // The API call succeeded, but does the data satisfy our rules?
 
-                    if (govData.IsRegistered)
+                    if (await _candidateRepository.IsCandidateExistByVerificationHashAsync(govData.HashedData)) // Check if the candidate is already registered in our system
+                    {
                         return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                            Error.Conflict(nameof(ProblemDetails409ErrorTypes.Candidate_AlreadyRegistered),
-                            "Candidate account already exists."));
+                            Error.Conflict(nameof(ProblemDetails409ErrorTypes.Candidate_AlreadyRegistered), "Candidate account already exists."));
+                    }
 
                     // -----------------------------------------------------------------------
                     // PHASE 4: LOCAL COMMIT (Create the Account)
                     // -----------------------------------------------------------------------
 
-                    ApplicationUser newUser = ApplicationUser.CreateVoterOrCandidateAccount(
-                            dto.UserName!,
-                            govData.FirstName,
-                            govData.LastName,
-                            govData.DateOfBirth.ToDateTime(TimeOnly.MinValue),
-                            govData.Gender,
-                            (int)govData.GovernorateId
-                        );
 
+                    ApplicationUser newUser = ApplicationUser
+                        .CreateAccount(dto.UserName!);
+
+                    // SAVE TO DB
                     var createResult = await _userManager.CreateAsync(newUser, dto.NewPassword!);
 
                     if (!createResult.Succeeded)
                         return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                            Error.Failure(nameof(ProblemDetails500ErrorTypes.UserCreation_Failed), createResult.Errors.First().Description));
+                            Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), createResult.Errors.First().Description));
 
-                    var assignRoleResult = await _userManager.AddToRoleAsync(newUser, RoleTypesEnum.Candidate.ToString());
+                    // await _userManager.AddToRoleAsync(newUser, RoleTypesEnum.Voter.ToString());
+                    var assignVoterRoleResult = await _userManager.AddToRoleAsync(newUser, RoleTypesEnum.Candidate.ToString());
 
-                    if (!assignRoleResult.Succeeded)
+                    if (!assignVoterRoleResult.Succeeded)
                     {
+                        // Optional: Cleanup user if role assignment fails
                         await _userManager.DeleteAsync(newUser);
-                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                            Error.Failure(nameof(ProblemDetails500ErrorTypes.UserRoleAssignment_Failed),
-                            "Failed to assign candidate role."));
+                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), "Failed to assign candidate role."));
                     }
+                    // Now create candidate account in our local database with the details from the Government System.
+                    Candidate candidate = Candidate.Create(
+                        govData.FirstName,
+                        govData.LastName,
+                        govData.DateOfBirth,
+                        govData.Gender,
+                        govData.Governorate,
+                        govData.HashedData,
+                        newUser.Id);
 
-                    // -----------------------------------------------------------------------
-                    // PHASE 5: DISTRIBUTED COMMIT (The Sync)
-                    // -----------------------------------------------------------------------
+                    _candidateRepository.Add(candidate);
 
-                    var confirmRequest = new NeoVoting_CandidateIsRegisteredRequestDTO
+                    await _unitOfWork.SaveChangesAsync();
+
+                    var response = new RegisterVoterOrCandidate_ResponseDTO
                     {
-                        NationalId = dto.NationalId,
-                        NominationToken = dto.VotingOrNominationToken,
-                        RegisteredUsername = dto.UserName
+                        ApplicationUserId = newUser.Id,
+                        AccountId = candidate.Id,
+                        UserName = newUser.UserName,
+                        FirstName = candidate.FirstName,
+                        LastName = candidate.LastName,
+                        DateOfBirth = candidate.DateOfBirth,
+                        Gender = candidate.Gender,
+                        Governorate = candidate.Governorate,
+                        Role = RoleTypesEnum.Candidate
                     };
 
-                    var confirmResult = await _govGateway.MarkCandidateAsRegisteredAsync(confirmRequest, ct);
-
-                    // -----------------------------------------------------------------------
-                    // PHASE 6: THE COMPENSATING TRANSACTION (The Rollback)
-                    // -----------------------------------------------------------------------
-
-                    if (confirmResult.IsFailure || !confirmResult.Value.IsRegistered)
-                    {
-                        var logError = SystemAuditLog.Create(
-                        newUser.Id,
-                        newUser.UserName!,
-                        SystemActionTypesEnum.ERROR_CANDIDATE_NOT_REGISTERED,
-                        $"Candidate '{newUser.UserName}' registration failed.",
-                        null,
-                        null,
-                        null
-                    );
-
-                        var addedlogError = await _systemAuditLogRepository.AddSystemAuditLogAsync(logError, ct);
-                        if (addedlogError == null)
-                        {
-                            _logger.LogError("Failed to add system audit log for candidate {CandidateId}", newUser.Id);
-                        }
-
-                        int rowAddedError = await _unitOfWork.SaveChangesAsync(ct);
-                        if (rowAddedError == 0)
-                        {
-                            _logger.LogError("SaveChangesAsync returned 0 after adding audit log for candidate {CandidateId}", newUser.Id);
-                        }
-
-                        try
-                        {
-                            await _userManager.DeleteAsync(newUser);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogCritical(ex, "CRITICAL: Failed to rollback user creation for NationalID {NationalId}. User exists in NeoVoting but not in Gov System.", dto.NationalId);
-                        }
-
-                        var errorToReturn = confirmResult.IsFailure
-                            ? confirmResult.Error
-                            : Error.Failure(nameof(ProblemDetails500ErrorTypes.GovernmentSystemGateway_Error),
-                            "Government System failed to confirm registration.");
-
-                        return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(errorToReturn);
-                    }
-
-                    // -----------------------------------------------------------------------
-                    // PHASE 7: SUCCESS & AUDIT
-                    // -----------------------------------------------------------------------
-
-                    var log = SystemAuditLog.Create(
-                        newUser.Id,
-                        newUser.UserName!,
-                        SystemActionTypesEnum.CANDIDATE_REGISTERED,
-                        $"Candidate '{newUser.UserName}' registered successfully.",
-                        null,
-                        null,
-                        null
-                    );
-
-                    var addedlog = await _systemAuditLogRepository.AddSystemAuditLogAsync(log, ct);
-                    if (addedlog == null)
-                    {
-                        _logger.LogError("Failed to add system audit log for candidate {CandidateId}", newUser.Id);
-                    }
-
-                    int rowAdded = await _unitOfWork.SaveChangesAsync(ct);
-                    if (rowAdded == 0)
-                    {
-                        _logger.LogError("SaveChangesAsync returned 0 after adding audit log for candidate {CandidateId}", newUser.Id);
-                    }
-
-                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(
-                        MapToResponseDTO(newUser, RoleTypesEnum.Candidate.ToString()));
+                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Success(response);
                 }
-                else
-                {
-                    return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
-                        Error.Forbidden(nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess), "This account type cannot be created via this portal."));
-                }
+
+            return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
+                Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), "Failed to register this account type."));
         }
-
-        
-
        
     }
 }

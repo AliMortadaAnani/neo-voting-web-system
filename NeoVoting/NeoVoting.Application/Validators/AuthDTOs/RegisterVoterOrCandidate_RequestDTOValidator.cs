@@ -12,7 +12,7 @@ namespace NeoVoting.Application.Validators.AuthDTOs
     {
         public RegisterVoterOrCandidate_RequestDTOValidator()
         {
-            RuleFor(x => x.Username).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.UserName).NotEmpty().MaximumLength(100);
             RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(3);
             RuleFor(x => x.ConfirmPassword).NotEmpty();
             RuleFor(x => x.NationalId).NotEmpty();

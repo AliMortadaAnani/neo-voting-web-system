@@ -7,7 +7,7 @@ namespace NeoVoting.Application.ResponseDTOs.AuthDTOs
     public class Authentication_ResponseDTO
     {
         public string AccessToken { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty; // although its meant to be stored in a secure http-only cookie, we still return it in the response for the client to store it in a secure storage (like local storage or session storage) if needed or Mobile app to store it in secure storage (like Keychain for iOS or Keystore for Android)
         public DateTime AccessTokenExpiration { get; set; }
         public DateTime RefreshTokenExpiration { get; set; }
 

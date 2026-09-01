@@ -2,14 +2,16 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NeoVoting.Application.ResponseDTOs.AuthDTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
+using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.CLI
 {
     public class AdminOperationsCLI
     {
-        public static async Task SeedAdminUser(IServiceProvider serviceProvider)
+        public static async Task SeedAdminUser_AndRoles(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
@@ -51,6 +53,28 @@ namespace NeoVoting.Application.CLI
                 ApplicationRole applicationRole = ApplicationRole.CreateAdminRole();
 
                 await roleManager.CreateAsync(applicationRole);
+                Console.WriteLine("Admin role created.");
+            }
+
+            string voterRoleName = RoleTypesEnum.Voter.ToString();
+            // Ensure "Voter" Role Exists
+            if (await roleManager.FindByNameAsync(voterRoleName) is null)
+            {
+                ApplicationRole voterRole = ApplicationRole.CreateVoterRole();
+
+                await roleManager.CreateAsync(voterRole);
+                Console.WriteLine("Voter role created.");
+
+            }
+
+            string candidateRoleName = RoleTypesEnum.Candidate.ToString();
+            // Ensure "Candidate" Role Exists
+            if (await roleManager.FindByNameAsync(candidateRoleName) is null)
+            {
+                ApplicationRole candidateRole = ApplicationRole.CreateCandidateRole();
+
+                await roleManager.CreateAsync(candidateRole);
+                Console.WriteLine("Candidate role created.");
             }
 
             // 3. Create User

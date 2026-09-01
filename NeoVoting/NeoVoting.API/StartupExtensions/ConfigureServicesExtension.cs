@@ -117,7 +117,7 @@ namespace NeoVoting.API.StartupExtensions
                             Type = nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
                             Title = "Unauthorized",
                             Status = StatusCodes.Status401Unauthorized,
-                            Detail = "Authentication failed. Token is missing, invalid, or expired.",
+                            Detail = "Authentication failed.JWT Token is missing, invalid, or expired.",
                             Instance = context.Request.Path
                         };
 
@@ -266,10 +266,10 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<ICurrentUserServices, CurrentUserServices>();
             builder.Services.AddScoped<IAuthServices, AuthServices>();
             builder.Services.AddScoped<ITokenServices, TokenServices>();
-            builder.Services.AddScoped<IAdminServices, AdminServices>();
-            builder.Services.AddScoped<ICandidateServices, CandidateServices>();
-            builder.Services.AddScoped<IVoterServices, VoterServices>();
-            builder.Services.AddScoped<IGeneralServices, GeneralServices>();
+            //builder.Services.AddScoped<IAdminServices, AdminServices>();
+            //builder.Services.AddScoped<ICandidateServices, CandidateServices>();
+            //builder.Services.AddScoped<IVoterServices, VoterServices>();
+            //builder.Services.AddScoped<IGeneralServices, GeneralServices>();
             builder.Services.AddScoped<IFileServices, LocalFileServices>();
 
             return builder;

@@ -155,12 +155,12 @@ namespace GovernmentSystem.API.StartupExtensions
 
         public static WebApplicationBuilder ConfigureControllers(this WebApplicationBuilder builder)
         {
-            builder.Services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    // Automatically convert ALL enums to their string names in JSON responses
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
+            builder.Services.AddControllers();
+                //.AddJsonOptions(options =>
+                //{
+                //    // Automatically convert ALL enums to their string names in JSON responses
+                //    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                //});
 
             builder.Services.AddEndpointsApiExplorer();
 

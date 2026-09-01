@@ -13,6 +13,6 @@ namespace NeoVoting.Application.ServicesContracts
 
         Task<Result<RegisterVoterOrCandidate_ResponseDTO>> RegisterVoterOrCandidateAsync(RegisterVoterOrCandidate_RequestDTO registrationDTO, RoleTypesEnum role);
 
-        Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO refreshTokenRequestDTO);
+        Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO? refreshTokenRequestDTO, string? refreshTokenFromCookie, string? accessTokenFromHeader);
     }
 }

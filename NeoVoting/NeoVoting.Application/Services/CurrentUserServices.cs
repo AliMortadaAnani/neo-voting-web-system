@@ -30,6 +30,8 @@ namespace NeoVoting.Application.Services
                 var value = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                             ?? User?.FindFirst("applicationUserId")?.Value;
 
+
+
                 return int.TryParse(value, out var result) ? result : null;
             }
         }

@@ -20,7 +20,7 @@ namespace NeoVoting.API.StartupExtensions
             return command.ToLower() switch
             {
                 "seeddata" => await HandleSeedDataAsync(app),
-                "seedadmin" => await HandleSeedAdminAsync(app),
+                "seedadmin_roles" => await HandleSeedAdmin_Roles_Async(app),
                 "updateadminpassword" => await HandleUpdateAdminPasswordAsync(app, args),
                 _ => false // Command not recognized, proceed to start web server normally
             };
@@ -35,14 +35,14 @@ namespace NeoVoting.API.StartupExtensions
             return true;
         }
 
-        private static async Task<bool> HandleSeedAdminAsync(WebApplication app)
+        private static async Task<bool> HandleSeedAdmin_Roles_Async(WebApplication app)
         {
             Console.WriteLine("Starting Admin Seeding Process...");
 
             using var scope = app.Services.CreateScope();
             try
             {
-                await AdminOperationsCLI.SeedAdminUser(scope.ServiceProvider);
+                await AdminOperationsCLI.SeedAdminUser_AndRoles(scope.ServiceProvider);
                 Console.WriteLine("Admin seeding complete.");
             }
             catch (Exception ex)
