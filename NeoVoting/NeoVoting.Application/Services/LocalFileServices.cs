@@ -17,8 +17,8 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<string>> SaveFileAsync(CandidateProfileUploadImage_RequestDTO fileDto)
         {
-            if (fileDto == null) throw new ArgumentNullException(nameof(fileDto));
-            if (fileDto.File == null) throw new ArgumentNullException(nameof(fileDto.File));
+            if (fileDto == null) return Result<string>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.File_Upload_Error), "File request is null."));
+            if (fileDto.File == null) return Result<string>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.File_Upload_Error), "File is null."));
 
             // 1. Validate Extension
             var ext = Path.GetExtension(fileDto.File.FileName).ToLowerInvariant();
@@ -44,13 +44,14 @@ namespace NeoVoting.Application.Services
             return Result<string>.Success(relativeUrl);
         }
 
-        public void DeleteFile(string fileUrl)
+        public bool DeleteFile(string fileUrl)
         {
-            if (string.IsNullOrEmpty(fileUrl)) return;
+            if (string.IsNullOrEmpty(fileUrl)) return false;
 
             // Convert URL back to local path logic if needed
             var filePath = Path.Combine(_environment.WebRootPath, fileUrl.TrimStart('/'));
-            if (File.Exists(filePath)) File.Delete(filePath);
+            if (File.Exists(filePath)){ File.Delete(filePath); return true; }
+            return false;
         }
 
       

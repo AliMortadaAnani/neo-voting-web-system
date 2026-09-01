@@ -13,7 +13,7 @@ namespace NeoVoting.Application.ServicesContracts
 
         Task<Authentication_ResponseDTO> CreateVoterTokensAsync(ApplicationUser user, Voter voter);
 
-        Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token);
+        Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token);
 
     }
 }

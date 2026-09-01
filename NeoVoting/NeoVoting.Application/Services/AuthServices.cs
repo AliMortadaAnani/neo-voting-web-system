@@ -15,7 +15,7 @@ namespace NeoVoting.Application.Services
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
+        //private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IGovernmentSystemGateway _govGateway;
         private readonly ITokenServices _tokenServices;
         private readonly ICurrentUserServices _currentUserServices;
@@ -30,7 +30,7 @@ namespace NeoVoting.Application.Services
             UserManager<ApplicationUser> userManager,
             ITokenServices tokenServices,
             ILogger<AuthServices> logger,
-            RoleManager<ApplicationRole> roleManager,
+            //RoleManager<ApplicationRole> roleManager,
             IUnitOfWork unitOfWork,
             IGovernmentSystemGateway governmentSystemGateway,
             ICurrentUserServices currentUserServices,
@@ -42,7 +42,7 @@ namespace NeoVoting.Application.Services
             _tokenServices = tokenServices;
             _govGateway = governmentSystemGateway;
             _logger = logger;
-            _roleManager = roleManager;
+            //_roleManager = roleManager;
             _unitOfWork = unitOfWork;
             _currentUserServices = currentUserServices;
             _candidateRepository = candidateRepository;
@@ -172,7 +172,7 @@ namespace NeoVoting.Application.Services
             {
                 // User doesn't exist in DB - they're effectively logged out
                 // This is a success case (idempotent logout)
-                return Result<bool>.Success(true);
+                return Result<bool>.Success(false);
             }
 
             // 3. Invalidate the refresh token
@@ -189,7 +189,7 @@ namespace NeoVoting.Application.Services
                 return Result<bool>.Failure(
                     Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), $"Failed to invalidate refresh token: {errors}"));
             }
-
+            // tell browser to delete the refresh token cookie (done in AuthController)
             return Result<bool>.Success(true);
         }
 

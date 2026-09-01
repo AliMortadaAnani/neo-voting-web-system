@@ -10,7 +10,9 @@ namespace NeoVoting.Domain.ResultErrorDomain
         Cannot_Update_CompletedElection,
 
         Active_Poll_AlreadyExists,
-        Cannot_Update_CompletedPoll
+        Cannot_Update_CompletedPoll,
+
+        File_Upload_Error
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

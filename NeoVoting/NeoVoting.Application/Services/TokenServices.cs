@@ -209,7 +209,7 @@ namespace NeoVoting.Application.Services
 
 
         // 11. Method to read and verify claims from an access token even if its lifetime has lapsed
-        public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string? token)
+        public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
         {
             // 12. Setup strict validation rules, explicitly turning off lifetime checks
             var tokenValidationParameters = new TokenValidationParameters

@@ -8,6 +8,6 @@ namespace NeoVoting.Application.ServicesContracts
     {
         Task<Result<string>> SaveFileAsync(CandidateProfileUploadImage_RequestDTO dto);
 
-        void DeleteFile(string filePath);
+        bool DeleteFile(string filePath);
     }
 }
