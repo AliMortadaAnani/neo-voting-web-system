@@ -6,8 +6,8 @@
     public enum SystemActionTypesEnum
     {
         ADMIN_CREATED_ELECTION = 1,
-        ADMIN_STARTED_VOTING_PHASE = 2,
-        ADMIN_ENDED_VOTING_PHASE = 3,
+        ADMIN_STARTED_ELECTION_VOTING_PHASE = 2,
+        ADMIN_ENDED_ELECTION_VOTING_PHASE = 3,
 
         ADMIN_CREATED_POLL = 4,
         ADMIN_STARTED_POLL = 5,

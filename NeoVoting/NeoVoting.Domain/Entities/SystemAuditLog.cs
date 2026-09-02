@@ -18,7 +18,7 @@ namespace NeoVoting.Domain.Entities
             int adminId,
             string userName,
             SystemActionTypesEnum actionType,
-            string? details)
+            string? details = null)
         {
             Validate(userName, actionType);
 

@@ -14,27 +14,40 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             _context = context;
         }
+        public async Task<bool> IsActiveElectionExistsAsync()
+        {
+            return await _context.Elections.AnyAsync(e => e.Status != StatusEnum.Completed);
+        }
+        public async Task<bool> IsElectionNameExistsAsync(string electionName)
+        {
+            return await _context.Elections.AnyAsync(e => e.Name == electionName);
+        }
+        public void Add(Election election)
+        {
+            _context.Elections.Add(election);
+        }
+
+
 
         public async Task<Election?> GetByIdAsync(int electionId)
         {
             return await _context.Elections.FindAsync(electionId);
         }
 
-        public async Task<bool> IsActiveElectionExistsAsync()
+        public async Task<bool> IsElectionUpcomingPhaseAsync(int electionId)
         {
-            return await _context.Elections.AnyAsync(e => e.Status != StatusEnum.Completed);
+            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Upcoming); //unused
         }
 
-        public async Task<bool> IsElectionNameExistsAsync(string electionName)
+        public async Task<bool> IsElectionVotingPhaseAsync(int electionId)
         {
-            return await _context.Elections.AnyAsync(e => e.Name == electionName);
+            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Voting);//unused
         }
 
-        public void Add(Election election)
+        public async Task<bool> IsElectionCompletedPhaseAsync(int electionId)
         {
-            _context.Elections.Add(election);
+            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Completed);//unused
         }
-
         public async Task<List<Election>> GetPagedAsync(int pageNumber, int pageSize)
         {
             return await _context.Elections
@@ -54,19 +67,6 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.Elections.FirstOrDefaultAsync(e => e.Status != StatusEnum.Completed);
         }
 
-        public async Task<bool> IsElectionUpcomingPhaseAsync(int electionId)
-        {
-            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Upcoming);
-        }
-
-        public async Task<bool> IsElectionVotingPhaseAsync(int electionId)
-        {
-            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Voting);
-        }
-
-        public async Task<bool> IsElectionCompletedPhaseAsync(int electionId)
-        {
-            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Completed);
-        }
+       
     }
 }

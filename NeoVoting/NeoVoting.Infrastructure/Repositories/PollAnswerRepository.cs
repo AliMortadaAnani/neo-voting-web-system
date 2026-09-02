@@ -14,11 +14,6 @@ namespace NeoVoting.Infrastructure.Repositories
             _context = context;
         }
 
-        public void Add(PollAnswer answer)
-        {
-            _context.PollAnswers.Add(answer);
-        }
-
         public async Task<List<PollAnswer>> GetAllAnswersByPollIdAsync(int pollId)
         {
             return await _context.PollAnswers
@@ -28,9 +23,18 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+
         public async Task<bool> IsPollAnswerExistsAsync(int pollId, string answerText)
         {
-            return await _context.PollAnswers.AnyAsync(pa => pa.PollId == pollId && pa.Answer == answerText);
+            return await _context.PollAnswers.AnyAsync(pa => pa.PollId == pollId && pa.Answer == answerText); // unused
         }
+
+        public void Add(PollAnswer answer)
+        {
+            _context.PollAnswers.Add(answer); // unused
+        }
+
+       
+       
     }
 }

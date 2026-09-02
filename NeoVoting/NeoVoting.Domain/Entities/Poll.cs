@@ -48,5 +48,23 @@ namespace NeoVoting.Domain.Entities
                 EndDate = endDate
             };
         }
+
+        public void StartPoll()
+        {
+            if (Status != StatusEnum.Upcoming)
+            {
+                throw new InvalidOperationException("Poll can only be started if it is in upcoming status.");
+            }
+            Status = StatusEnum.Voting;
+        }
+
+        public void EndPoll()
+        {
+            if (Status != StatusEnum.Voting)
+            {
+                throw new InvalidOperationException("Poll can only be ended if it is in the voting status.");
+            }
+            Status = StatusEnum.Completed;
+        }
     }
 }

@@ -14,7 +14,7 @@
             // Required by EF Core
         }
 
-        public static PollAnswer Create(string answerText, int pollId)
+        public static PollAnswer Create(string answerText)
         {
             if (string.IsNullOrWhiteSpace(answerText))
             {
@@ -22,8 +22,7 @@
             }
             return new PollAnswer
             {
-                Answer = answerText,
-                PollId = pollId
+                Answer = answerText
             };
         }
     }

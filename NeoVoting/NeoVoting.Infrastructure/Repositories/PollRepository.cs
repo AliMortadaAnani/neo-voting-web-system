@@ -15,14 +15,41 @@ namespace NeoVoting.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<bool> IsActivePollExistsAsync()
+        {
+            return await _context.Polls.AnyAsync(p => p.Status != StatusEnum.Completed);
+        }
+
+        public async Task<bool> IsPollNameExistsAsync(string pollName)
+        {
+            return await _context.Polls.AnyAsync(p => p.Name == pollName);
+        }
+
         public void Add(Poll poll)
         {
             _context.Polls.Add(poll);
         }
 
-        public async Task<bool> IsActivePollExistsAsync()
+        public async Task<Poll?> GetByIdAsync(int pollId)
         {
-            return await _context.Polls.AnyAsync(p => p.Status != StatusEnum.Completed);
+            return await _context.Polls
+                .Include(p => p.PollAnswers)
+                .FirstOrDefaultAsync(p => p.Id == pollId);
+        }
+
+        public async Task<bool> IsPollUpcomingPhaseAsync(int pollId)
+        {
+            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Upcoming);//unused
+        }
+
+        public async Task<bool> IsPollVotingPhaseAsync(int pollId)
+        {
+            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Voting);//unused
+        }
+
+        public async Task<bool> IsPollCompletedPhaseAsync(int pollId)
+        {
+            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Completed);//unused
         }
 
         public async Task<int> CountAsync()
@@ -40,13 +67,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Poll?> GetByIdAsync(int pollId)
-        {
-            return await _context.Polls
-                .Include(p => p.PollAnswers)
-                .FirstOrDefaultAsync(p => p.Id == pollId);
-        }
-
+        
         
 
         public async Task<Poll?> GetActivePollAsync()
@@ -56,24 +77,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .SingleOrDefaultAsync(p => p.Status != StatusEnum.Completed);
         }
 
-        public async Task<bool> IsPollNameExistsAsync(string pollName)
-        {
-            return await _context.Polls.AnyAsync(p => p.Name == pollName);
-        }
-
-        public async Task<bool> IsPollUpcomingPhaseAsync(int pollId)
-        {
-            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Upcoming);
-        }
-
-        public async Task<bool> IsPollVotingPhaseAsync(int pollId)
-        {
-            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Voting);
-        }
-
-        public async Task<bool> IsPollCompletedPhaseAsync(int pollId)
-        {
-            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Completed);
-        }
+        
+        
     }
 }

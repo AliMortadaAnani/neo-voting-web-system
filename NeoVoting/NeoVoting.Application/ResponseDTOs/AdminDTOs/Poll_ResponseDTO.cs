@@ -1,4 +1,6 @@
-﻿namespace NeoVoting.Application.ResponseDTOs.AdminDTOs
+﻿using NeoVoting.Domain.Enums;
+
+namespace NeoVoting.Application.ResponseDTOs.AdminDTOs
 {
     public class Poll_ResponseDTO
     {
@@ -8,6 +10,7 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
+        public StatusEnum? Status { get; set; }
         public List<PollAnswerListDTO>? Answers { get; set; } = new List<PollAnswerListDTO>();
     }
 

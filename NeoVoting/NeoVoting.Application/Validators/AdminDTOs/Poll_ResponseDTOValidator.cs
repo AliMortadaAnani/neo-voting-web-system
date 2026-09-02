@@ -18,6 +18,7 @@ namespace NeoVoting.Application.Validators.AdminDTOs
             RuleFor(x => x.StartDate).NotNull();
             RuleFor(x => x.EndDate).NotNull();
             RuleFor(x => x.Answers).NotNull();
+            RuleFor(x => x.Status).NotNull();
         }
     }
 

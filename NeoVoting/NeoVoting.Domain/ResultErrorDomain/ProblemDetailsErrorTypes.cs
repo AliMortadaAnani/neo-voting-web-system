@@ -7,11 +7,17 @@ namespace NeoVoting.Domain.ResultErrorDomain
     public enum ProblemDetails400ErrorTypes // Validation / Bad Request
     {
         Active_Election_AlreadyExists,
-        Cannot_Update_CompletedElection,
-
+        Cannot_Complete_CompletedElection,
+        Cannot_Start_StartedElection,
+        Cannot_Complete_UpcomingElection,
+        Cannot_Start_CompletedElection,
         Active_Poll_AlreadyExists,
-        Cannot_Update_CompletedPoll,
+        Cannot_Complete_CompletedPoll,
+        Cannot_Start_StartedPoll,
+        Cannot_Complete_UpcomingPoll,
 
+        Cannot_Start_CompletedPoll,
+        Poll_InvalidAnswers,
         File_Upload_Error
     }
 
