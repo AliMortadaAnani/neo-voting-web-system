@@ -73,5 +73,22 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.ElectionWinners
                 .AnyAsync(ew => ew.CandidateProfileId == candidateProfileId && ew.CandidateProfile.ElectionId == electionId);
         }
+
+        public async Task<List<ElectionWinner>> GetAllWinnersByElectionIdAsync(int electionId, GovernorateIdEnum? governorate = null)
+        {
+            var query = _context.ElectionWinners
+                .Include(ew => ew.CandidateProfile)
+                .ThenInclude(cp => cp.Candidate)
+                .AsNoTracking()
+                .Where(ew => ew.CandidateProfile.ElectionId == electionId);
+
+            // Conditionally filter by governorate if provided and not null
+            if (governorate.HasValue)
+            {
+                query = query.Where(ew => ew.CandidateProfile.Candidate.Governorate == governorate.Value);
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

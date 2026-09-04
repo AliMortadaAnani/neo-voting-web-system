@@ -135,23 +135,21 @@ namespace NeoVoting.Domain.Entities
         // CONSTRUCTORS
         // ==================================================================
 
+        public ElectionStatistics(int electionId, GovernorateIdEnum? governorate, DateOnly parliamentStartDate, DateOnly parliamentEndDate)
+        {
+            ElectionId = electionId;
+            Governorate = governorate;
+            ParliamentStartDate = parliamentStartDate;
+            ParliamentEndDate = parliamentEndDate;
+            Election = null!;
+        }
+
         public ElectionStatistics()
         {
             Election = null!;
         }
 
-        public ElectionStatistics(
-            int electionId,
-            GovernorateIdEnum? governorate = null,
-            DateOnly? parliamentStartDate = null,
-            DateOnly? parliamentEndDate = null)
-        {
-            ElectionId = electionId;
-            Governorate = governorate;
-            ParliamentStartDate = parliamentStartDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
-            ParliamentEndDate = parliamentEndDate ?? DateOnly.FromDateTime(DateTime.UtcNow.AddYears(4));
-            Election = null!;
-        }
+       
 
         // ==================================================================
         // DATA POPULATION METHODS

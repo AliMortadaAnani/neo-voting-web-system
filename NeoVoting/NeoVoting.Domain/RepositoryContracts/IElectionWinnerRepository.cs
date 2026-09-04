@@ -20,5 +20,7 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<int> CountWinnersByElectionIdAsync(
             int electionId,
             GovernorateIdEnum? governorate);
+
+        Task<List<ElectionWinner>> GetAllWinnersByElectionIdAsync(int electionId, GovernorateIdEnum? governorate = null);
     }
 }

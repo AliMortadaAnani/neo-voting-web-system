@@ -21,9 +21,9 @@ namespace NeoVoting.Application.ServicesContracts
         Task<PagedResult<ElectionVoteLog_ResponseDTO>> GetPagedElectionVoteLogsAsync(int electionId,GovernorateIdEnum governorate, int? pageNumber, int? pageSize);
         Task<PagedResult<PollVoteLog_ResponseDTO>> GetPagedPollVoteLogsAsync(int pollId, int? pageNumber, int? pageSize);
 
-        Task<Result<CompletedPollStatistics_ResponseDTO>> GetCompletedPollStatisticsAsync(int pollId);
+        Task<Result<PollStatistics>> GetCompletedPollStatisticsAsync(int pollId);
 
-        Task<Result<CompletedElectionStatistics_ResponseDTO>> GetCompletedElectionStatisticsAsync(int electionId,GovernorateIdEnum governorate);
+        Task<Result<ElectionStatistics>> GetCompletedElectionStatisticsAsync(int electionId,GovernorateIdEnum governorate);
 
         Task<PagedResult<CandidateResults_ResponseDTO>> GetPagedCandidateResultsForElectionAsync(int electionId, GovernorateIdEnum governorate, int? pageNumber, int? pageSize);
 

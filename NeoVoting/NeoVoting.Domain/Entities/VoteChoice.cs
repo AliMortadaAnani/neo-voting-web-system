@@ -33,11 +33,11 @@
         /// <param name="candidateProfileId">The ID of the candidate being voted for.</param>
         /// <returns>A new, valid VoteChoice object.</returns>
         /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
-        public static VoteChoice Create(Guid voteId, int candidateProfileId)
+        public static VoteChoice Create( int candidateProfileId)
         {
             var voteChoice = new VoteChoice
             {
-                VoteId = voteId,
+                
                 CandidateProfileId = candidateProfileId
             };
 

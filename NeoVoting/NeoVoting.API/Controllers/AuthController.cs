@@ -1,11 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using NeoVoting.Application.RequestDTOs.AdminDTOs;
 using NeoVoting.Application.RequestDTOs.AuthDTOs;
 using NeoVoting.Application.RequestDTOs.CandidateDTOs;
+using NeoVoting.Application.RequestDTOs.VoterDTOs;
+using NeoVoting.Application.ResponseDTOs.AdminDTOs;
 using NeoVoting.Application.ResponseDTOs.AuthDTOs;
+using NeoVoting.Application.ResponseDTOs.CandidateDTOs;
+using NeoVoting.Application.ResponseDTOs.VoterDTOs;
+using NeoVoting.Application.Services;
 using NeoVoting.Application.ServicesContracts;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
+using System.ComponentModel.Design;
 
 namespace NeoVoting.API.Controllers
 {
@@ -15,13 +23,26 @@ namespace NeoVoting.API.Controllers
         private readonly IAuthServices _authServices;
         private readonly IFileServices _fileServices;
         private readonly ILogger<AuthController> _logger;
+
+        private readonly IAdminServices _adminServices;
+        private readonly IGeneralServices _generalServices;
+
+        private readonly IVoterServices _voterServices;
+
+        private readonly ICandidateServices _candidateServices;
         private const string RefreshTokenCookieName = "refresh";
 
-        public AuthController(IAuthServices authServices, ILogger<AuthController> logger, IFileServices fileServices)
+        public AuthController(IAuthServices authServices, ILogger<AuthController> logger, IFileServices fileServices, IAdminServices adminServices, IGeneralServices generalServices, IVoterServices voterServices, ICandidateServices candidateServices)
         {
             _authServices = authServices;
             _logger = logger;
             _fileServices = fileServices;
+            _adminServices = adminServices;
+            _generalServices = generalServices;
+            _voterServices = voterServices;
+            _candidateServices = candidateServices;
+
+
         }
 
         // 1. POST: api/auth/login
@@ -245,6 +266,120 @@ namespace NeoVoting.API.Controllers
             };
 
             Response.Cookies.Append(RefreshTokenCookieName, refreshToken, cookieOptions);
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ProducesResponseType(typeof(Election_ResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> CreateElection([FromBody] ElectionCreate_RequestDTO requestDTO)
+        {
+            _logger.LogInformation("Creating a new election.");
+
+            var result = await _adminServices.CreateElectionAsync(requestDTO);
+
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Election created successfully with ID: {ElectionId}", result.Value.Id); // Adjust based on your DTO property
+                                                                                                          
+            }
+
+            _logger.LogWarning("Failed to create election: {Error}", result.Error.Description);
+            return HandleResult(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{electionId:int}/start")]
+        [ProducesResponseType(typeof(Election_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> StartElection(int electionId)
+        {
+            _logger.LogInformation("Attempting to start election with ID: {ElectionId}", electionId);
+
+            var result = await _adminServices.StartElectionAsync(electionId);
+
+            if (result.IsSuccess)
+                _logger.LogInformation("Election {ElectionId} started successfully.", electionId);
+            else
+                _logger.LogWarning("Failed to start election {ElectionId}: {Error}", electionId, result.Error.Description);
+
+            return HandleResult(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{electionId:int}/complete")]
+        [ProducesResponseType(typeof(Election_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CompleteElection(int electionId)
+        {
+            _logger.LogInformation("Attempting to complete election with ID: {ElectionId}", electionId);
+
+            var result = await _adminServices.CompleteElectionAsync(electionId);
+
+            if (result.IsSuccess)
+                _logger.LogInformation("Election {ElectionId} completed successfully.", electionId);
+            else
+                _logger.LogWarning("Failed to complete election {ElectionId}: {Error}", electionId, result.Error.Description);
+
+            return HandleResult(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{electionId:int}/statistics")]
+        [ProducesResponseType(typeof(ElectionStatistics), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCompletedElectionStatistics(int electionId, [FromQuery] GovernorateIdEnum governorate)
+        {
+            _logger.LogInformation("Fetching statistics for election ID: {ElectionId}, Governorate: {Governorate}", electionId, governorate);
+
+            var result = await _generalServices.GetCompletedElectionStatisticsAsync(electionId, governorate);
+
+            return HandleResult(result);
+        }
+
+        [Authorize(Roles = "Voter")]
+        [HttpPost("{electionId:int}/vote")]
+        [ProducesResponseType(typeof(ElectionVoteLog_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> CastVoteInElection(int electionId, [FromBody] Voter_Cast_In_Election_RequestDTO requestDTO)
+        {
+            _logger.LogInformation("Voter casting vote in election ID: {ElectionId}", electionId);
+
+            var result = await _voterServices.CastVoteInElectionAsync(electionId, requestDTO);
+
+            if (result.IsSuccess)
+                _logger.LogInformation("Vote cast successfully in election {ElectionId}", electionId);
+            else
+                _logger.LogWarning("Failed to cast vote in election {ElectionId}: {Error}", electionId, result.Error.Description);
+
+            return HandleResult(result);
+        }
+
+        [Authorize(Roles = "Candidate")]
+        [HttpPost("profile")]
+        [ProducesResponseType(typeof(CandidateProfile_ResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)] // Handling your profile-already-exists error scenario
+        public async Task<IActionResult> CreateCandidateProfile(int electionId, [FromBody] CandidateProfile_Create_Update_RequestDTO candidateRequestDTO)
+        {
+            _logger.LogInformation("Candidate profile creation attempted for election ID: {ElectionId}", electionId);
+
+            var result = await _candidateServices.CreateCandidateProfileAsync(electionId, candidateRequestDTO);
+
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Candidate profile created successfully for election ID: {ElectionId}", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to create candidate profile for election {ElectionId}: {Error}", electionId, result.Error.Description);
+            }
+
+            return HandleResult(result);
         }
     }
 }

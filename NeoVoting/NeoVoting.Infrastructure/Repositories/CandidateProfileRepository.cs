@@ -30,6 +30,7 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             return await _context.CandidateProfiles
                 .Include(cp => cp.Candidate)
+                .ThenInclude(c => c.User)
                 .FirstOrDefaultAsync(cp => cp.CandidateId == candidateId && cp.ElectionId == electionId);
         }
 

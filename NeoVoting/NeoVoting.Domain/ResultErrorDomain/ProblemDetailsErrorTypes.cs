@@ -15,7 +15,12 @@ namespace NeoVoting.Domain.ResultErrorDomain
         Cannot_Complete_CompletedPoll,
         Cannot_Start_StartedPoll,
         Cannot_Complete_UpcomingPoll,
-
+        Cannot_Nominate_CompletedElection,
+        Cannot_Nominate_StartedElection,
+        Cannot_Vote_CompletedElection,
+        Cannot_Vote_UpcomingElection,
+        Cannot_Vote_CompletedPoll,
+        Cannot_Vote_UpcomingPoll,
         Cannot_Start_CompletedPoll,
         Poll_InvalidAnswers,
         File_Upload_Error

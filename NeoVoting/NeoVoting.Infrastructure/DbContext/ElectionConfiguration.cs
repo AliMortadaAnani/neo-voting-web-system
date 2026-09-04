@@ -51,21 +51,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 $"([Status] IN ({sqlValues}) )")
             );
 
-            // Table name and constraints
-            builder.ToTable(tb =>
-            {
-                // Example: enforce that NominationEndDate > NominationStartDate
-                tb.HasCheckConstraint("CK_Election_NominationDates",
-                    "[NominationEndDate] > [NominationStartDate]");
-
-                // Example: enforce that VotingEndDate > VotingStartDate
-                tb.HasCheckConstraint("CK_Election_VotingDates",
-                    "[VotingEndDate] > [VotingStartDate]");
-
-                // Example: enforce that VotingStartDate >= NominationEndDate
-                tb.HasCheckConstraint("CK_Election_VotingAfterNomination",
-                    "[VotingStartDate] >= [NominationEndDate]");
-            });
+            
         }
     }
 }
