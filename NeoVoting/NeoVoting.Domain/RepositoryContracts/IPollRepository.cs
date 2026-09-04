@@ -19,10 +19,5 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<Poll?> GetActivePollAsync();
 
-        Task<bool> IsPollUpcomingPhaseAsync(int pollId);
-
-        Task<bool> IsPollVotingPhaseAsync(int pollId);
-
-        Task<bool> IsPollCompletedPhaseAsync(int pollId);
     }
 }

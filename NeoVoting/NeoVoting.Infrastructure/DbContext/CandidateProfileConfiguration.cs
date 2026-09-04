@@ -12,17 +12,13 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasKey(cp => cp.Id);
             builder.Property(entity => entity.Id).ValueGeneratedOnAdd();
             // Properties
-            builder.Property(cp => cp.Goals)
-                .IsRequired()
-                .HasMaxLength(2000); // adjust as needed
+           
 
             builder.Property(cp => cp.NominationReasons)
                 .IsRequired()
                 .HasMaxLength(2000); // adjust as needed
 
-            builder.Property(cp => cp.ProfilePhotoFilename)
-                .IsRequired(false)
-                .HasMaxLength(1000); // optional, allow null
+           
 
             // Relationships
             builder.HasOne(cp => cp.Candidate)

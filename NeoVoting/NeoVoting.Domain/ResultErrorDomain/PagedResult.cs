@@ -1,4 +1,4 @@
-﻿namespace NeoVoting.Domain.EF_DTOs
+﻿namespace NeoVoting.Domain.ResultErrorDomain
 {
     public class PagedResult<T>
     {

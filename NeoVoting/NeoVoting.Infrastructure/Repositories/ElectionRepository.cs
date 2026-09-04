@@ -34,20 +34,7 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.Elections.FindAsync(electionId);
         }
 
-        public async Task<bool> IsElectionUpcomingPhaseAsync(int electionId)
-        {
-            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Upcoming); //unused
-        }
-
-        public async Task<bool> IsElectionVotingPhaseAsync(int electionId)
-        {
-            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Voting);//unused
-        }
-
-        public async Task<bool> IsElectionCompletedPhaseAsync(int electionId)
-        {
-            return await _context.Elections.AnyAsync(e => e.Id == electionId && e.Status == StatusEnum.Completed);//unused
-        }
+    
         public async Task<List<Election>> GetPagedAsync(int pageNumber, int pageSize)
         {
             return await _context.Elections

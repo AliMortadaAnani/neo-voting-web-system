@@ -50,7 +50,7 @@ namespace NeoVoting.Infrastructure.DbContext
 
             builder.Property(cp => cp.VerificationHash)
                 .IsRequired()
-                .HasMaxLength(200); // adjust as needed
+                .HasMaxLength(2000); // adjust as needed
 
             builder.HasOne(ew => ew.User)
                 .WithOne(cp => cp.Candidate)

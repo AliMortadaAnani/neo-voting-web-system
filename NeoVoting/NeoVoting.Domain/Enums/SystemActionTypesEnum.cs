@@ -11,10 +11,6 @@
 
         ADMIN_CREATED_POLL = 4,
         ADMIN_STARTED_POLL = 5,
-        ADMIN_ENDED_POLL = 6,
-
-        ADMIN_BANNED_USER_ACCOUNT = 7,
-
-        ADMIN_RESET_USER_PASSWORD = 8
+        ADMIN_ENDED_POLL = 6
     }
 }

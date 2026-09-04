@@ -6,8 +6,6 @@ namespace NeoVoting.Domain.RepositoryContracts
     {
         Task<bool> IsCandidateExistByVerificationHashAsync(string verificationHash);
 
-        Task<Candidate?> GetByVerificationHashAsync(string verificationHash);
-
         void Add(Candidate candidate);
 
         Task<Candidate?> GetByUserIdAsync(int userId);

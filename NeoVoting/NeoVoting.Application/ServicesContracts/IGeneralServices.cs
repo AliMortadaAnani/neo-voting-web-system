@@ -1,7 +1,6 @@
 ﻿using NeoVoting.Application.ResponseDTOs.AdminDTOs;
 using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
 using NeoVoting.Application.ResponseDTOs.VoterDTOs;
-using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.ResultErrorDomain;

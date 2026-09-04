@@ -11,7 +11,6 @@ namespace NeoVoting.Domain.Entities
         // --- Properties ---
 
         public Guid Id { get; private set; }
-        public GovernorateIdEnum Governorate { get; private set; }
         public DateTime TimestampUTC { get; private set; }
 
         // --- Foreign Keys & Navigation Properties ---
@@ -19,21 +18,24 @@ namespace NeoVoting.Domain.Entities
         public int ElectionId { get; private set; }
         public Election Election { get; private set; }
 
-        public ICollection<VoteChoice> VoteChoices { get; private set; } = new List<VoteChoice>();
+        public int CandidateProfileId { get; private set; }
+        public CandidateProfile CandidateProfile { get; private set; }
+
+
 
         private Vote()
         {
             Election = null!;
+            CandidateProfile = null!;
         }
 
-        public static Vote Create(int electionId, GovernorateIdEnum governorate)
+        public static Vote Create(int electionId, int candidateProfileId)
         {
             var vote = new Vote
             {
                 Id = Guid.NewGuid(),
                 ElectionId = electionId,
-                Governorate = governorate,
-
+                CandidateProfileId = candidateProfileId,
                 TimestampUTC = DateTime.UtcNow // The timestamp is always set at the moment of creation.
             };
 

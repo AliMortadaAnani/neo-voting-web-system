@@ -2,7 +2,6 @@
 using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
 using NeoVoting.Application.ResponseDTOs.VoterDTOs;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;

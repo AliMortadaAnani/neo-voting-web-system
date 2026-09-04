@@ -10,9 +10,11 @@ namespace NeoVoting.Domain.Entities
 
         public DateTime? RefreshTokenExpirationDateTime { get; private set; }
 
-        public Candidate? Candidate { get; private set; }
+        public Candidate? Candidate { get; private set; } // Candidate IS a user, but not all users are candidates. This is a one-to-one relationship.
 
-        public Voter? Voter { get; private set; }
+        public Voter? Voter { get; private set; } // Voter IS a user, but not all users are voters. This is a one-to-one relationship.
+
+        // admin do not have a separate entity, they are just users with a specific role. So no need for an Admin entity.
 
         private ApplicationUser()
         { }
@@ -34,12 +36,6 @@ namespace NeoVoting.Domain.Entities
 
         // --- Token Management Methods ---
 
-        /// <summary>
-        /// Updates the user's refresh token and its expiration date.
-        /// Use this when a user logs in or refreshes their session.
-        /// </summary>
-        /// <param name="token">The new cryptographic refresh token string.</param>
-        /// <param name="expiryDateTime">The UTC date and time when this token expires.</param>
         public void UpdateRefreshToken(string token, DateTime expiryDateTime)
         {
             ValidateRefreshTokenParams(token, expiryDateTime);
@@ -48,19 +44,12 @@ namespace NeoVoting.Domain.Entities
             RefreshTokenExpirationDateTime = expiryDateTime;
         }
 
-        /// <summary>
-        /// Revokes the current refresh token by setting it and its expiration to null.
-        /// Use this when a user logs out or if a security breach is suspected.
-        /// </summary>
         public void InvalidateRefreshToken()
         {
             RefreshToken = null;
             RefreshTokenExpirationDateTime = DateTime.UtcNow.AddMinutes(-1); ;
         }
 
-        /// <summary>
-        /// Helper method to validate parameters for setting a refresh token.
-        /// </summary>
         private static void ValidateRefreshTokenParams(string token, DateTime expiryDateTime)
         {
             var errors = new StringBuilder();
@@ -71,8 +60,7 @@ namespace NeoVoting.Domain.Entities
             }
 
             // Ensure the expiry is in the future.
-            // Depending on your logic, you might want a buffer (e.g., > 1 minute from now),
-            // but strict > UtcNow is the baseline requirement.
+
             if (expiryDateTime <= DateTime.UtcNow)
             {
                 errors.AppendLine($"Refresh token expiration must be in the future. Provided: {expiryDateTime} UTC, Now: {DateTime.UtcNow} UTC.");

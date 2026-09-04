@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
@@ -20,34 +21,15 @@ namespace NeoVoting.Infrastructure.Repositories
             _context.Votes.Add(vote);
         }
 
-        public async Task<bool> IsVoteChoicesForVoteEqualFive(Vote vote)
-        {
-            // Relies on VoteChoices being loaded or checking against the DB
-            return await _context.VoteChoices.CountAsync(vc => vc.VoteId == vote.Id) == 5;
-        }
-
-        public async Task<Vote?> GetByVoteId(Guid voteId)
-        {
-            return await _context.Votes
-
-                .FindAsync(voteId);
-        }
 
         public async Task<List<Vote>> GetPagedByElectionIdAsync(
-    int electionId,
-    GovernorateIdEnum? governorate,
-    int pageNumber,
-    int pageSize)
+                                    int electionId,
+                                    int pageNumber,
+                                    int pageSize)
         {
             var query = _context.Votes
                 .AsNoTracking()
                 .Where(v => v.ElectionId == electionId);
-
-            // If governorate is provided, filter by it. If null, it gets all votes for the election.
-            if (governorate.HasValue)
-            {
-                query = query.Where(v => v.Governorate == governorate.Value);
-            }
 
             return await query
                 .OrderByDescending(v => v.TimestampUTC)
@@ -57,19 +39,37 @@ namespace NeoVoting.Infrastructure.Repositories
         }
 
         public async Task<int> CountByElectionIdAsync(
-            int electionId,
-            GovernorateIdEnum? governorate)
+            int electionId)
         {
             var query = _context.Votes
                 .Where(v => v.ElectionId == electionId);
 
-            if (governorate.HasValue)
-            {
-                query = query.Where(v => v.Governorate == governorate.Value);
-            }
-
             return await query.CountAsync();
         }
+
+        public async Task<List<CandidateProfileWithVotesDto>> GetPagedCandidatesProfilesResultsAsync(int electionId, int pageNumber, int pageSize)
+        {
+            var query = _context.CandidateProfiles
+               .AsNoTracking()
+               .Where(cp => cp.ElectionId == electionId);
+
+            return await query
+                // 1. First, sort by vote count descending (highest votes come first)
+                .OrderByDescending(cp => cp.Votes.Count)
+
+                // 2. Then, if multiple candidates share the exact same vote count, randomize using Guid.
+                .ThenBy(cp => Guid.NewGuid())
+
+                .Select(cp => new CandidateProfileWithVotesDto
+                {
+                    CandidateProfile = cp,
+                    TotalVotes = cp.Votes.Count
+                })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
 
     }
 }

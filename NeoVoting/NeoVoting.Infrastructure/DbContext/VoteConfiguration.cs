@@ -23,24 +23,15 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-           
 
-            builder.Property(v => v.Governorate)
-                 .IsRequired()
-                 .HasConversion<int>(); // Store enum as int in the database
 
-            // 1. Get all integer values from the Enum
-            var enumValues = Enum.GetValues(typeof(GovernorateIdEnum))
-                                 .Cast<int>();
+            builder.HasOne(vc => vc.CandidateProfile)
+                .WithMany(cp => cp.Votes)
+                .HasForeignKey(vc => vc.CandidateProfileId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+            // Prevent deleting a CandidateProfile if votes reference it
 
-            // 2. Create the SQL string: "1, 2, 3"
-            var sqlValues = string.Join(", ", enumValues);
-
-            // 3. Add the Check Constraint
-            // SQL: CHECK ([GovernorateId] IN (1, 2, 3) )
-            builder.ToTable(t =>
-                t.HasCheckConstraint("CK_Vote_Governorate", $"([Governorate] IN ({sqlValues}) )")
-            );
         }
     }
 }

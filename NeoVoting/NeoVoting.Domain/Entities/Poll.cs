@@ -19,7 +19,7 @@ namespace NeoVoting.Domain.Entities
 
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
-        public PollStatistics? PollStatistics { get; private set; }
+    
 
         private Poll()
         {
@@ -36,10 +36,7 @@ namespace NeoVoting.Domain.Entities
             {
                 throw new ArgumentException("Poll question cannot be null or empty.", nameof(question));
             }
-            if (startDate >= endDate)
-            {
-                throw new ArgumentException("Start date must be earlier than end date.");
-            }
+       
             return new Poll
             {
                 Name = name,
@@ -65,6 +62,12 @@ namespace NeoVoting.Domain.Entities
                 throw new InvalidOperationException("Poll can only be ended if it is in the voting status.");
             }
             Status = StatusEnum.Completed;
+        }
+
+        public void UpdatePollDates(DateTime startDate, DateTime endDate)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
         }
     }
 }

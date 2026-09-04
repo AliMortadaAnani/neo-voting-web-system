@@ -37,20 +37,7 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == pollId);
         }
 
-        public async Task<bool> IsPollUpcomingPhaseAsync(int pollId)
-        {
-            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Upcoming);//unused
-        }
-
-        public async Task<bool> IsPollVotingPhaseAsync(int pollId)
-        {
-            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Voting);//unused
-        }
-
-        public async Task<bool> IsPollCompletedPhaseAsync(int pollId)
-        {
-            return await _context.Polls.AnyAsync(p => p.Id == pollId && p.Status == StatusEnum.Completed);//unused
-        }
+      
 
         public async Task<int> CountAsync()
         {

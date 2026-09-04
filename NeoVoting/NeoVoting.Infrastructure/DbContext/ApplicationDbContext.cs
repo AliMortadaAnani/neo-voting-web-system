@@ -26,13 +26,9 @@ namespace NeoVoting.Infrastructure.DbContext
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<CandidateProfile> CandidateProfiles { get; set; }
         public DbSet<Vote> Votes { get; set; }
-        public DbSet<VoteChoice> VoteChoices { get; set; }
-        public DbSet<ElectionWinner> ElectionWinners { get; set; }
 
         public DbSet<SystemAuditLog> SystemAuditLogs { get; set; }
 
-        public DbSet<ElectionStatistics> Election_Statistics { get; set; }
-        public DbSet<PollStatistics> Poll_Statistics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

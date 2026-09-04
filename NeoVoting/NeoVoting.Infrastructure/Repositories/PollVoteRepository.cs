@@ -25,12 +25,6 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.PollVotes.CountAsync(pv => pv.PollId == pollId);
         }
 
-        public async Task<PollVote?> GetByPollVoteIdAsync(Guid pollVoteId)
-        {
-            return await _context.PollVotes
-
-                .FindAsync(pollVoteId);
-        }
 
         public async Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize)
         {
@@ -42,29 +36,20 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<PollResultBucketDto>> GetResultsAsyncByPollId(int pollId)
+        public async Task<List<PollAnswerWithVotesDto>> GetResultsAsyncByPollId(int pollId)
         {
             return await _context.PollAnswers
                 .AsNoTracking()
                 .Where(pa => pa.PollId == pollId)
                 .OrderByDescending(pa => pa.PollVotes.Count)
                 .ThenBy(cp => Guid.NewGuid()) // Randomize order for answers with the same vote count
-                .Select(pa => new PollResultBucketDto
+                .Select(pa => new PollAnswerWithVotesDto
                 {
-                    Answer = pa,
-                    VoteCount = pa.PollVotes.Count // EF Core handles this as a LEFT JOIN with a COUNT
+                    pollAnswer = pa,
+                    TotalVotes = pa.PollVotes.Count // EF Core handles this as a LEFT JOIN with a COUNT
                 })
                 .ToListAsync();
         }
 
-        public async Task<PollAnswer?> GetWinnerAnswerByPollIdAsync(int pollId)
-        {
-            return await _context.PollAnswers
-                .AsNoTracking()
-                .Where(pa => pa.PollId == pollId)
-                .OrderByDescending(pa => pa.PollVotes.Count)
-                .ThenBy(cp => Guid.NewGuid())
-                .FirstOrDefaultAsync();
-        }
     }
 }

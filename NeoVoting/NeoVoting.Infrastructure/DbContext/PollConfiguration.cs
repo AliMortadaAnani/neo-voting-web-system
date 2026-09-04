@@ -48,13 +48,7 @@ namespace NeoVoting.Infrastructure.DbContext
                 $"([Status] IN ({sqlValues}) )")
             );
 
-            // Table name and constraints
-            builder.ToTable(tb =>
-            {
-                // Example: enforce that EndDate > StartDate
-                tb.HasCheckConstraint("CK_Poll_StartEndDates",
-                    "[EndDate] > [StartDate]");
-            });
+           
         }
     }
 }

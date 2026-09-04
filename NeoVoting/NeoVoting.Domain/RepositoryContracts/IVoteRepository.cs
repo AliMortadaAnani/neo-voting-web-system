@@ -1,4 +1,5 @@
-﻿using NeoVoting.Domain.Entities;
+﻿using NeoVoting.Domain.EF_DTOs;
+using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
@@ -7,12 +8,12 @@ namespace NeoVoting.Domain.RepositoryContracts
     {
         void Add(Vote vote);
 
-        Task<bool> IsVoteChoicesForVoteEqualFive(Vote vote);
+        Task<List<Vote>> GetPagedByElectionIdAsync(int electionId, int pageNumber, int pageSize);
 
-        Task<Vote?> GetByVoteId(Guid voteId);
+        Task<int> CountByElectionIdAsync (int electionId);
 
-        Task<List<Vote>> GetPagedByElectionIdAsync(int electionId,GovernorateIdEnum? governorate, int pageNumber, int pageSize);
+        Task<List<CandidateProfileWithVotesDto>> GetPagedCandidatesProfilesResultsAsync(int electionId, int pageNumber, int pageSize);
 
-        Task<int> CountByElectionIdAsync (int electionId, GovernorateIdEnum? governorate);
+      
     }
 }

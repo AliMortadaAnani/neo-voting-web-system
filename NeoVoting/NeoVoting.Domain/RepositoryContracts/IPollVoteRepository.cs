@@ -9,12 +9,9 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<int> CountByPollIdAsync(int pollId);
 
-        Task<PollVote?> GetByPollVoteIdAsync(Guid pollVoteId);
-
         Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize);
 
-        Task<List<PollResultBucketDto>> GetResultsAsyncByPollId(int pollId);
-
-        Task<PollAnswer?> GetWinnerAnswerByPollIdAsync(int pollId);
+        Task<List<PollAnswerWithVotesDto>> GetResultsAsyncByPollId(int pollId);
+     
     }
 }

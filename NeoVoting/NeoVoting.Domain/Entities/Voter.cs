@@ -60,33 +60,6 @@ namespace NeoVoting.Domain.Entities
 
         // so we guarantee in all cases that the verification hash in the database is always up to date with the latest private data of the user
 
-        public void UpdateFields_AtUserPasswordReset(
-
-            string firstName,
-            string lastName,
-            DateOnly dateOfBirth,
-            char gender,
-            GovernorateIdEnum governorate,
-            string verificationHash
-            )
-        {
-            FirstName = firstName;
-            LastName = lastName;
-            DateOfBirth = dateOfBirth;
-            Gender = gender;
-            Governorate = governorate;
-            VerificationHash = verificationHash;
-        }
-
-        //public void MarkAsVoted()
-        //{
-        //    if(HasVoted)
-        //    {
-        //        throw new InvalidOperationException("This voter has already voted.");
-        //    }
-
-        //    HasVoted = true;
-
-        //}
+       
     }
 }

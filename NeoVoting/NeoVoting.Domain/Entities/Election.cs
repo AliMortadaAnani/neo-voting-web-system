@@ -19,16 +19,13 @@ namespace NeoVoting.Domain.Entities
 
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
-        public ICollection<ElectionStatistics> ElectionStatisticsList { get; private set; } = new List<ElectionStatistics>();
-        // each election can have many election statistics, global and per governorate
-
         private Election()
         { }
 
         public static Election Create(string name, DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
         {
             // --- Centralized Validation Logic ---
-            Validate(name, nominationStartDate, nominationEndDate, votingStartDate, votingEndDate, isCreating: true);
+            Validate(name);
 
             var election = new Election
             {
@@ -61,16 +58,8 @@ namespace NeoVoting.Domain.Entities
             Status = StatusEnum.Completed;
         }
 
-        /// <summary>
-        /// Private helper method to contain all validation rules for creating an election.
-        /// </summary>
         private static void Validate(
-            string name,
-            DateTime nominationStartDate,
-            DateTime nominationEndDate,
-            DateTime votingStartDate,
-            DateTime votingEndDate,
-            bool isCreating = false // default false for update
+            string name
             )
         {
             var errors = new StringBuilder();
@@ -79,34 +68,19 @@ namespace NeoVoting.Domain.Entities
             {
                 errors.AppendLine("Election name is required.");
             }
-            //when creating, nomination start date must be in the future
-            if (isCreating && nominationStartDate < DateTime.UtcNow)
-            {
-                errors.AppendLine("Nomination start date must be in the future.");
-            }
-
-            // Rule 1: Nomination end date must be after start date.
-            if (nominationEndDate <= nominationStartDate)
-            {
-                errors.AppendLine("Nomination end date must be after the start date.");
-            }
-
-            // Rule 2: Voting start date must be after nomination has ended.
-            if (votingStartDate < nominationEndDate)
-            {
-                errors.AppendLine("Voting start date must not be before the nomination period has ended.");
-            }
-
-            // Rule 3: Voting end date must be after voting has started.
-            if (votingEndDate <= votingStartDate)
-            {
-                errors.AppendLine("Voting end date must be after the voting start date.");
-            }
 
             if (errors.Length > 0)
             {
                 throw new ArgumentException(errors.ToString());
             }
+        }
+
+        public void UpdateElectionDates(DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
+        {
+            NominationStartDate = nominationStartDate;
+            NominationEndDate = nominationEndDate;
+            VotingStartDate = votingStartDate;
+            VotingEndDate = votingEndDate;
         }
     }
 }
