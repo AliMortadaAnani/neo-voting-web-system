@@ -8,6 +8,7 @@ namespace NeoVoting.Domain.ResultErrorDomain
     {
         // Elections
         ElectionAlreadyActive,
+
         ElectionAlreadyStarted,
         ElectionAlreadyCompleted,
         ElectionNotYetStarted,
@@ -17,16 +18,19 @@ namespace NeoVoting.Domain.ResultErrorDomain
 
         // Polls
         PollAlreadyActive,
+
         PollAlreadyStarted,
         PollAlreadyCompleted,
         PollNotYetStarted,
         PollNotYetCompleted,
         PollInvalidAnswers,
-        PollCannotVote
+        PollCannotVote,
+
+        PagingInvalidParameters,
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum ProblemDetails401ErrorTypes // Unauthorized 
+    public enum ProblemDetails401ErrorTypes // Unauthorized
     {
         User_InvalidCredentials, // any user in system
 
@@ -65,7 +69,6 @@ namespace NeoVoting.Domain.ResultErrorDomain
         Election_DuplicateName,
 
         Poll_DuplicateName
-        
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

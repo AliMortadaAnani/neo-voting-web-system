@@ -28,8 +28,4 @@
     <ProjectReference Include="..\NeoVoting.Infrastructure\NeoVoting.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
 </Project>

@@ -26,7 +26,6 @@ namespace NeoVoting.Infrastructure.Repositories
         public void Add(PollAnswer answer)
         {
             _context.PollAnswers.Add(answer); // unused
-        }     
-       
+        }
     }
 }

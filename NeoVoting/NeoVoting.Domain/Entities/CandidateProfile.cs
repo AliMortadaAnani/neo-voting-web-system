@@ -26,7 +26,6 @@ namespace NeoVoting.Domain.Entities
             Election = null!;
         }
 
-
         public static CandidateProfile Create(int candidateId, int electionId, string nominationReasons)
         {
             // --- Centralized Validation Logic ---
@@ -41,7 +40,6 @@ namespace NeoVoting.Domain.Entities
 
             return profile;
         }
-
 
         private static void ValidateFields(string nominationReasons)
         {

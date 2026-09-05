@@ -29,7 +29,6 @@ namespace NeoVoting.Infrastructure.DbContext
 
         public DbSet<SystemAuditLog> SystemAuditLogs { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Essential for Identity framework keys and tables

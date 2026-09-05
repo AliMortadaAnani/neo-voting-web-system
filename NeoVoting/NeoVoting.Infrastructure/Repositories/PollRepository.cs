@@ -37,8 +37,6 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == pollId);
         }
 
-      
-
         public async Task<int> CountAsync()
         {
             return await _context.Polls.CountAsync();
@@ -54,17 +52,11 @@ namespace NeoVoting.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        
-        
-
         public async Task<Poll?> GetActivePollAsync()
         {
             return await _context.Polls
                 .Include(p => p.PollAnswers)
                 .SingleOrDefaultAsync(p => p.Status != StatusEnum.Completed);
         }
-
-        
-        
     }
 }

@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="RequestDTOs\GeneralDTOs\" />
+    <Folder Include="ResponseDTOs\CandidateDTOs\" />
   </ItemGroup>
 
 </Project>

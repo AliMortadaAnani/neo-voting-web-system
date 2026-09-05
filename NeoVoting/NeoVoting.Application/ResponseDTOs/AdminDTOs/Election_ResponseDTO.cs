@@ -11,6 +11,6 @@ namespace NeoVoting.Application.ResponseDTOs.AdminDTOs
         public DateTime? VotingStartDate { get; set; }
         public DateTime? VotingEndDate { get; set; }
 
-        public StatusEnum Status { get; set; }
+        public StatusEnum? Status { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
@@ -10,10 +9,8 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<List<Vote>> GetPagedByElectionIdAsync(int electionId, int pageNumber, int pageSize);
 
-        Task<int> CountByElectionIdAsync (int electionId);
+        Task<int> CountByElectionIdAsync(int electionId);
 
         Task<List<CandidateProfileWithVotesDto>> GetPagedCandidatesProfilesResultsAsync(int electionId, int pageNumber, int pageSize);
-
-      
     }
 }

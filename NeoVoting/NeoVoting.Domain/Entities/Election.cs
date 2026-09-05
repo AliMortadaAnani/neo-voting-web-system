@@ -74,13 +74,5 @@ namespace NeoVoting.Domain.Entities
                 throw new ArgumentException(errors.ToString());
             }
         }
-
-        public void UpdateElectionDates(DateTime nominationStartDate, DateTime nominationEndDate, DateTime votingStartDate, DateTime votingEndDate)
-        {
-            NominationStartDate = nominationStartDate;
-            NominationEndDate = nominationEndDate;
-            VotingStartDate = votingStartDate;
-            VotingEndDate = votingEndDate;
-        }
     }
 }

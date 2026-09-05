@@ -1,12 +1,7 @@
 ﻿using FluentValidation;
-using NeoVoting.Application.ResponseDTOs.AdminDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
 
-namespace NeoVoting.Application.Validators.AdminDTOs
+namespace NeoVoting.Application.Validators.GeneralDTOs
 {
     public class Poll_ResponseDTOValidator : AbstractValidator<Poll_ResponseDTO>
     {
@@ -22,12 +17,13 @@ namespace NeoVoting.Application.Validators.AdminDTOs
         }
     }
 
-    public class PollAnswerListDTOValidator : AbstractValidator<PollAnswerListDTO>
+    public class PollAnswerListDTOValidator : AbstractValidator<PollAnswerDTO>
     {
         public PollAnswerListDTOValidator()
         {
             RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Answer).NotEmpty();
+            // RuleFor(x => x.VotesCount).NotNull();
         }
     }
 }

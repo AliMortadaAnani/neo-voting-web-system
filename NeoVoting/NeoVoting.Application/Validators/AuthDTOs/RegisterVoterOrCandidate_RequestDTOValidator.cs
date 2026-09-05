@@ -1,10 +1,5 @@
 ﻿using FluentValidation;
 using NeoVoting.Application.RequestDTOs.AuthDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Validators.AuthDTOs
 {

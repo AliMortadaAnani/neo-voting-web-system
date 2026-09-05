@@ -15,8 +15,7 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<int> CountAsync();
 
         Task<Election?> GetByIdAsync(int electionId);
- 
-        Task<Election?> GetActiveElectionAsync();
 
+        Task<Election?> GetActiveElectionAsync();
     }
 }

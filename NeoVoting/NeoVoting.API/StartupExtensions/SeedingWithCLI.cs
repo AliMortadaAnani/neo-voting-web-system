@@ -19,7 +19,7 @@ namespace NeoVoting.API.StartupExtensions
 
             return command.ToLower() switch
             {
-                "seeddata" => await HandleSeedDataAsync(app),
+                // "seeddata" => await HandleSeedDataAsync(app),
                 "seedadmin_roles" => await HandleSeedAdmin_Roles_Async(app),
                 "updateadminpassword" => await HandleUpdateAdminPasswordAsync(app, args),
                 _ => false // Command not recognized, proceed to start web server normally

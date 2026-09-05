@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Infrastructure.DbContext
 {
@@ -23,15 +22,12 @@ namespace NeoVoting.Infrastructure.DbContext
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
             builder.HasOne(vc => vc.CandidateProfile)
                 .WithMany(cp => cp.Votes)
                 .HasForeignKey(vc => vc.CandidateProfileId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
             // Prevent deleting a CandidateProfile if votes reference it
-
         }
     }
 }

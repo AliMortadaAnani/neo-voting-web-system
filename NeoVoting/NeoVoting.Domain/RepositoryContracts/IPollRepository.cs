@@ -16,8 +16,6 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<Poll?> GetByIdAsync(int pollId);
 
-
         Task<Poll?> GetActivePollAsync();
-
     }
 }

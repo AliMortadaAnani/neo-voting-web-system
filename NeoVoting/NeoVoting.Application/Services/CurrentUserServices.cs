@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Domain.Enums;
-using System;
-using System.Linq;
 using System.Security.Claims;
-
 
 namespace NeoVoting.Application.Services
 {
@@ -19,9 +15,6 @@ namespace NeoVoting.Application.Services
 
         private ClaimsPrincipal? User => _httpContextAccessor.HttpContext?.User;
 
-        public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
-        // [Authorize] attribute ensures that the user is authenticated, but this property can be used for additional checks if needed.
-
         public int? ApplicationUserId
         {
             get
@@ -29,8 +22,6 @@ namespace NeoVoting.Application.Services
                 // Check both standard NameIdentifier (sub) and custom claim name if applicable
                 var value = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                             ?? User?.FindFirst("applicationUserId")?.Value;
-
-
 
                 return int.TryParse(value, out var result) ? result : null;
             }
@@ -54,35 +45,6 @@ namespace NeoVoting.Application.Services
                        ?? User?.FindFirst("name")?.Value
                        ?? User?.Identity?.Name;
             }
-        }
-
-        public GovernorateIdEnum? Governorate
-        {
-            get
-            {
-                var value = User?.FindFirst("governorate")?.Value;
-
-                // Handles if the token stores it as an integer string (e.g., "3") or Enum Name (e.g., "Beirut")
-                //if (string.IsNullOrEmpty(value))
-                //    return null;
-
-                if (int.TryParse(value, out var intVal) && Enum.IsDefined(typeof(GovernorateIdEnum), intVal))
-                {
-                    return (GovernorateIdEnum)intVal;
-                }
-
-                //if (Enum.TryParse<GovernorateIdEnum>(value, ignoreCase: true, out var enumVal))
-                //{
-                //    return enumVal;
-                //}
-
-                return null;
-            }
-        }
-
-        public string? GetClaim(string claimType)
-        {
-            return User?.FindFirst(claimType)?.Value;
         }
     }
 }

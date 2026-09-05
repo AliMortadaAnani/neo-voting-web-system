@@ -1,10 +1,5 @@
 ﻿using FluentValidation;
 using NeoVoting.Application.ResponseDTOs.AuthDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.Validators.AuthDTOs
 {
@@ -20,8 +15,7 @@ namespace NeoVoting.Application.Validators.AuthDTOs
             RuleFor(x => x.UserName).NotEmpty();
             RuleFor(x => x.Role).NotNull();
 
-
-            // commented out because these fields may not be present in the response DTO 
+            // commented out because these fields may not be present in the response DTO
             // as admin wont have these fields, and we want to validate the response DTO for all user types (admin, candidate, voter)
 
             //RuleFor(x => x.AccountId).NotNull();

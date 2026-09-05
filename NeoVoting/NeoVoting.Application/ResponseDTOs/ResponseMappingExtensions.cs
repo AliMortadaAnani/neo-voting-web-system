@@ -1,10 +1,6 @@
 ﻿using NeoVoting.Application.ResponseDTOs.AdminDTOs;
+using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
 using NeoVoting.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoVoting.Application.ResponseDTOs
 {
@@ -34,7 +30,7 @@ namespace NeoVoting.Application.ResponseDTOs
                 StartDate = poll.StartDate,
                 EndDate = poll.EndDate,
                 Status = poll.Status,
-                Answers = poll.PollAnswers.Select(a => new PollAnswerListDTO
+                Answers = poll.PollAnswers.Select(a => new PollAnswerDTO
                 {
                     Id = a.Id,
                     Answer = a.Answer

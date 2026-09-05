@@ -12,7 +12,6 @@ using NeoVoting.Application.Exceptions;
 using NeoVoting.Application.RequestDTOs.AuthDTOs;
 using NeoVoting.Application.Services;
 using NeoVoting.Application.ServicesContracts;
-using NeoVoting.Application.Validators.AdminDTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Domain.ResultErrorDomain;
@@ -252,16 +251,12 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
             builder.Services.AddScoped<IVoterRepository, VoterRepository>();
             builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
-            builder.Services.AddScoped<IElectionStatisticsRepository, ElectionStatisticsRepository>();
-            builder.Services.AddScoped<IElectionWinnerRepository, ElectionWinnerRepository>();
             builder.Services.AddScoped<IVoteRepository, VoteRepository>();
-            builder.Services.AddScoped<IVoteChoiceRepository, VoteChoiceRepository>();
             builder.Services.AddScoped<IPollRepository, PollRepository>();
             builder.Services.AddScoped<IPollVoteRepository, PollVoteRepository>();
             builder.Services.AddScoped<IPollAnswerRepository, PollAnswerRepository>();
             builder.Services.AddScoped<IEventParticipationRepository, EventParticipationRepository>();
             builder.Services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
-            builder.Services.AddScoped<IPollStatisticsRepository, PollStatisticsRepository>();
             // Services
             builder.Services.AddScoped<ICurrentUserServices, CurrentUserServices>();
             builder.Services.AddScoped<IAuthServices, AuthServices>();
@@ -270,8 +265,6 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<ICandidateServices, CandidateServices>();
             builder.Services.AddScoped<IVoterServices, VoterServices>();
             builder.Services.AddScoped<IGeneralServices, GeneralServices>();
-            builder.Services.AddScoped<IFileServices, LocalFileServices>();
-
             return builder;
         }
 

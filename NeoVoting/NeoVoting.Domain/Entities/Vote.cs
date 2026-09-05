@@ -1,6 +1,4 @@
-﻿using NeoVoting.Domain.Enums; // Assuming enums for Governorates are here
-
-namespace NeoVoting.Domain.Entities
+﻿namespace NeoVoting.Domain.Entities
 {
     /// <summary>
     /// Represents a single, immutable vote cast in an election.
@@ -20,8 +18,6 @@ namespace NeoVoting.Domain.Entities
 
         public int CandidateProfileId { get; private set; }
         public CandidateProfile CandidateProfile { get; private set; }
-
-
 
         private Vote()
         {

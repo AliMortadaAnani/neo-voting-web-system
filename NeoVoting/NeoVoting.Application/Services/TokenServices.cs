@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NeoVoting.Application.ResponseDTOs.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
@@ -51,7 +50,6 @@ namespace NeoVoting.Application.Services
             return tokenHandler.WriteToken(token);
         }
 
-
         // ==========================================
         // 2. SPECIFIC CLAIM BUILDERS
         // ==========================================
@@ -69,7 +67,7 @@ namespace NeoVoting.Application.Services
     };
         }
 
-        private List<Claim> CreateCandidateClaims(ApplicationUser user,Candidate candidate)
+        private List<Claim> CreateCandidateClaims(ApplicationUser user, Candidate candidate)
         {
             return new List<Claim>
     {
@@ -79,14 +77,14 @@ namespace NeoVoting.Application.Services
         new Claim("applicationUserId", user.Id.ToString()),
         new Claim(ClaimTypes.Name, user.UserName!),
         new Claim(ClaimTypes.Role, RoleTypesEnum.Candidate.ToString()), // Role claim ("Candidate")
-        
+
         // Candidate-specific custom claims mapped to your CurrentUserService expectations
         new Claim("accountId", candidate.Id.ToString()),
         new Claim("governorate", ((int)candidate.Governorate).ToString())
     };
         }
 
-        private List<Claim> CreateVoterClaims(ApplicationUser user,Voter voter)
+        private List<Claim> CreateVoterClaims(ApplicationUser user, Voter voter)
         {
             return new List<Claim>
     {
@@ -96,13 +94,12 @@ namespace NeoVoting.Application.Services
         new Claim("applicationUserId", user.Id.ToString()),
         new Claim(ClaimTypes.Name, user.UserName!),
         new Claim(ClaimTypes.Role, RoleTypesEnum.Voter.ToString()), // Role claim ("Voter")
-        
+
         // Voter-specific custom claims mapped to your CurrentUserService expectations
         new Claim("accountId", voter.Id.ToString()),
         new Claim("governorate", ((int)voter.Governorate).ToString())
     };
         }
-
 
         // ==========================================
         // 3. WRAPPER / ORCHESTRATOR METHODS
@@ -111,9 +108,9 @@ namespace NeoVoting.Application.Services
         public async Task<Authentication_ResponseDTO> CreateAdminTokensAsync(ApplicationUser user)
         {
             var claims = CreateAdminClaims(user);
-            
+
             var accessTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
-           
+
             var accessToken = CreateJWT_AccessToken(claims);
 
             // 8. Generate a cryptographically secure random sequence for the refresh token
@@ -121,7 +118,6 @@ namespace NeoVoting.Application.Services
 
             // 9. Calculate the absolute expiration timestamp for the refresh token (usually much longer than access token)
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
-
 
             return new Authentication_ResponseDTO
             {
@@ -149,7 +145,6 @@ namespace NeoVoting.Application.Services
 
             // 9. Calculate the absolute expiration timestamp for the refresh token (usually much longer than access token)
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
-
 
             return new Authentication_ResponseDTO
             {
@@ -185,7 +180,6 @@ namespace NeoVoting.Application.Services
             // 9. Calculate the absolute expiration timestamp for the refresh token (usually much longer than access token)
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
 
-
             return new Authentication_ResponseDTO
             {
                 AccessToken = accessToken,
@@ -205,8 +199,6 @@ namespace NeoVoting.Application.Services
                 DateOfBirth = voter.DateOfBirth
             };
         }
-
-
 
         // 11. Method to read and verify claims from an access token even if its lifetime has lapsed
         public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
@@ -260,4 +252,3 @@ namespace NeoVoting.Application.Services
         }
     }
 }
-

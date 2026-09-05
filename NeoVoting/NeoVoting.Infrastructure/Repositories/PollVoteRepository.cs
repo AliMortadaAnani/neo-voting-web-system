@@ -25,7 +25,6 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.PollVotes.CountAsync(pv => pv.PollId == pollId);
         }
 
-
         public async Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize)
         {
             return await _context.PollVotes
@@ -50,6 +49,5 @@ namespace NeoVoting.Infrastructure.Repositories
                 })
                 .ToListAsync();
         }
-
     }
 }

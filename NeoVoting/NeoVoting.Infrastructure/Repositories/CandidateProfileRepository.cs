@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
@@ -34,8 +33,6 @@ namespace NeoVoting.Infrastructure.Repositories
                 .FirstOrDefaultAsync(cp => cp.CandidateId == candidateId && cp.ElectionId == electionId);
         }
 
-
-
         public async Task<List<CandidateProfile>> GetPagedByElectionIdAsync(
      int electionId,
      int pageNumber,
@@ -45,8 +42,6 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Include(cp => cp.Candidate)
                 .AsNoTracking()
                 .Where(cp => cp.ElectionId == electionId);
-
-           
 
             return await query
                 .Skip((pageNumber - 1) * pageSize)
@@ -62,7 +57,5 @@ namespace NeoVoting.Infrastructure.Repositories
 
             return await query.CountAsync();
         }
-
-     
     }
 }

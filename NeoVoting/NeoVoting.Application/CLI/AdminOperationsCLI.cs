@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NeoVoting.Application.ResponseDTOs.AuthDTOs;
 using NeoVoting.Domain.Entities;
 using NeoVoting.Domain.Enums;
-using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.Application.CLI
 {
@@ -64,7 +62,6 @@ namespace NeoVoting.Application.CLI
 
                 await roleManager.CreateAsync(voterRole);
                 Console.WriteLine("Voter role created.");
-
             }
 
             string candidateRoleName = RoleTypesEnum.Candidate.ToString();

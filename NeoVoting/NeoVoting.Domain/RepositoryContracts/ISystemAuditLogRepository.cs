@@ -14,7 +14,5 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<int> CountAsync(
             SystemActionTypesEnum? actionType, int? adminId
             );
-
-        
     }
 }

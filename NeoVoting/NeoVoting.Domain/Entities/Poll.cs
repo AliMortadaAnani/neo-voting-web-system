@@ -19,8 +19,6 @@ namespace NeoVoting.Domain.Entities
 
         public ICollection<EventParticipation> EventParticipations { get; private set; } = new List<EventParticipation>();
 
-    
-
         private Poll()
         {
             // Required by EF Core
@@ -36,7 +34,7 @@ namespace NeoVoting.Domain.Entities
             {
                 throw new ArgumentException("Poll question cannot be null or empty.", nameof(question));
             }
-       
+
             return new Poll
             {
                 Name = name,
@@ -62,12 +60,6 @@ namespace NeoVoting.Domain.Entities
                 throw new InvalidOperationException("Poll can only be ended if it is in the voting status.");
             }
             Status = StatusEnum.Completed;
-        }
-
-        public void UpdatePollDates(DateTime startDate, DateTime endDate)
-        {
-            StartDate = startDate;
-            EndDate = endDate;
         }
     }
 }

@@ -59,7 +59,5 @@ namespace NeoVoting.Domain.Entities
         // for that we need to update the verification hash in the database when the user reset his password
 
         // so we guarantee in all cases that the verification hash in the database is always up to date with the latest private data of the user
-
-       
     }
 }

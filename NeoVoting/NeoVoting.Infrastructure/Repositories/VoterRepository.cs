@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
@@ -25,14 +24,11 @@ namespace NeoVoting.Infrastructure.Repositories
             _context.Voters.Add(voter);
         }
 
-
         public async Task<Voter?> GetByUserIdAsync(int userId)
         {
             return await _context.Voters
                 .Include(v => v.User)
                 .FirstOrDefaultAsync(v => v.UserId == userId);
         }
-
-
     }
 }

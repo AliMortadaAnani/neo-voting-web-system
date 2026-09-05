@@ -15,8 +15,10 @@ namespace NeoVoting.Application.Services
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+
         //private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IGovernmentSystemGateway _govGateway;
+
         private readonly ITokenServices _tokenServices;
         private readonly ICurrentUserServices _currentUserServices;
         private readonly ICandidateRepository _candidateRepository;
@@ -58,7 +60,7 @@ namespace NeoVoting.Application.Services
                 return Result<Authentication_ResponseDTO>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.User_InvalidCredentials),
                     "Invalid user credentials."));
             }
-            
+
             // IMPROVEMENT: Use CheckPasswordSignInAsync instead of CheckPasswordAsync
             // This enables "LockoutOnFailure" (the 'true' parameter).
             // It protects against brute force attacks.
@@ -110,7 +112,7 @@ namespace NeoVoting.Application.Services
                     {
                         var candidateRecordFromDb = await _candidateRepository.GetByUserIdAsync(user.Id);
 
-                        if(candidateRecordFromDb == null)
+                        if (candidateRecordFromDb == null)
                         {
                             return Result<Authentication_ResponseDTO>.Failure(
                                 Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), "Candidate record not found for the user with candidate role."));
@@ -140,10 +142,8 @@ namespace NeoVoting.Application.Services
                     throw new ArgumentOutOfRangeException(nameof(roleEnum), roleEnum, "Invalid role type.");
             }
 
-
-
             // Helper method in ApplicationUser entity
-            user.UpdateRefreshToken(authResponse.RefreshToken, authResponse.RefreshTokenExpiration);
+            user.UpdateRefreshToken(authResponse.RefreshToken!, authResponse.RefreshTokenExpiration!.Value);
 
             var updateResult = await _userManager.UpdateAsync(user);
 
@@ -193,7 +193,7 @@ namespace NeoVoting.Application.Services
             return Result<bool>.Success(true);
         }
 
-        public async Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO? refreshTokenRequestDTO , string? refreshTokenFromCookie, string? accessTokenFromHeader)
+        public async Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO? refreshTokenRequestDTO, string? refreshTokenFromCookie, string? accessTokenFromHeader)
         {
             // 1. Determine which refresh token to use based on your precedence rules:
             //    - If cookie is present, use it.
@@ -213,7 +213,8 @@ namespace NeoVoting.Application.Services
                 ? accessTokenFromHeader
                 : refreshTokenRequestDTO?.AccessToken;
 
-            if (string.IsNullOrEmpty(activeAccessToken)) {
+            if (string.IsNullOrEmpty(activeAccessToken))
+            {
                 return Result<Authentication_ResponseDTO>.Failure(
                     Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken), "Access token is missing."));
             }
@@ -311,10 +312,8 @@ namespace NeoVoting.Application.Services
                     throw new ArgumentOutOfRangeException(nameof(roleEnum), roleEnum, "Invalid role type.");
             }
 
-
-
             // Helper method in ApplicationUser entity
-            user.UpdateRefreshToken(authResponse.RefreshToken, authResponse.RefreshTokenExpiration);
+            user.UpdateRefreshToken(authResponse.RefreshToken!, authResponse.RefreshTokenExpiration!.Value);
 
             var updateResult = await _userManager.UpdateAsync(user);
 
@@ -328,7 +327,7 @@ namespace NeoVoting.Application.Services
             // we will send the refresh token in a secure http-only cookie in AuthController
             return Result<Authentication_ResponseDTO>.Success(authResponse);
         }
-        
+
         public async Task<Result<RegisterVoterOrCandidate_ResponseDTO>> RegisterVoterOrCandidateAsync(
     RegisterVoterOrCandidate_RequestDTO dto,
     RoleTypesEnum role)
@@ -336,8 +335,6 @@ namespace NeoVoting.Application.Services
             if (await _userManager.FindByNameAsync(dto.UserName!) != null)
                 return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Conflict(nameof(ProblemDetails409ErrorTypes.User_DuplicateUsername), "This username is already taken. Please choose a different username."));
-
-           
 
             if (role == RoleTypesEnum.Voter)
             {
@@ -368,7 +365,7 @@ namespace NeoVoting.Application.Services
                 // -----------------------------------------------------------------------
                 // The API call succeeded, but does the data satisfy our rules?
 
-                if(await _voterRepository.IsVoterExistByVerificationHashAsync(govData.HashedData)) // Check if the voter is already registered in our system
+                if (await _voterRepository.IsVoterExistByVerificationHashAsync(govData.HashedData)) // Check if the voter is already registered in our system
                 {
                     return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                         Error.Conflict(nameof(ProblemDetails409ErrorTypes.Voter_AlreadyRegistered), "Voter account already exists."));
@@ -377,7 +374,6 @@ namespace NeoVoting.Application.Services
                 // -----------------------------------------------------------------------
                 // PHASE 4: LOCAL COMMIT (Create the Account)
                 // -----------------------------------------------------------------------
-
 
                 ApplicationUser newUser = ApplicationUser
                     .CreateAccount(dto.UserName!);
@@ -411,7 +407,6 @@ namespace NeoVoting.Application.Services
                 _voterRepository.Add(voter);
 
                 await _unitOfWork.SaveChangesAsync();
-
 
                 var response = new RegisterVoterOrCandidate_ResponseDTO
                 {
@@ -468,7 +463,6 @@ namespace NeoVoting.Application.Services
                     // PHASE 4: LOCAL COMMIT (Create the Account)
                     // -----------------------------------------------------------------------
 
-
                     ApplicationUser newUser = ApplicationUser
                         .CreateAccount(dto.UserName!);
 
@@ -521,6 +515,5 @@ namespace NeoVoting.Application.Services
             return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                 Error.Failure(nameof(ProblemDetails500ErrorTypes.Server_Error), "Failed to register this account type."));
         }
-       
     }
 }

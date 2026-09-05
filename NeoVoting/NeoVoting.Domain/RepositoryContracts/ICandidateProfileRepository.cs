@@ -1,5 +1,4 @@
 ﻿using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
@@ -18,6 +17,5 @@ namespace NeoVoting.Domain.RepositoryContracts
      int electionId,
      int pageNumber,
      int pageSize);
-
     }
 }

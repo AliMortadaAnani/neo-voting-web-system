@@ -50,8 +50,6 @@ namespace NeoVoting.Infrastructure.DbContext
                 t.HasCheckConstraint("CK_Election_Status",
                 $"([Status] IN ({sqlValues}) )")
             );
-
-            
         }
     }
 }

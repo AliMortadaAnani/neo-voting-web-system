@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NeoVoting.Domain.EF_DTOs;
 using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 using NeoVoting.Domain.RepositoryContracts;
 using NeoVoting.Infrastructure.DbContext;
 
@@ -20,7 +19,6 @@ namespace NeoVoting.Infrastructure.Repositories
         {
             _context.Votes.Add(vote);
         }
-
 
         public async Task<List<Vote>> GetPagedByElectionIdAsync(
                                     int electionId,
@@ -69,7 +67,5 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-
-
     }
 }

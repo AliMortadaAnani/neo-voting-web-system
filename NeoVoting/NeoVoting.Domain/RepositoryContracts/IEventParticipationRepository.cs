@@ -1,5 +1,4 @@
 ﻿using NeoVoting.Domain.Entities;
-using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.Domain.RepositoryContracts
 {
@@ -10,6 +9,5 @@ namespace NeoVoting.Domain.RepositoryContracts
         Task<bool> HasVoterVotedByVoterIdAndElectionIdAsync(int voterId, int electionId);
 
         Task<bool> HasVoterVotedByVoterIdAndPollIdAsync(int voterId, int pollId);
-     
     }
 }
