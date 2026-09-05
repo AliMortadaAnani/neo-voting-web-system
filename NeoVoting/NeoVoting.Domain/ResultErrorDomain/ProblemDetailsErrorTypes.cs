@@ -8,24 +8,15 @@ namespace NeoVoting.Domain.ResultErrorDomain
     {
         // Elections
         ElectionAlreadyActive,
-
-        ElectionAlreadyStarted,
-        ElectionAlreadyCompleted,
-        ElectionNotYetStarted,
-        ElectionNotYetCompleted,
-        ElectionCannotNominate,
-        ElectionCannotVote,
-
+        ElectionInvalidState,
+        Election_NotComplete,
         // Polls
         PollAlreadyActive,
-
-        PollAlreadyStarted,
-        PollAlreadyCompleted,
-        PollNotYetStarted,
-        PollNotYetCompleted,
+        PollInvalidState,
+        PollNotComplete,
         PollInvalidAnswers,
-        PollCannotVote,
 
+        // Paging
         PagingInvalidParameters,
     }
 
@@ -55,7 +46,8 @@ namespace NeoVoting.Domain.ResultErrorDomain
         Election_NotFound,
         CandidateProfile_NotFound,
         ActiveElectionNotFound,
-        ActivePollNotFound
+        ActivePollNotFound,
+        PollAnswer_NotFound
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

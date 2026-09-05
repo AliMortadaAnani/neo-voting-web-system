@@ -254,7 +254,6 @@ namespace NeoVoting.API.StartupExtensions
             builder.Services.AddScoped<IVoteRepository, VoteRepository>();
             builder.Services.AddScoped<IPollRepository, PollRepository>();
             builder.Services.AddScoped<IPollVoteRepository, PollVoteRepository>();
-            builder.Services.AddScoped<IPollAnswerRepository, PollAnswerRepository>();
             builder.Services.AddScoped<IEventParticipationRepository, EventParticipationRepository>();
             builder.Services.AddScoped<ISystemAuditLogRepository, SystemAuditLogRepository>();
             // Services

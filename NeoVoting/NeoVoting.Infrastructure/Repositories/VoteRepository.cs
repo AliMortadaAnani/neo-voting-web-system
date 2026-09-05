@@ -48,6 +48,7 @@ namespace NeoVoting.Infrastructure.Repositories
         public async Task<List<CandidateProfileWithVotesDto>> GetPagedCandidatesProfilesResultsAsync(int electionId, int pageNumber, int pageSize)
         {
             var query = _context.CandidateProfiles
+                .Include(cp => cp.Candidate)
                .AsNoTracking()
                .Where(cp => cp.ElectionId == electionId);
 
@@ -66,6 +67,11 @@ namespace NeoVoting.Infrastructure.Repositories
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task<Vote?> GetByIdAsync(Guid id)
+        {
+            return await _context.Votes.FindAsync(id);
         }
     }
 }

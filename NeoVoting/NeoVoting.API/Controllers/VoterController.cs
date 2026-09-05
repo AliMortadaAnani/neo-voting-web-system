@@ -26,7 +26,7 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(List<CandidateProfile_ResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPagedNominatedCandidates([FromRoute] int electionId, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)
+        public async Task<IActionResult> GetPagedNominatedCandidates([FromRoute] int electionId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             _logger.LogInformation("Get paged nominated candidates for election {ElectionId}", electionId);
             var paged = await _voterServices.GetPagedNominatedCandidatesProfilesForElectionAsync(electionId, pageNumber, pageSize);

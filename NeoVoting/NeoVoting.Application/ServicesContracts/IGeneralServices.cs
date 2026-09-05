@@ -11,21 +11,17 @@ namespace NeoVoting.Application.ServicesContracts
 
         Task<Result<Poll_ResponseDTO>> GetActivePollAsync();
 
-        Task<Result<Election_ResponseDTO>> GetElectionByIdAsync(int electionId);
+        Task<Result<PagedResult<Election_ResponseDTO>>> GetPagedElectionsAsync(int pageNumber, int pageSize);
 
-        Task<Result<Poll_ResponseDTO>> GetPollByIdAsync(int pollId);
+        Task<Result<PagedResult<Poll_ResponseDTO>>> GetPagedPollsAsync(int pageNumber, int pageSize);
 
-        Task<PagedResult<Election_ResponseDTO>> GetPagedElectionsAsync(int? page, int? pageSize);
+        Task<Result<PagedResult<ElectionVoteLog_ResponseDTO>>> GetPagedElectionVoteLogsAsync(int electionId,
+            int pageNumber, int pageSize);
 
-        Task<PagedResult<Poll_ResponseDTO>> GetPagedPollsAsync(int? page, int? pageSize);
-
-        Task<PagedResult<ElectionVoteLog_ResponseDTO>> GetPagedElectionVoteLogsAsync(int electionId,
-            int? pageNumber, int? pageSize);
-
-        Task<PagedResult<PollVoteLog_ResponseDTO>> GetPagedPollVoteLogsAsync(int pollId, int? pageNumber, int? pageSize);
+        Task<Result<PagedResult<PollVoteLog_ResponseDTO>>> GetPagedPollVoteLogsAsync(int pollId, int pageNumber, int pageSize);
 
         Task<Result<Poll_ResponseDTO>> GetPollResultsAsync(int pollId);
 
-        Task<PagedResult<CandidateProfile_ResponseDTO>> GetPagedCandidateResultsForElectionAsync(int electionId, int? pageNumber, int? pageSize);
+        Task<Result<PagedResult<CandidateProfile_ResponseDTO>>> GetPagedCandidateResultsForElectionAsync(int electionId, int pageNumber, int pageSize);
     }
 }

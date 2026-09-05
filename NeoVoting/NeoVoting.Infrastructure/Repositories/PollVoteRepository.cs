@@ -25,6 +25,11 @@ namespace NeoVoting.Infrastructure.Repositories
             return await _context.PollVotes.CountAsync(pv => pv.PollId == pollId);
         }
 
+        public async Task<PollVote?> GetByIdAsync(Guid id)
+        {
+            return await _context.PollVotes.FindAsync(id);
+        }
+
         public async Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize)
         {
             return await _context.PollVotes
@@ -48,6 +53,11 @@ namespace NeoVoting.Infrastructure.Repositories
                     TotalVotes = pa.PollVotes.Count // EF Core handles this as a LEFT JOIN with a COUNT
                 })
                 .ToListAsync();
+        }
+
+        public async  Task<bool> IsPollAnswerExistByIdInPoll(int pollAnswerId, int pollId)
+        {
+            return await _context.PollAnswers.AnyAsync(pa => pa.Id == pollAnswerId && pa.PollId == pollId);
         }
     }
 }

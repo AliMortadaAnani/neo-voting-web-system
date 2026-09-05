@@ -5,7 +5,8 @@ namespace NeoVoting.Domain.RepositoryContracts
     public interface ICandidateProfileRepository
     {
         void Add(CandidateProfile candidateProfile);
-
+        
+        Task<bool> IsCandidateProfileExistsInElectionAsync(int candidateProfileId, int electionId);
         Task<CandidateProfile?> GetByCandidateIdAndElectionIdAsync(int candidateId, int electionId);
 
         Task<bool> IsCandidateProfileExistsByCandidateIdAndElectionIdAsync(int candidateId, int electionId);

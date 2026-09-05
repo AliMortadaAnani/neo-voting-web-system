@@ -57,5 +57,11 @@ namespace NeoVoting.Infrastructure.Repositories
 
             return await query.CountAsync();
         }
+
+        public async Task<bool> IsCandidateProfileExistsInElectionAsync(int candidateProfileId, int electionId)
+        {
+            return await _context.CandidateProfiles
+                .AnyAsync(cp => cp.Id == candidateProfileId && cp.ElectionId == electionId);
+        }
     }
 }

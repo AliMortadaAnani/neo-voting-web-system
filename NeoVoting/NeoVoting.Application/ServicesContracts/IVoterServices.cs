@@ -7,7 +7,7 @@ namespace NeoVoting.Application.ServicesContracts
 {
     public interface IVoterServices
     {
-        Task<PagedResult<CandidateProfile_ResponseDTO>> GetPagedNominatedCandidatesProfilesForElectionAsync(int electionId, int? pageNumber, int? pageSize);
+        Task<Result<PagedResult<CandidateProfile_ResponseDTO>>> GetPagedNominatedCandidatesProfilesForElectionAsync(int electionId, int pageNumber, int pageSize);
 
         Task<Result<ElectionVoteLog_ResponseDTO>> CastVoteInElectionAsync(int electionId, Voter_Cast_In_Election_RequestDTO voter_Cast_In_Election_RequestDTO);
 

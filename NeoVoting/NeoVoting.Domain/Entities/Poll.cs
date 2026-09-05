@@ -40,7 +40,8 @@ namespace NeoVoting.Domain.Entities
                 Name = name,
                 Question = question,
                 StartDate = startDate,
-                EndDate = endDate
+                EndDate = endDate,
+                Status = StatusEnum.Upcoming
             };
         }
 

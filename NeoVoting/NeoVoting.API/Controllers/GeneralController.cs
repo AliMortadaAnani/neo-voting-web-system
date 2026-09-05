@@ -42,30 +42,10 @@ namespace NeoVoting.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpGet("elections/{electionId}")]
-        [ProducesResponseType(typeof(Election_ResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetElectionById([FromRoute] int electionId)
-        {
-            _logger.LogInformation("Get election by id requested - {ElectionId}", electionId);
-            var result = await _generalServices.GetElectionByIdAsync(electionId);
-            return HandleResult(result);
-        }
-
-        [HttpGet("polls/{pollId}")]
-        [ProducesResponseType(typeof(Poll_ResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPollById([FromRoute] int pollId)
-        {
-            _logger.LogInformation("Get poll by id requested - {PollId}", pollId);
-            var result = await _generalServices.GetPollByIdAsync(pollId);
-            return HandleResult(result);
-        }
-
         [HttpGet("elections/paged")]
         [ProducesResponseType(typeof(List<Election_ResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPagedElections([FromQuery] int? page = 1, [FromQuery] int? pageSize = 10)
+        public async Task<IActionResult> GetPagedElections([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             _logger.LogInformation("Get paged elections requested - Page: {Page}, Size: {Size}", page, pageSize);
             var paged = await _generalServices.GetPagedElectionsAsync(page, pageSize);
@@ -75,7 +55,7 @@ namespace NeoVoting.API.Controllers
         [HttpGet("polls/paged")]
         [ProducesResponseType(typeof(List<Poll_ResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPagedPolls([FromQuery] int? page = 1, [FromQuery] int? pageSize = 10)
+        public async Task<IActionResult> GetPagedPolls([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             _logger.LogInformation("Get paged polls requested - Page: {Page}, Size: {Size}", page, pageSize);
             var paged = await _generalServices.GetPagedPollsAsync(page, pageSize);
@@ -86,7 +66,7 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(List<ElectionVoteLog_ResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPagedElectionVoteLogs([FromRoute] int electionId, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)
+        public async Task<IActionResult> GetPagedElectionVoteLogs([FromRoute] int electionId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             _logger.LogInformation("Get paged election vote logs requested for election {ElectionId}", electionId);
             var paged = await _generalServices.GetPagedElectionVoteLogsAsync(electionId, pageNumber, pageSize);
@@ -97,7 +77,7 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(List<PollVoteLog_ResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPagedPollVoteLogs([FromRoute] int pollId, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)
+        public async Task<IActionResult> GetPagedPollVoteLogs([FromRoute] int pollId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             _logger.LogInformation("Get paged poll vote logs requested for poll {PollId}", pollId);
             var paged = await _generalServices.GetPagedPollVoteLogsAsync(pollId, pageNumber, pageSize);
@@ -119,7 +99,7 @@ namespace NeoVoting.API.Controllers
         [ProducesResponseType(typeof(List<CandidateProfile_ResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails400ErrorTypes), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails404ErrorTypes), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPagedCandidateResultsForElection([FromRoute] int electionId, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)
+        public async Task<IActionResult> GetPagedCandidateResultsForElection([FromRoute] int electionId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             _logger.LogInformation("Get paged candidate results for election {ElectionId}", electionId);
             var paged = await _generalServices.GetPagedCandidateResultsForElectionAsync(electionId, pageNumber, pageSize);

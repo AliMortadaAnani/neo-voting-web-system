@@ -20,6 +20,6 @@ namespace NeoVoting.Application.ServicesContracts
 
         Task<Result<Poll_ResponseDTO>> CompletePollAsync(int pollId);
 
-        Task<PagedResult<SystemAuditLog_ResponseDTO>> GetPagedSystemAuditLogsAsync(SystemActionTypesEnum? actionTypesEnum, int? adminId, int? pageNumber, int? pageSize);
+        Task<Result<PagedResult<SystemAuditLog_ResponseDTO>>> GetPagedSystemAuditLogsAsync(SystemActionTypesEnum? actionTypesEnum, int? adminId, int pageNumber, int pageSize);
     }
 }

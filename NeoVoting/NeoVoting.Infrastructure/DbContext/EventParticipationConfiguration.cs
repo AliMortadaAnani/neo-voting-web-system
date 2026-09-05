@@ -15,13 +15,13 @@ namespace NeoVoting.Infrastructure.DbContext
             builder.HasOne(ew => ew.Poll)
                .WithMany(cp => cp.EventParticipations)
                .HasForeignKey(ew => ew.PollId)
-               .IsRequired()
+               .IsRequired(false)
                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(ew => ew.Election)
                .WithMany(cp => cp.EventParticipations)
                .HasForeignKey(ew => ew.ElectionId)
-               .IsRequired()
+               .IsRequired(false)
                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasIndex(v => new { v.VoterId, v.ElectionId }).IsUnique().HasFilter("[ElectionId] IS NOT NULL");

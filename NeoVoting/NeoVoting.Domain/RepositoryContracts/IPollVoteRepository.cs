@@ -11,6 +11,9 @@ namespace NeoVoting.Domain.RepositoryContracts
 
         Task<List<PollVote>> GetPagedByPollIdAsync(int pollId, int pageNumber, int pageSize);
 
+        Task<PollVote?> GetByIdAsync(Guid id);
+
+        Task<bool> IsPollAnswerExistByIdInPoll(int pollAnswerId, int pollId);
         Task<List<PollAnswerWithVotesDto>> GetResultsAsyncByPollId(int pollId);
     }
 }

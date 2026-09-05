@@ -94,7 +94,7 @@ namespace NeoVoting.API.Controllers
         [HttpGet("systemAuditLogs")]
         [ProducesResponseType(typeof(List<SystemAuditLog_ResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPagedSystemAuditLogs([FromQuery] NeoVoting.Domain.Enums.SystemActionTypesEnum? actionTypesEnum, [FromQuery] int? adminId, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)
+        public async Task<IActionResult> GetPagedSystemAuditLogs([FromQuery] NeoVoting.Domain.Enums.SystemActionTypesEnum? actionTypesEnum, [FromQuery] int? adminId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             _logger.LogInformation("Get paged system audit logs requested");
             var paged = await _adminServices.GetPagedSystemAuditLogsAsync(actionTypesEnum, adminId, pageNumber, pageSize);
