@@ -16,9 +16,11 @@ namespace NeoVoting.API.Controllers
         private readonly ILogger<GeneralController> _logger;
         private readonly IGeneralServices _generalServices;
 
-        public GeneralController(IGeneralServices generalServices, ILogger<GeneralController> logger)
+        private readonly IVoterServices _voterServices;
+        public GeneralController(IGeneralServices generalServices, IVoterServices voterServices, ILogger<GeneralController> logger)
         {
             _generalServices = generalServices;
+            _voterServices = voterServices;
             _logger = logger;
         }
 
@@ -59,6 +61,17 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged polls requested - Page: {Page}, Size: {Size}", page, pageSize);
             var paged = await _generalServices.GetPagedPollsAsync(page, pageSize);
+            return Ok(paged);
+        }
+
+        [HttpGet("elections/{electionId}/candidates/paged")]
+        [ProducesResponseType(typeof(List<CandidateProfile_ResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetPagedNominatedCandidates([FromRoute] int electionId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            _logger.LogInformation("Get paged nominated candidates for election {ElectionId}", electionId);
+            var paged = await _voterServices.GetPagedNominatedCandidatesProfilesForElectionAsync(electionId, pageNumber, pageSize);
             return Ok(paged);
         }
 
