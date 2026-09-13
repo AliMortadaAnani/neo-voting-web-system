@@ -155,6 +155,10 @@ namespace GovernmentSystem.API.StartupExtensions
 
         public static WebApplicationBuilder ConfigureControllers(this WebApplicationBuilder builder)
         {
+
+            builder.Services.AddHttpContextAccessor();
+
+
             builder.Services.AddControllers();
                 //.AddJsonOptions(options =>
                 //{
@@ -239,7 +243,7 @@ namespace GovernmentSystem.API.StartupExtensions
             {
                 options.AddPolicy("FrontendPolicy", policyBuilder =>
                 {
-                    policyBuilder.WithOrigins("http://localhost:3000") // Your Frontend URL
+                    policyBuilder.WithOrigins("http://localhost:5173") // Your Frontend URL
                                  .AllowAnyHeader()
                                  .AllowAnyMethod()
                                  .AllowCredentials();

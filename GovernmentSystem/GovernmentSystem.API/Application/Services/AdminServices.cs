@@ -13,11 +13,34 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.Admin
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AdminServices> _logger;
 
-        public AdminServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AdminServices> logger)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+       
+        public AdminServices(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, ILogger<AdminServices> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public string? CurrentUserName =>
+       _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
+        public async Task<Result<AuthResponse>> GetCurrentUserAsync()
+        {
+            if(_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+            {
+                return Result<AuthResponse>.Success(new AuthResponse
+                {
+                    IsSuccess = true,
+                    Message = "Logged in successfully",
+                    Username = CurrentUserName!,
+                    Role = "Admin"
+                });
+            }
+            //usually, authorization middleware should handle this, but in case it doesn't, we return an unauthorized error
+            return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Admin is not authenticated."));
         }
 
         public async Task<Result<AuthResponse>> LoginAsync(LoginDTO loginDTO)

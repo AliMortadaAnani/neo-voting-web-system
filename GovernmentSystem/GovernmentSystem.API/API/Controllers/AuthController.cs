@@ -50,5 +50,20 @@ namespace GovernmentSystem.API.API.Controllers
                 _logger.LogWarning("User logout failed: {Error}", result.Error.Description);
             return HandleResult(result);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("me")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> CurrentUser()
+        {
+            var result = await _adminServices.GetCurrentUserAsync();
+            if (result.IsSuccess)
+                _logger.LogInformation("Current user retrieved successfully");
+            else
+                _logger.LogWarning("Current user retrieval failed: {Error}", result.Error.Description);
+            return HandleResult(result);
+        }
+
     }
 }

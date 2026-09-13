@@ -51,7 +51,7 @@ namespace NeoVoting.API.Controllers
             return HandleResult(result, result.IsSuccess);
         }
 
-        [HttpPost("elections/{electionId}/start")]
+        [HttpPatch("elections/{electionId}/start")]
         [ProducesResponseType(typeof(Election_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> StartElection([FromRoute] int electionId)
@@ -61,7 +61,7 @@ namespace NeoVoting.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpPost("elections/{electionId}/complete")]
+        [HttpPatch("elections/{electionId}/complete")]
         [ProducesResponseType(typeof(Election_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CompleteElection([FromRoute] int electionId)
@@ -71,7 +71,7 @@ namespace NeoVoting.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpPost("polls/{pollId}/start")]
+        [HttpPatch("polls/{pollId}/start")]
         [ProducesResponseType(typeof(Poll_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> StartPoll([FromRoute] int pollId)
@@ -81,7 +81,7 @@ namespace NeoVoting.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpPost("polls/{pollId}/complete")]
+        [HttpPatch("polls/{pollId}/complete")]
         [ProducesResponseType(typeof(Poll_ResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BadRequest400ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CompletePoll([FromRoute] int pollId)

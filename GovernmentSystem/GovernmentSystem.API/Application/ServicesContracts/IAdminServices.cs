@@ -9,5 +9,8 @@ namespace GovernmentSystem.API.Application.ServicesContracts
         Task<Result<AuthResponse>> LoginAsync(LoginDTO loginDTO);
 
         Task<Result<string>> LogoutAsync();
+
+        Task<Result<AuthResponse>> GetCurrentUserAsync();
+
     }
 }
