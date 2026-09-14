@@ -1,29 +1,24 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ProtectedRoute, PublicRoute } from "./components/auth/RouteGuards";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-// Placeholder components for now
-import Login from "./pages/Login";
-import Home from "./pages/Home";
+// Temporary placeholder components until we build the actual pages
+const LoginPage = () => (
+  <div className="p-6 text-xl font-bold">Login Page(Public)</div>
+);
+const HomePage = () => (
+  <div className="p-6 text-xl font-bold">Home Page (Protected)</div>
+);
+const NotFoundPage = () => (
+  <div className="p-6 text-xl font-bold text-red-500">404 Not Found</div>
+);
 
-export function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public-only routes (e.g., Login) */}
-        <Route element={<PublicRoute />}>
-          <Route path="/login" element={<Login />} />
-        </Route>
-
-        {/* Protected Feature routes (Dashboard, CRUDs, etc.) */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/home" element={<Home />} />
-          {/* Future CRUD routes will go here */}
-        </Route>
-
-        {/* Catch-all redirect */}
-        <Route path="*" element={<Navigate to="/home" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/home" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }
 

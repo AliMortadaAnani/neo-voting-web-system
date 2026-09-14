@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
-    port: 5172, // Forces Vite to use port 5172
+    port: 5173, // Forces Vite to use port 5172
     strictPort: false, // Optional: Fails if port 5172 is taken instead of picking a random one
   },
 });

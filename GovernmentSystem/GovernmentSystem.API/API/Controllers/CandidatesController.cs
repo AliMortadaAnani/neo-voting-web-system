@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace GovernmentSystem.API.API.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [EnableRateLimiting("GeneralApiLimiter")]
+   //[EnableRateLimiting("GeneralApiLimiter")]
     public class CandidatesController : ApiController
     {
         private readonly ICandidateServices _candidateServices;
