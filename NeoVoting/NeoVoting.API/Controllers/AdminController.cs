@@ -14,7 +14,7 @@ namespace NeoVoting.API.Controllers
     /// </summary>
     ///
 
-    [EnableRateLimiting("GeneralApiLimiter")]
+    //[EnableRateLimiting("GeneralApiLimiter")]
     [Authorize(Roles = nameof(RoleTypesEnum.Admin))]
     public class AdminController : ApiController
     {

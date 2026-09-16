@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace GovernmentSystem.API.API.Controllers
 {
-    [EnableRateLimiting("AuthLimiter")]
+    //[EnableRateLimiting("AuthLimiter")]
     public class AuthController : ApiController
     {
         private readonly IAdminServices _adminServices;

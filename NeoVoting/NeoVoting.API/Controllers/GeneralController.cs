@@ -9,7 +9,7 @@ using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.API.Controllers
 {
-    [EnableRateLimiting("GeneralApiLimiter")]
+    //[EnableRateLimiting("GeneralApiLimiter")]
     [AllowAnonymous]
     public class GeneralController : ApiController
     {

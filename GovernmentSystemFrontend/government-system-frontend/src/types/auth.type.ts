@@ -4,3 +4,5 @@ export type AuthResponse = {
   username: string;
   role: string;
 };
+
+//type LoginCredentials is exported from src/schemas/auth.schema.ts

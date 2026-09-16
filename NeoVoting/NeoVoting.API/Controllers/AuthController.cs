@@ -8,7 +8,7 @@ using NeoVoting.Domain.Enums;
 
 namespace NeoVoting.API.Controllers
 {
-    [EnableRateLimiting("AuthLimiter")]
+    //[EnableRateLimiting("AuthLimiter")]
     public class AuthController : ApiController
     {
         private readonly IAuthServices _authServices;
