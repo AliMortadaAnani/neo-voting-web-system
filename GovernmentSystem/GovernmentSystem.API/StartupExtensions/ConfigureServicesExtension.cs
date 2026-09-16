@@ -105,7 +105,8 @@ namespace GovernmentSystem.API.StartupExtensions
                             Status = StatusCodes.Status401Unauthorized,
                             Title = "Unauthorized",
                             Detail = "Authentication is required to access this resource.",
-                            Type = nameof(ProblemDetails401ErrorTypes.Auth_UnauthorizedAccess)
+                            Type = nameof(ProblemDetails401ErrorTypes.Auth_UnauthorizedAccess),
+                            Instance = context.Request.Path
                         };
 
                         return context.Response.WriteAsJsonAsync(problem);
@@ -128,7 +129,8 @@ namespace GovernmentSystem.API.StartupExtensions
                             Status = StatusCodes.Status403Forbidden,
                             Title = "Forbidden",
                             Detail = "You do not have permission to access this resource.",
-                            Type = nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess)
+                            Type = nameof(ProblemDetails403ErrorTypes.Auth_ForbiddenAccess),
+                            Instance = context.Request.Path
                         };
 
                         return context.Response.WriteAsJsonAsync(problem);
@@ -311,7 +313,8 @@ namespace GovernmentSystem.API.StartupExtensions
                         Status = StatusCodes.Status429TooManyRequests,
                         Title = "Too many requests",
                         Detail = "You have exceeded your rate limit. Please try again later.",
-                        Type = nameof(ProblemDetails429ErrorTypes.RateLimit_Exceeded) // Assuming you have this enum
+                        Type = nameof(ProblemDetails429ErrorTypes.RateLimit_Exceeded),
+                        Instance = context.HttpContext.Request.Path // Assuming you have this enum
                     };
 
                     await context.HttpContext.Response.WriteAsJsonAsync(problem, token);

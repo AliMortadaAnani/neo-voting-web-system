@@ -7,7 +7,7 @@ namespace NeoVoting.Application.Validators.CandidateDTOs
     {
         public CandidateProfile_Create_RequestDTOValidator()
         {
-            RuleFor(x => x.NominationReasons).NotEmpty().MaximumLength(4000);
+            RuleFor(x => x.NominationReasons).NotEmpty().MaximumLength(4000).MinimumLength(3);
         }
     }
 }

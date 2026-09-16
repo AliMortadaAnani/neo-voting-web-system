@@ -7,7 +7,7 @@ namespace NeoVoting.Application.Validators.AdminDTOs
     {
         public ElectionCreate_RequestDTOValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.Name).NotEmpty().MaximumLength(100).MinimumLength(3);
             RuleFor(x => x.NominationStartDate).NotNull();
             RuleFor(x => x.NominationEndDate).NotNull();
             RuleFor(x => x.VotingStartDate).NotNull();
