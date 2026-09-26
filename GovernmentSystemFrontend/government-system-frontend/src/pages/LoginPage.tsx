@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { loginSchema, type LoginCredentials } from "../schemas/auth.schema";
+import { loginSchema, type LoginCredentials } from "../schemas/auth.schemas";
 import { useAuth } from "../hooks/useAuth";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { loginAsync, isLoggingIn, loginError } = useAuth();
+  const { login, isLoggingIn } = useAuth();
 
   const {
     register,
@@ -16,30 +16,20 @@ export const LoginPage = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginCredentials) => {
-    try {
-      await loginAsync(data);
-      // Navigation only happens if the promise resolves successfully:
-      navigate("/citizens", { replace: true });
-    } catch {
-      // Nothing needed here:
-      // 1. Toast fires automatically from useAuth
-      // 2. loginError is populated automatically by TanStack Query
-    }
+  const onSubmit = (data: LoginCredentials) => {
+    login(data, {
+      onSuccess: () => {
+        navigate("/citizens", { replace: true });
+      },
+    });
   };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-md">
         <h1 className="mb-6 text-center text-2xl font-bold text-slate-800">
           Admin Login
         </h1>
-
-        {/* Server Error Banner (from loginError) */}
-        {loginError && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 border border-red-200">
-            {loginError.message}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Username Input */}

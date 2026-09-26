@@ -1,10 +1,12 @@
-import { Navigate, Outlet, Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuthCheck } from "../hooks/useAuth";
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isCheckingAuth, user, logoutAsync, isLoggingOut } =
-    useAuth();
+  const location = useLocation();
+  const { isAuthenticated, isCheckingAuth, isAuthError, authError } =
+    useAuthCheck();
 
+  // 1. Initial session verification
   if (isCheckingAuth) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50">
@@ -15,62 +17,31 @@ export const ProtectedRoute = () => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  // 2. Server or Network down (not a 401 auth failure)
+  if (isAuthError && authError?.status !== 401) {
+    return (
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-2 bg-slate-50">
+        <p className="text-sm font-semibold text-slate-700">
+          {authError?.status === 0
+            ? "Network error: Unable to reach the server."
+            : "Server error: Please try again later."}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="text-xs text-blue-600 underline hover:text-blue-800"
+        >
+          Reload page
+        </button>
+      </div>
+    );
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Shared Admin Header */}
-      <header className="border-b border-slate-200 bg-white px-6 py-3.5 shadow-xs">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          {/* Brand & Entity Navigation */}
-          <div className="flex items-center gap-8">
-            <span className="font-bold tracking-tight text-slate-900">
-              Government Portal
-            </span>
-            <nav className="flex items-center gap-4 text-sm font-medium text-slate-600">
-              <Link
-                to="/citizens"
-                className="transition-colors hover:text-slate-900"
-              >
-                Citizens
-              </Link>
-              <Link
-                to="/voters"
-                className="transition-colors hover:text-slate-900"
-              >
-                Voters
-              </Link>
-              <Link
-                to="/candidates"
-                className="transition-colors hover:text-slate-900"
-              >
-                Candidates
-              </Link>
-            </nav>
-          </div>
+  // 3. Not logged in or 401 expired cookie -> Redirect to login
+  if (!isAuthenticated) {
+    // We pass `from: location` so login can redirect them back here
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-          {/* User Badge & Logout */}
-          <div className="flex items-center gap-4">
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-              {user?.username} ({user?.role})
-            </span>
-            <button
-              onClick={() => logoutAsync()}
-              disabled={isLoggingOut}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100 disabled:opacity-50"
-            >
-              {isLoggingOut ? "Logging out..." : "Logout"}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Page Content */}
-      <main className="mx-auto max-w-7xl p-6">
-        <Outlet />
-      </main>
-    </div>
-  );
+  // 4. Authorized -> Render protected route content / layout
+  return <Outlet />;
 };

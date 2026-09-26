@@ -1,17 +1,17 @@
 import axios from "axios";
 
 export type ProblemDetails = {
-  type?: string;
-  title?: string;
-  status?: number;
-  detail?: string;
-  instance?: string;
-  errors?: Record<string, string[]>;
-  traceId?: string;
+  type?: string; // code property in AppError
+  title?: string; // deduced from status code
+  status?: number; // status property in AppError
+  detail?: string; // message property in AppError : Error
+  instance?: string; // not used
+  errors?: Record<string, string[]>; // errors property in AppError
+  traceId?: string; // not used
 };
 
 export type AppError = Error & {
-  code?: string;
+  code?: string; // type from ProblemDetails
   status?: number;
   errors?: Record<string, string[]>;
 };
@@ -25,13 +25,17 @@ export const api = axios.create({
 });
 
 api.interceptors.response.use(
-  (response) => response.data,
+  // Standard approach: passes through the full AxiosResponse
+  (response) => response,
+
   (error) => {
     if (!error.response) {
-      const offlineError: AppError = new Error(
-        "Network error: Server is offline or unreachable.",
-      );
+      const message = "Network error: Server is offline or unreachable.";
+
+      const offlineError: AppError = new Error(message);
+      offlineError.code = "NETWORK_ERROR";
       offlineError.status = 0;
+      offlineError.errors = {};
 
       return Promise.reject(offlineError);
     }
@@ -41,9 +45,9 @@ api.interceptors.response.use(
       problem.detail || problem.type || "An unexpected error occurred.";
 
     const uiError: AppError = new Error(message);
-    uiError.code = problem.type;
-    uiError.status = problem.status ?? error.response.status;
-    uiError.errors = problem.errors;
+    uiError.code = problem.type ?? error.response.statusText ?? "UNKNOWN_ERROR";
+    uiError.status = problem.status ?? error.response.status ?? 500;
+    uiError.errors = problem.errors ?? {};
 
     return Promise.reject(uiError);
   },

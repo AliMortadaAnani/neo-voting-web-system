@@ -2,62 +2,69 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { getMe, login, logout } from "../services/auth.services";
 import type { AppError } from "../api/api";
-import type { AuthResponse } from "../types/auth.type";
-import type { LoginCredentials } from "../schemas/auth.schema";
+import type { AuthResponse } from "../types/auth.types.ts";
+import type { LoginCredentials } from "../schemas/auth.schemas";
 
-export const useAuth = () => {
-  const queryClient = useQueryClient();
-
-  // 1. Session check: Reads GET /auth/me to verify the cookie
-  const { data: user, isLoading: isCheckingAuth } = useQuery<
-    AuthResponse,
-    AppError
-  >({
+export const useAuthCheck = () => {
+  const {
+    data: user,
+    isLoading: isCheckingAuth,
+    isError: isAuthError,
+    error: authError,
+  } = useQuery<AuthResponse, AppError>({
     queryKey: ["auth", "me"],
     queryFn: getMe,
-    retry: false, // Never retry on failure
-    staleTime: 1000 * 60 * 60, // Cache session for 1 hour before re-checking
-  });
-
-  // 2. Login mutation: Submits credentials, updates session cache, and toasts result
-  const loginMutation = useMutation<AuthResponse, AppError, LoginCredentials>({
-    mutationFn: login,
-    onSuccess: (data) => {
-      // Instantly inject user into cache so the app knows we're logged in
-      queryClient.setQueryData(["auth", "me"], data);
-      toast.success(data.message || "Welcome back!");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  // 3. Logout mutation: Clears cookie on server, wipes client cache, and toasts result
-  const logoutMutation = useMutation<string, AppError, void>({
-    mutationFn: logout,
-    onSuccess: (message) => {
-      // Clear entire TanStack cache so no citizen/voter data lingers in memory
-      queryClient.setQueryData(["auth", "me"], null);
-      queryClient.clear();
-      toast.success(message || "Logged out successfully");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
+    retry: false, // Don't retry on 401
+    staleTime: 1000 * 60 * 10, // 10 minutes
   });
 
   return {
     user,
-    isAuthenticated: Boolean(user?.isSuccess),
+    isAuthenticated: !!user?.isSuccess,
     isCheckingAuth,
-    // Mutations & states
-    //login: loginMutation.mutate,
+    isAuthError,
+    authError,
+  };
+};
+
+export const useAuth = () => {
+  const queryClient = useQueryClient();
+
+  const loginMutation = useMutation<AuthResponse, AppError, LoginCredentials>({
+    mutationFn: login,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["auth", "me"], data);
+      toast.success(data.message || "Welcome!");
+    },
+    onError: (error: AppError) => {
+      toast.error(error.message || "Invalid credentials");
+    },
+  });
+
+  const logoutMutation = useMutation<string, AppError, void>({
+    mutationFn: logout,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["auth", "me"], null);
+      queryClient.removeQueries(); // Clears all sensitive cached data safely
+      toast.success(data || "Logged out successfully");
+    },
+    onError: (error: AppError) => {
+      toast.error(error.message || "Failed to log out");
+    },
+  });
+
+  return {
+    // Both mutate (safe) and mutateAsync (promise) available:
+    login: loginMutation.mutate,
     loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
+    isLoginError: loginMutation.isError,
     loginError: loginMutation.error,
-    //logout: logoutMutation.mutate,
+
+    logout: logoutMutation.mutate,
     logoutAsync: logoutMutation.mutateAsync,
     isLoggingOut: logoutMutation.isPending,
+    isLogoutError: logoutMutation.isError,
     logoutError: logoutMutation.error,
   };
 };
