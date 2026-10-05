@@ -1,6 +1,8 @@
+import { z } from "zod";
 import type { PagedResult } from "./citizen.types";
+import { candidateFormSchema } from "../schemas/candidate.schemas";
 
-export type CandidateResponse = {
+export type CandidateResponseDTO = {
   id: number;
   nationalId: string;
   citizenId: number;
@@ -13,12 +15,6 @@ export type CandidateResponse = {
   gender: "M" | "F" | string;
 };
 
-export type CreateCandidateDTO = {
-  nationalId: string;
-};
-
-export type UpdateCandidateDTO = {
-  nationalId: string;
-};
-
 export type { PagedResult };
+
+export type CandidateRequestDTO = z.infer<typeof candidateFormSchema>;

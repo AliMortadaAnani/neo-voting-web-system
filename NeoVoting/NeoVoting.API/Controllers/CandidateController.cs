@@ -33,5 +33,8 @@ namespace NeoVoting.API.Controllers
             var result = await _candidateServices.CreateCandidateProfileAsync(electionId, request);
             return HandleResult(result, result.IsSuccess);
         }
+
+
+        
     }
 }

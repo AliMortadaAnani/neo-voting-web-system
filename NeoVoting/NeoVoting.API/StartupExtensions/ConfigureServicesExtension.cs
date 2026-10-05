@@ -100,7 +100,8 @@ namespace NeoVoting.API.StartupExtensions
                     ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidAudience = configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
+                        Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!)),
+                    ClockSkew = TimeSpan.Zero
                 };
 
                 options.Events = new JwtBearerEvents
@@ -282,7 +283,7 @@ namespace NeoVoting.API.StartupExtensions
             {
                 options.AddPolicy("FrontendPolicy", policyBuilder =>
                 {
-                    policyBuilder.WithOrigins("http://localhost:3000") // Your Frontend URL
+                    policyBuilder.WithOrigins("http://localhost:5173","http://localhost:5174") // Your Frontend URL
                                  .AllowAnyHeader()
                                  .AllowAnyMethod()
                                  .AllowCredentials();

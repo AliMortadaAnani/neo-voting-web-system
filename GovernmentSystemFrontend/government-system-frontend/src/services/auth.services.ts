@@ -1,17 +1,14 @@
 import { api } from "../api/api";
-import type { AuthResponse } from "../types/auth.types.ts";
-import type { LoginCredentials } from "../schemas/auth.schemas";
+import type { LoginRequestDTO, AuthResponseDTO } from "../types/auth.types.ts";
 
-export const login = async (
-  credentials: LoginCredentials,
-): Promise<AuthResponse> => {
-  const response = await api.post<AuthResponse>("/auth/login", credentials);
+export const login = async (dto: LoginRequestDTO): Promise<AuthResponseDTO> => {
+  const response = await api.post<AuthResponseDTO>("/auth/login", dto);
   return response.data;
 };
 
 //it checks if the user is sending a valid cookie
-export const getMe = async (): Promise<AuthResponse> => {
-  const response = await api.get<AuthResponse>("/auth/me");
+export const getMe = async (): Promise<AuthResponseDTO> => {
+  const response = await api.get<AuthResponseDTO>("/auth/me");
   return response.data;
 };
 

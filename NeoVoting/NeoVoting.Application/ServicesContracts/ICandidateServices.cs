@@ -7,5 +7,7 @@ namespace NeoVoting.Application.ServicesContracts
     public interface ICandidateServices
     {
         Task<Result<CandidateProfile_ResponseDTO>> CreateCandidateProfileAsync(int electionId, CandidateProfile_Create_RequestDTO candidateRequestDTO);
+
+        Task<Result<CandidateProfile_ResponseDTO>> GetCandidateProfileByElectionIdAndCandidateAccountIdAsync(int electionId,int candidateId);
     }
 }

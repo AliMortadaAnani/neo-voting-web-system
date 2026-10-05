@@ -1,8 +1,11 @@
-export type AuthResponse = {
+import { z } from "zod";
+import { loginSchema } from "../schemas/auth.schemas";
+
+export type AuthResponseDTO = {
   isSuccess: boolean;
   message: string;
   username: string;
   role: string;
 };
 
-//type LoginCredentials is exported from src/schemas/auth.schemas.ts
+export type LoginRequestDTO = z.infer<typeof loginSchema>;

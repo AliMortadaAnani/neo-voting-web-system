@@ -1,58 +1,53 @@
 import { api } from "../api/api";
 import type {
-  CandidateResponse,
+  CandidateResponseDTO,
   PagedResult,
-  CreateCandidateDTO,
-  UpdateCandidateDTO,
+  CandidateRequestDTO,
 } from "../types/candidate.types";
 
 export const getCandidatesPaged = async (
   pageNumber = 1,
   pageSize = 10,
-): Promise<PagedResult<CandidateResponse>> => {
-  const response = await api.get<PagedResult<CandidateResponse>>(
+): Promise<PagedResult<CandidateResponseDTO>> => {
+  const res = await api.get<PagedResult<CandidateResponseDTO>>(
     "/Candidates/paged",
-    {
-      params: { pageNumber, pageSize },
-    },
+    { params: { pageNumber, pageSize } },
   );
-  return response.data;
+  return res.data;
 };
 
 export const getCandidateDetails = async (
-  nationalId: string,
-): Promise<CandidateResponse> => {
-  const response = await api.post<CandidateResponse>("/Candidates/details", {
-    nationalId,
-  });
-  return response.data;
+  dto: CandidateRequestDTO,
+): Promise<CandidateResponseDTO> => {
+  const res = await api.post<CandidateResponseDTO>("/Candidates/details", dto);
+  return res.data;
 };
 
 export const addCandidate = async (
-  dto: CreateCandidateDTO,
-): Promise<CandidateResponse> => {
-  const response = await api.post<CandidateResponse>("/Candidates/add", dto);
-  return response.data;
+  dto: CandidateRequestDTO,
+): Promise<CandidateResponseDTO> => {
+  const res = await api.post<CandidateResponseDTO>("/Candidates/add", dto);
+  return res.data;
 };
 
 export const regenerateNominationToken = async (
-  dto: UpdateCandidateDTO,
-): Promise<CandidateResponse> => {
-  const response = await api.put<CandidateResponse>(
+  dto: CandidateRequestDTO,
+): Promise<CandidateResponseDTO> => {
+  const res = await api.put<CandidateResponseDTO>(
     "/Candidates/generateNewToken",
     dto,
   );
-  return response.data;
+  return res.data;
 };
 
-export const deleteCandidate = async (nationalId: string): Promise<boolean> => {
-  const response = await api.post<boolean>("/Candidates/delete", {
-    nationalId,
-  });
-  return response.data;
+export const deleteCandidate = async (
+  dto: CandidateRequestDTO,
+): Promise<boolean> => {
+  const res = await api.post<boolean>("/Candidates/delete", dto);
+  return res.data;
 };
 
 export const getCandidatesTotalCount = async (): Promise<number> => {
-  const response = await api.get<number>("/Candidates/totalCount");
-  return response.data;
+  const res = await api.get<number>("/Candidates/totalCount");
+  return res.data;
 };

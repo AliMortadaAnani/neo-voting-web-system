@@ -28,27 +28,28 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext.Citizens.Remove(citizen);
         }
 
-        public Task<Citizen?> GetCitizenByNationalIdAsync(string nationalId)
+        public async Task<Citizen?> GetCitizenByNationalIdAsync(string nationalId)
         {
             _logger.LogInformation("CitizenRepository: Fetching citizen by NationalId");
-            return _dbContext.Citizens.SingleOrDefaultAsync(c => c.NationalId == nationalId);
+            return await _dbContext.Citizens.SingleOrDefaultAsync(c => c.NationalId == nationalId);
         }
 
-        public Task<List<Citizen>> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<List<Citizen>> GetPagedAsync(int pageNumber, int pageSize)
         {
             _logger.LogInformation("CitizenRepository: Fetching paged citizens - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
-            return _dbContext.Citizens
+            return await _dbContext.Citizens
                 .AsNoTracking()
-                .OrderBy(c => c.Id)
+                .OrderBy(c => c.LastName)
+                .ThenBy(c => c.FirstName)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        public Task<int> CountAsync()
+        public async Task<int> CountAsync()
         {
             _logger.LogInformation("CitizenRepository: Counting total citizens");
-            return _dbContext.Citizens.CountAsync();
+            return await _dbContext.Citizens.CountAsync();
         }
     }
 }

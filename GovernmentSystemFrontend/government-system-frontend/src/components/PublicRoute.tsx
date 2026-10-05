@@ -1,23 +1,25 @@
+// components/PublicRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuthCheck } from "../hooks/useAuth";
+import { AuthStatus } from "./AuthStatus";
 
 export const PublicRoute = () => {
-  const { isAuthenticated, isCheckingAuth } = useAuthCheck();
+  const { isAuthenticated, isCheckingAuth, isAuthError, authError } =
+    useAuthCheck();
 
-  // 1. Still waiting to verify session cookie
-  if (isCheckingAuth) {
+  if (isCheckingAuth || (isAuthError && authError?.status !== 401)) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
-        <p className="text-sm font-medium text-slate-500">Loading...</p>
-      </div>
+      <AuthStatus
+        isCheckingAuth={isCheckingAuth}
+        isAuthError={isAuthError}
+        authError={authError}
+      />
     );
   }
 
-  // 2. If already logged in, public routes (like /login) are forbidden
   if (isAuthenticated) {
     return <Navigate to="/citizens" replace />;
   }
 
-  // 3. Not logged in -> Show login/register page
   return <Outlet />;
 };

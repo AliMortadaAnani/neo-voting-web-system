@@ -7,10 +7,9 @@ import {
 import toast from "react-hot-toast";
 import type { AppError } from "../api/api";
 import type {
-  CandidateResponse,
+  CandidateResponseDTO,
   PagedResult,
-  CreateCandidateDTO,
-  UpdateCandidateDTO,
+  CandidateRequestDTO,
 } from "../types/candidate.types";
 import {
   getCandidatesPaged,
@@ -21,7 +20,6 @@ import {
   deleteCandidate,
 } from "../services/candidate.services";
 
-// 1. Query Key Factory
 export const candidateKeys = {
   all: ["candidates"] as const,
   lists: () => [...candidateKeys.all, "list"] as const,
@@ -33,9 +31,8 @@ export const candidateKeys = {
   totalCount: () => [...candidateKeys.all, "total-count"] as const,
 };
 
-// 2. Read Hooks
 export const useCandidates = (page = 1, pageSize = 10) => {
-  return useQuery<PagedResult<CandidateResponse>, AppError>({
+  return useQuery<PagedResult<CandidateResponseDTO>, AppError>({
     queryKey: candidateKeys.list(page, pageSize),
     queryFn: () => getCandidatesPaged(page, pageSize),
     placeholderData: keepPreviousData,
@@ -43,11 +40,11 @@ export const useCandidates = (page = 1, pageSize = 10) => {
   });
 };
 
-export const useCandidate = (nationalId?: string | null) => {
-  return useQuery<CandidateResponse, AppError>({
-    queryKey: candidateKeys.detail(nationalId ?? ""),
-    queryFn: () => getCandidateDetails(nationalId!),
-    enabled: Boolean(nationalId && nationalId.trim().length > 0),
+export const useCandidate = (dto: CandidateRequestDTO | null) => {
+  return useQuery<CandidateResponseDTO, AppError>({
+    queryKey: candidateKeys.detail(dto?.nationalId ?? ""),
+    queryFn: () => getCandidateDetails(dto!),
+    enabled: Boolean(dto?.nationalId && dto?.nationalId.trim().length > 0),
     staleTime: 1000 * 60,
   });
 };
@@ -60,7 +57,6 @@ export const useCandidatesTotalCount = () => {
   });
 };
 
-// 3. Write Hooks
 export const useCandidateMutations = () => {
   const queryClient = useQueryClient();
 
@@ -70,11 +66,10 @@ export const useCandidateMutations = () => {
   const invalidateTotalCount = () =>
     queryClient.invalidateQueries({ queryKey: candidateKeys.totalCount() });
 
-  // Add Candidate
   const addMutation = useMutation<
-    CandidateResponse,
+    CandidateResponseDTO,
     AppError,
-    CreateCandidateDTO
+    CandidateRequestDTO
   >({
     mutationFn: addCandidate,
     onSuccess: () => {
@@ -87,16 +82,14 @@ export const useCandidateMutations = () => {
     },
   });
 
-  // Regenerate Token
   const tokenMutation = useMutation<
-    CandidateResponse,
+    CandidateResponseDTO,
     AppError,
-    UpdateCandidateDTO
+    CandidateRequestDTO
   >({
     mutationFn: regenerateNominationToken,
     onSuccess: (data, variables) => {
       invalidateLists();
-      // Instantly update the cache with the new token
       queryClient.setQueryData(
         candidateKeys.detail(variables.nationalId),
         data,
@@ -108,14 +101,13 @@ export const useCandidateMutations = () => {
     },
   });
 
-  // Delete Candidate
-  const deleteMutation = useMutation<boolean, AppError, string>({
+  const deleteMutation = useMutation<boolean, AppError, CandidateRequestDTO>({
     mutationFn: deleteCandidate,
-    onSuccess: (_, nationalId) => {
+    onSuccess: (_, variables) => {
       invalidateLists();
       invalidateTotalCount();
       queryClient.removeQueries({
-        queryKey: candidateKeys.detail(nationalId),
+        queryKey: candidateKeys.detail(variables.nationalId),
       });
       toast.success("Candidate record removed successfully");
     },
@@ -128,16 +120,19 @@ export const useCandidateMutations = () => {
     addCandidate: addMutation.mutate,
     addCandidateAsync: addMutation.mutateAsync,
     isAdding: addMutation.isPending,
+    isAddError: addMutation.isError,
     addError: addMutation.error,
 
     regenerateToken: tokenMutation.mutate,
     regenerateTokenAsync: tokenMutation.mutateAsync,
     isRegeneratingToken: tokenMutation.isPending,
+    isRegenerateTokenError: tokenMutation.isError,
     regenerateTokenError: tokenMutation.error,
 
     deleteCandidate: deleteMutation.mutate,
     deleteCandidateAsync: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isPending,
+    isDeleteError: deleteMutation.isError,
     deleteError: deleteMutation.error,
   };
 };

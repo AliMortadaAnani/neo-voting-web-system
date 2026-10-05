@@ -15,13 +15,25 @@ namespace NeoVoting.API.Controllers
     {
         private readonly ILogger<GeneralController> _logger;
         private readonly IGeneralServices _generalServices;
-
+        private readonly ICandidateServices _candidateServices;
         private readonly IVoterServices _voterServices;
-        public GeneralController(IGeneralServices generalServices, IVoterServices voterServices, ILogger<GeneralController> logger)
+        public GeneralController(IGeneralServices generalServices, IVoterServices voterServices,
+            ICandidateServices candidateServices, ILogger<GeneralController> logger)
         {
             _generalServices = generalServices;
             _voterServices = voterServices;
+            _candidateServices = candidateServices;
             _logger = logger;
+        }
+
+        [HttpGet("elections/{electionId}/profiles/{candidateId}")]
+        [ProducesResponseType(typeof(CandidateProfile_ResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NotFound404ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCandidateProfile([FromRoute] int electionId, [FromRoute] int candidateId)
+        {
+            _logger.LogInformation("Get candidate profile requested for election {ElectionId} and candidate {CandidateId}", electionId, candidateId);
+            var result = await _candidateServices.GetCandidateProfileByElectionIdAndCandidateAccountIdAsync(electionId, candidateId);
+            return HandleResult(result);
         }
 
         [HttpGet("elections/active")]

@@ -13,4 +13,3 @@ export const loginSchema = z.object({
     .max(100, "Password must be at most 100 characters"),
 });
 
-export type LoginCredentials = z.infer<typeof loginSchema>;

@@ -117,7 +117,7 @@ namespace NeoVoting.Application.Services
             var refreshToken = GenerateRefreshToken();
 
             // 9. Calculate the absolute expiration timestamp for the refresh token (usually much longer than access token)
-            var refreshTokenExpiry = DateTime.UtcNow.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
+            var refreshTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:RefreshTokenDurationInDays"]!));
 
             return new Authentication_ResponseDTO
             {

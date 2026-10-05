@@ -13,7 +13,7 @@ namespace GovernmentSystem.API.API.Controllers
     // Route must match your IP Whitelist logic (/api/public)
     [Route("api/public")]
     [ApiKeyAuth] //  Secured by API Key
-    [EnableRateLimiting("ApiKeyLimiter")]
+    //[EnableRateLimiting("ApiKeyLimiter")]
     public class NeoVotingController : ApiController
     {
         private readonly IVoterServices _voterServices;

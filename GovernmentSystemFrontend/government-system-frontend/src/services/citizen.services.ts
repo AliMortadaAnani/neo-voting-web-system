@@ -1,56 +1,54 @@
 import { api } from "../api/api";
 import type {
-  CitizenResponse,
+  CitizenResponseDTO,
   PagedResult,
-  CreateCitizenDTO,
-  UpdateCitizenDTO,
+  CitizenCreateRequestDTO,
+  CitizenFetchRequestDTO,
+  CitizenUpdateRequestDTO,
 } from "../types/citizen.types";
 
 export const getCitizensPaged = async (
   pageNumber = 1,
   pageSize = 10,
-): Promise<PagedResult<CitizenResponse>> => {
-  const response = await api.get<PagedResult<CitizenResponse>>(
+): Promise<PagedResult<CitizenResponseDTO>> => {
+  const res = await api.get<PagedResult<CitizenResponseDTO>>(
     "/Citizens/paged",
     {
       params: { pageNumber, pageSize },
     },
   );
-  return response.data;
+  return res.data;
 };
 
 export const getCitizenDetails = async (
-  nationalId: string,
-): Promise<CitizenResponse> => {
-  const response = await api.post<CitizenResponse>("/Citizens/details", {
-    nationalId,
-  });
-  return response.data;
+  dto: CitizenFetchRequestDTO,
+): Promise<CitizenResponseDTO> => {
+  const res = await api.post<CitizenResponseDTO>("/Citizens/details", dto);
+  return res.data;
 };
 
 export const createCitizen = async (
-  dto: CreateCitizenDTO,
-): Promise<CitizenResponse> => {
-  const response = await api.post<CitizenResponse>("/Citizens/add", dto);
-  return response.data;
+  dto: CitizenCreateRequestDTO,
+): Promise<CitizenResponseDTO> => {
+  const res = await api.post<CitizenResponseDTO>("/Citizens/add", dto);
+  return res.data;
 };
 
 export const updateCitizen = async (
-  dto: UpdateCitizenDTO,
-): Promise<CitizenResponse> => {
-  const response = await api.put<CitizenResponse>(
-    "/Citizens/updateDetails",
-    dto,
-  );
-  return response.data;
+  dto: CitizenUpdateRequestDTO,
+): Promise<CitizenResponseDTO> => {
+  const res = await api.put<CitizenResponseDTO>("/Citizens/updateDetails", dto);
+  return res.data;
 };
 
-export const deleteCitizen = async (nationalId: string): Promise<boolean> => {
-  const response = await api.post<boolean>("/Citizens/delete", { nationalId });
-  return response.data;
+export const deleteCitizen = async (
+  dto: CitizenFetchRequestDTO,
+): Promise<boolean> => {
+  const res = await api.post<boolean>("/Citizens/delete", dto);
+  return res.data;
 };
 
 export const getCitizensTotalCount = async (): Promise<number> => {
-  const response = await api.get<number>("/Citizens/totalCount");
-  return response.data;
+  const res = await api.get<number>("/Citizens/totalCount");
+  return res.data;
 };

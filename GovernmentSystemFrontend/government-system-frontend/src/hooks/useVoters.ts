@@ -7,10 +7,9 @@ import {
 import toast from "react-hot-toast";
 import type { AppError } from "../api/api";
 import type {
-  VoterResponse,
+  VoterResponseDTO,
   PagedResult,
-  CreateVoterDTO,
-  UpdateVoterDTO,
+  VoterRequestDTO,
 } from "../types/voter.types";
 import {
   getVotersPaged,
@@ -21,7 +20,6 @@ import {
   deleteVoter,
 } from "../services/voter.services";
 
-// 1. Query Key Factory
 export const voterKeys = {
   all: ["voters"] as const,
   lists: () => [...voterKeys.all, "list"] as const,
@@ -32,9 +30,8 @@ export const voterKeys = {
   totalCount: () => [...voterKeys.all, "total-count"] as const,
 };
 
-// 2. Read Hooks
 export const useVoters = (page = 1, pageSize = 10) => {
-  return useQuery<PagedResult<VoterResponse>, AppError>({
+  return useQuery<PagedResult<VoterResponseDTO>, AppError>({
     queryKey: voterKeys.list(page, pageSize),
     queryFn: () => getVotersPaged(page, pageSize),
     placeholderData: keepPreviousData,
@@ -42,11 +39,11 @@ export const useVoters = (page = 1, pageSize = 10) => {
   });
 };
 
-export const useVoter = (nationalId?: string | null) => {
-  return useQuery<VoterResponse, AppError>({
-    queryKey: voterKeys.detail(nationalId ?? ""),
-    queryFn: () => getVoterDetails(nationalId!),
-    enabled: Boolean(nationalId && nationalId.trim().length > 0),
+export const useVoter = (dto: VoterRequestDTO | null) => {
+  return useQuery<VoterResponseDTO, AppError>({
+    queryKey: voterKeys.detail(dto?.nationalId ?? ""),
+    queryFn: () => getVoterDetails(dto!),
+    enabled: Boolean(dto?.nationalId && dto?.nationalId.trim().length > 0),
     staleTime: 1000 * 60,
   });
 };
@@ -59,7 +56,6 @@ export const useVotersTotalCount = () => {
   });
 };
 
-// 3. Write Hooks
 export const useVoterMutations = () => {
   const queryClient = useQueryClient();
 
@@ -69,8 +65,7 @@ export const useVoterMutations = () => {
   const invalidateTotalCount = () =>
     queryClient.invalidateQueries({ queryKey: voterKeys.totalCount() });
 
-  // Add Voter
-  const addMutation = useMutation<VoterResponse, AppError, CreateVoterDTO>({
+  const addMutation = useMutation<VoterResponseDTO, AppError, VoterRequestDTO>({
     mutationFn: addVoter,
     onSuccess: () => {
       invalidateLists();
@@ -82,12 +77,14 @@ export const useVoterMutations = () => {
     },
   });
 
-  // Regenerate Token
-  const tokenMutation = useMutation<VoterResponse, AppError, UpdateVoterDTO>({
+  const tokenMutation = useMutation<
+    VoterResponseDTO,
+    AppError,
+    VoterRequestDTO
+  >({
     mutationFn: regenerateVotingToken,
     onSuccess: (data, variables) => {
       invalidateLists();
-      // Instantly update the cache with the new token
       queryClient.setQueryData(voterKeys.detail(variables.nationalId), data);
       toast.success("New voting token generated successfully");
     },
@@ -96,14 +93,13 @@ export const useVoterMutations = () => {
     },
   });
 
-  // Delete Voter
-  const deleteMutation = useMutation<boolean, AppError, string>({
+  const deleteMutation = useMutation<boolean, AppError, VoterRequestDTO>({
     mutationFn: deleteVoter,
-    onSuccess: (_, nationalId) => {
+    onSuccess: (_, variables) => {
       invalidateLists();
       invalidateTotalCount();
       queryClient.removeQueries({
-        queryKey: voterKeys.detail(nationalId),
+        queryKey: voterKeys.detail(variables.nationalId),
       });
       toast.success("Voter record removed successfully");
     },
@@ -115,17 +111,20 @@ export const useVoterMutations = () => {
   return {
     addVoter: addMutation.mutate,
     addVoterAsync: addMutation.mutateAsync,
-    isAdding: addMutation.isPending,
-    addError: addMutation.error,
+    isAddingVoter: addMutation.isPending,
+    isAddVoterError: addMutation.isError,
+    addVoterError: addMutation.error,
 
-    regenerateToken: tokenMutation.mutate,
-    regenerateTokenAsync: tokenMutation.mutateAsync,
-    isRegeneratingToken: tokenMutation.isPending,
-    regenerateTokenError: tokenMutation.error,
+    regenerateVotingToken: tokenMutation.mutate,
+    regenerateVotingTokenAsync: tokenMutation.mutateAsync,
+    isRegeneratingVotingToken: tokenMutation.isPending,
+    isRegenerateVotingTokenError: tokenMutation.isError,
+    regenerateVotingTokenError: tokenMutation.error,
 
     deleteVoter: deleteMutation.mutate,
     deleteVoterAsync: deleteMutation.mutateAsync,
-    isDeleting: deleteMutation.isPending,
-    deleteError: deleteMutation.error,
+    isDeletingVoter: deleteMutation.isPending,
+    isDeleteVoterError: deleteMutation.isError,
+    deleteVoterError: deleteMutation.error,
   };
 };

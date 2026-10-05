@@ -8,6 +8,7 @@ namespace NeoVoting.Application.Validators.GeneralDTOs
         public CandidateProfiles_ResponseDTOValidator()
         {
             RuleFor(x => x.CandidateProfileId).NotNull();
+            RuleFor(x => x.CandidateAccountId).NotNull();
             RuleFor(x => x.FirstName).NotEmpty();
             RuleFor(x => x.LastName).NotEmpty();
             RuleFor(x => x.Gender).NotNull();

@@ -1,47 +1,64 @@
+// pages/LoginPage.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
-import { loginSchema, type LoginCredentials } from "../schemas/auth.schemas";
+import { loginSchema } from "../schemas/auth.schemas";
+import type { LoginRequestDTO } from "../types/auth.types";
 import { useAuth } from "../hooks/useAuth";
 
 export const LoginPage = () => {
-  const navigate = useNavigate();
   const { login, isLoggingIn } = useAuth();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginCredentials>({
+  } = useForm<LoginRequestDTO>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
   });
 
-  const onSubmit = (data: LoginCredentials) => {
-    login(data, {
-      onSuccess: () => {
-        navigate("/citizens", { replace: true });
-      },
-    });
+  const onSubmit = (data: LoginRequestDTO) => {
+    login(data);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold text-slate-800">
-          Admin Login
-        </h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      {/* Login Card */}
+      <div className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-xl font-bold tracking-tight text-gray-900">
+            GovPortal
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Sign in to access your dashboard
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Username Input */}
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          {/* Username Field */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
               Username
             </label>
             <input
+              id="username"
               type="text"
-              placeholder="Enter username"
+              autoComplete="username"
+              placeholder="e.g. admin"
               {...register("username")}
-              className="w-full rounded-lg border border-slate-300 p-2.5 text-sm focus:border-slate-800 focus:outline-none"
+              className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 ${
+                errors.username
+                  ? "border-red-500 focus:ring-red-200"
+                  : "border-gray-300 focus:border-blue-600 focus:ring-blue-100"
+              }`}
             />
             {errors.username && (
               <p className="mt-1 text-xs text-red-600">
@@ -50,16 +67,25 @@ export const LoginPage = () => {
             )}
           </div>
 
-          {/* Password Input */}
+          {/* Password Field */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
+              id="password"
               type="password"
+              autoComplete="current-password"
               placeholder="••••••••"
               {...register("password")}
-              className="w-full rounded-lg border border-slate-300 p-2.5 text-sm focus:border-slate-800 focus:outline-none"
+              className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 ${
+                errors.password
+                  ? "border-red-500 focus:ring-red-200"
+                  : "border-gray-300 focus:border-blue-600 focus:ring-blue-100"
+              }`}
             />
             {errors.password && (
               <p className="mt-1 text-xs text-red-600">
@@ -72,9 +98,9 @@ export const LoginPage = () => {
           <button
             type="submit"
             disabled={isLoggingIn}
-            className="w-full rounded-lg bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:bg-slate-400"
+            className="mt-2 flex w-full items-center justify-center rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isLoggingIn ? "Authenticating..." : "Sign In"}
+            {isLoggingIn ? "Signing in..." : "Sign In"}
           </button>
         </form>
       </div>

@@ -245,7 +245,7 @@ namespace GovernmentSystem.API.StartupExtensions
             {
                 options.AddPolicy("FrontendPolicy", policyBuilder =>
                 {
-                    policyBuilder.WithOrigins("http://localhost:5173") // Your Frontend URL
+                    policyBuilder.WithOrigins("http://localhost:5173", "http://localhost:5174") // Your Frontend URL
                                  .AllowAnyHeader()
                                  .AllowAnyMethod()
                                  .AllowCredentials();

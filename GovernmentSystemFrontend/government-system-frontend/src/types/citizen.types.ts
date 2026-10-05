@@ -1,3 +1,9 @@
+import { z } from "zod";
+import {
+  createCitizenFormSchema,
+  updateCitizenFormSchema,
+  fetchCitizenFormSchema,
+} from "../schemas/citizen.schemas";
 export const Governorate = {
   Beirut: 1,
   MountLebanon: 2,
@@ -16,7 +22,7 @@ export const GOVERNORATE_NAMES: Record<number, string> = {
   [Governorate.North]: "North",
 };
 
-export type CitizenResponse = {
+export type CitizenResponseDTO = {
   id: number;
   nationalId: string;
   firstName: string;
@@ -36,14 +42,6 @@ export type PagedResult<T> = {
   hasPreviousPage: boolean;
 };
 
-export type CreateCitizenDTO = {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  governorate: number;
-  gender: string;
-};
-
-export type UpdateCitizenDTO = CreateCitizenDTO & {
-  nationalId: string;
-};
+export type CitizenCreateRequestDTO = z.infer<typeof createCitizenFormSchema>;
+export type CitizenUpdateRequestDTO = z.infer<typeof updateCitizenFormSchema>;
+export type CitizenFetchRequestDTO = z.infer<typeof fetchCitizenFormSchema>;

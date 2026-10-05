@@ -7,5 +7,3 @@ export const candidateFormSchema = z.object({
     .min(1, "National ID is required")
     .max(100, "Maximum 100 characters"),
 });
-
-export type CandidateFormValues = z.infer<typeof candidateFormSchema>;

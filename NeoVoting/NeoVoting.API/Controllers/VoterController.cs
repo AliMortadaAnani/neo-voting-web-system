@@ -49,5 +49,6 @@ namespace NeoVoting.API.Controllers
             var result = await _voterServices.CastVoteInPollAsync(pollId, request);
             return HandleResult(result);
         }
+
     }
 }

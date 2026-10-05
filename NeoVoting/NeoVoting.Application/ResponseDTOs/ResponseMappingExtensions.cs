@@ -59,6 +59,7 @@ namespace NeoVoting.Application.ResponseDTOs
             var dto = new CandidateProfile_ResponseDTO
             {
                 CandidateProfileId = profile.Id,
+                CandidateAccountId = profile.Candidate.Id,
                 FirstName = profile.Candidate.FirstName,
                 LastName = profile.Candidate.LastName,
                 Gender = profile.Candidate.Gender,
@@ -81,6 +82,7 @@ namespace NeoVoting.Application.ResponseDTOs
             var dto = new CandidateProfile_ResponseDTO
             {
                 CandidateProfileId = profileResults.CandidateProfile.Id,
+                CandidateAccountId = profileResults.CandidateProfile.Candidate.Id,
                 FirstName = profileResults.CandidateProfile.Candidate.FirstName,
                 LastName = profileResults.CandidateProfile.Candidate.LastName,
                 Gender = profileResults.CandidateProfile.Candidate.Gender,

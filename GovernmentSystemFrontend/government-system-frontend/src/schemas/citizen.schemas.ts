@@ -24,7 +24,12 @@ const beAtLeast18YearsOld = (dobString: string) => {
   return age >= 18;
 };
 
-export const citizenFormSchema = z.object({
+const citizenFormSchema = z.object({
+  nationalId: z
+    .string()
+    .trim()
+    .min(1, "National ID is required")
+    .max(100, "Maximum 100 characters"),
   firstName: z
     .string()
     .trim()
@@ -41,7 +46,11 @@ export const citizenFormSchema = z.object({
     .refine(beAtLeast18YearsOld, {
       message: "The citizen must be at least 18 years old.",
     }),
-  governorate: z.string().min(1, "Please select a governorate"),
+  governorate: z
+    .number()
+    .int({ message: "Governorate must be an number from 1 to 5" })
+    .min(1)
+    .max(5),
   gender: z
     .string()
     .min(1, "Gender is required")
@@ -50,4 +59,16 @@ export const citizenFormSchema = z.object({
     }),
 });
 
-export type CitizenFormValues = z.infer<typeof citizenFormSchema>;
+export const createCitizenFormSchema = citizenFormSchema.omit({
+  nationalId: true,
+});
+
+export const updateCitizenFormSchema = citizenFormSchema;
+
+export const fetchCitizenFormSchema = citizenFormSchema.omit({
+  dateOfBirth: true,
+  governorate: true,
+  gender: true,
+  firstName: true,
+  lastName: true,
+});

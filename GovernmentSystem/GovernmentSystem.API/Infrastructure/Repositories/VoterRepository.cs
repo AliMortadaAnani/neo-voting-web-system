@@ -28,41 +28,42 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext.Voters.Remove(voter);
         }
 
-        public Task<Voter?> GetVoterByNationalIdAsync(string nationalId)
+        public async Task<Voter?> GetVoterByNationalIdAsync(string nationalId)
         {
             _logger.LogInformation("VoterRepository: Fetching voter by NationalId");
-            var voter = _dbContext.Voters
+            var voter = await _dbContext.Voters
                 .Include(v => v.Citizen)
                 .SingleOrDefaultAsync(v => v.Citizen.NationalId == nationalId);
             return voter;
         }
 
-        public Task<Voter?> GetVoterByHashedDataAsync(string hashedData)
+        public async Task<Voter?> GetVoterByHashedDataAsync(string hashedData)
         {
             _logger.LogInformation("VoterRepository: Fetching voter by HashedData");
-            var voter = _dbContext.Voters
+            var voter = await _dbContext.Voters
                 .Include(v => v.Citizen)
                 .SingleOrDefaultAsync(v => v.HashedData == hashedData);
             return voter;
         }
 
-        public Task<List<Voter>> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<List<Voter>> GetPagedAsync(int pageNumber, int pageSize)
         {
             _logger.LogInformation("VoterRepository: Fetching paged voters - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
-            var voters = _dbContext.Voters
+            var voters = await _dbContext.Voters
                  .AsNoTracking()
                  .Include(v => v.Citizen)
-                 .OrderBy(v => v.Id)
+                 .OrderBy(c => c.Citizen.LastName)
+                 .ThenBy(c => c.Citizen.FirstName)
                  .Skip((pageNumber - 1) * pageSize)
                  .Take(pageSize)
                  .ToListAsync();
             return voters;
         }
 
-        public Task<int> CountAsync()
+        public async Task<int> CountAsync()
         {
             _logger.LogInformation("VoterRepository: Counting total voters");
-            return _dbContext.Voters.CountAsync();
+            return await _dbContext.Voters.CountAsync();
         }
 
         public async Task<bool> IsVoterExistByNationalIdAsync(string nationalId)

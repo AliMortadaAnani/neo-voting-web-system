@@ -28,41 +28,42 @@ namespace GovernmentSystem.API.Infrastructure.Repositories
             _dbContext.Candidates.Remove(candidate);
         }
 
-        public Task<Candidate?> GetCandidateByNationalIdAsync(string nationalId)
+        public  async Task<Candidate?> GetCandidateByNationalIdAsync(string nationalId)
         {
             _logger.LogInformation("CandidateRepository: Fetching candidate by NationalId");
-            var candidate = _dbContext.Candidates
+            var candidate = await _dbContext.Candidates
                 .Include(c => c.Citizen)
                 .SingleOrDefaultAsync(c => c.Citizen.NationalId == nationalId);
             return candidate;
         }
 
-        public Task<Candidate?> GetCandidateByHashedDataAsync(string hashedData)
+        public async Task<Candidate?> GetCandidateByHashedDataAsync(string hashedData)
         {
             _logger.LogInformation("CandidateRepository: Fetching candidate by HashedData");
-            var candidate = _dbContext.Candidates
+            var candidate = await _dbContext.Candidates
                 .Include(c => c.Citizen)
                 .SingleOrDefaultAsync(c => c.HashedData == hashedData);
             return candidate;
         }
 
-        public Task<List<Candidate>> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<List<Candidate>> GetPagedAsync(int pageNumber, int pageSize)
         {
             _logger.LogInformation("CandidateRepository: Fetching paged candidates - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
-            var candidates = _dbContext.Candidates
+            var candidates = await _dbContext.Candidates
                  .AsNoTracking()
                  .Include(v => v.Citizen)
-                 .OrderBy(v => v.Id)
+                 .OrderBy(c => c.Citizen.LastName)
+                 .ThenBy(c => c.Citizen.FirstName)
                  .Skip((pageNumber - 1) * pageSize)
                  .Take(pageSize)
                  .ToListAsync();
             return candidates;
         }
 
-        public Task<int> CountAsync()
+        public async Task<int> CountAsync()
         {
             _logger.LogInformation("CandidateRepository: Counting total candidates");
-            return _dbContext.Candidates.CountAsync();
+            return await _dbContext.Candidates.CountAsync();
         }
 
         public async Task<bool> IsCandidateExistByNationalIdAsync(string nationalId)

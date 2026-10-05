@@ -13,14 +13,15 @@ export type ProblemDetails = {
 export type AppError = Error & {
   code?: string; // type from ProblemDetails
   status?: number;
-  errors?: Record<string, string[]>;
+  errors?: Record<string, string[]>; //from ASP.NET or FluentValidation
 };
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
   withCredentials: true,
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json", // specifies that the request body will be in JSON format
+    //if we want to send images or files, we can use "multipart/form-data" instead of "application/json"...
   },
 });
 
@@ -29,6 +30,8 @@ api.interceptors.response.use(
   (response) => response,
 
   (error) => {
+    // no response from the server => a network error or server is offline
+    //caused by the server being offline, CORS, ip whitelisting ...
     if (!error.response) {
       const message = "Network error: Server is offline or unreachable.";
 
@@ -41,8 +44,18 @@ api.interceptors.response.use(
     }
 
     const problem: ProblemDetails = error.response.data || {};
+
+    const fieldErrors = problem.errors
+      ? Object.values(problem.errors).flat().join(" ")
+      : ""; //from ASP.NET or FluentValidation, we can have multiple errors for a single field, so we flatten them into a single string
+    //In normal cases we should not obtain this error message expect if our handling was bypassed
+    // zod and typescript should handle this before sending the request to the backend
+
     const message =
-      problem.detail || problem.type || "An unexpected error occurred.";
+      fieldErrors ||
+      problem.detail ||
+      problem.type ||
+      "An unexpected error occurred.";
 
     const uiError: AppError = new Error(message);
     uiError.code = problem.type ?? error.response.statusText ?? "UNKNOWN_ERROR";

@@ -2,8 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { getMe, login, logout } from "../services/auth.services";
 import type { AppError } from "../api/api";
-import type { AuthResponse } from "../types/auth.types.ts";
-import type { LoginCredentials } from "../schemas/auth.schemas";
+import type { AuthResponseDTO, LoginRequestDTO } from "../types/auth.types.ts";
 
 export const useAuthCheck = () => {
   const {
@@ -11,11 +10,11 @@ export const useAuthCheck = () => {
     isLoading: isCheckingAuth,
     isError: isAuthError,
     error: authError,
-  } = useQuery<AuthResponse, AppError>({
+  } = useQuery<AuthResponseDTO, AppError>({
     queryKey: ["auth", "me"],
     queryFn: getMe,
     retry: false, // Don't retry on 401
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 15, // 15 minutes
   });
 
   return {
@@ -30,22 +29,24 @@ export const useAuthCheck = () => {
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
-  const loginMutation = useMutation<AuthResponse, AppError, LoginCredentials>({
-    mutationFn: login,
-    onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "me"], data);
-      toast.success(data.message || "Welcome!");
+  const loginMutation = useMutation<AuthResponseDTO, AppError, LoginRequestDTO>(
+    {
+      mutationFn: login,
+      onSuccess: (data) => {
+        queryClient.setQueryData(["auth", "me"], data);
+        toast.success(data.message || "Welcome!");
+      },
+      onError: (error: AppError) => {
+        toast.error(error.message || "Invalid credentials");
+      },
     },
-    onError: (error: AppError) => {
-      toast.error(error.message || "Invalid credentials");
-    },
-  });
+  );
 
   const logoutMutation = useMutation<string, AppError, void>({
     mutationFn: logout,
     onSuccess: (data) => {
-      queryClient.setQueryData(["auth", "me"], null);
-      queryClient.removeQueries(); // Clears all sensitive cached data safely
+      queryClient.setQueryData(["auth", "me"], null); // since protected routes are subscribed to this query, they will automatically redirect to login page when the user logs out
+      queryClient.clear(); // Clears all sensitive cached data safely
       toast.success(data || "Logged out successfully");
     },
     onError: (error: AppError) => {
@@ -54,7 +55,6 @@ export const useAuth = () => {
   });
 
   return {
-    // Both mutate (safe) and mutateAsync (promise) available:
     login: loginMutation.mutate,
     loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,

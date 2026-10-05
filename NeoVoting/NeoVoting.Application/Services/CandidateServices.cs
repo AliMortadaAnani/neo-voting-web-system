@@ -62,5 +62,25 @@ namespace NeoVoting.Application.Services
             return Result<CandidateProfile_ResponseDTO>.Success(responseDTO);
 
         }
+
+        public async Task<Result<CandidateProfile_ResponseDTO>> GetCandidateProfileByElectionIdAndCandidateAccountIdAsync(int electionId, int candidateId)
+        {
+            var election = await _electionRepository.GetByIdAsync(electionId);
+            if (election == null)
+            {
+                return Result<CandidateProfile_ResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Election_NotFound), "Election not found."));
+            }
+
+            var profile = await _candidateProfileRepository.GetByCandidateIdAndElectionIdAsync(candidateId, electionId);
+
+            if (profile == null)
+            {
+                return Result<CandidateProfile_ResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.CandidateProfile_NotFound), "Candidate profile not found."));
+            }
+
+            var responseDTO = profile.ToCandidateProfileResponse(null);
+
+            return Result<CandidateProfile_ResponseDTO>.Success(responseDTO);
+        }
     }
 }

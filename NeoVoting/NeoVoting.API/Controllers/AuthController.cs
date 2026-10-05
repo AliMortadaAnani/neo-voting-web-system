@@ -5,6 +5,7 @@ using NeoVoting.Application.RequestDTOs.AuthDTOs;
 using NeoVoting.Application.ResponseDTOs.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
 using NeoVoting.Domain.Enums;
+using NeoVoting.Domain.ResultErrorDomain;
 
 namespace NeoVoting.API.Controllers
 {
@@ -163,6 +164,31 @@ namespace NeoVoting.API.Controllers
             };
 
             Response.Cookies.Append(RefreshTokenCookieName, refreshToken, cookieOptions);
+        }
+
+        [Authorize(Roles = nameof(RoleTypesEnum.Admin))]
+        [HttpGet("test-admin")]
+        public async Task<IActionResult> TestAdmin()
+        {
+            var result = Result<string>.Success("Admin access granted");
+
+            return HandleResult(result);
+        }
+        [Authorize(Roles = nameof(RoleTypesEnum.Voter))]
+        [HttpGet("test-voter")]
+        public async Task<IActionResult> TestVoter()
+        {
+            var result = Result<string>.Success("Voter access granted");
+
+            return HandleResult(result);
+        }
+        [Authorize(Roles = nameof(RoleTypesEnum.Candidate))]
+        [HttpGet("test-candidate")]
+        public async Task<IActionResult> TestCandidate()
+        {
+            var result = Result<string>.Success("Candidate access granted");
+
+            return HandleResult(result);
         }
     }
 }
