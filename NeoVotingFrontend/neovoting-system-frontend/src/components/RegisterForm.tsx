@@ -3,14 +3,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { registerSchema, type RegisterRequest } from "../schemas/auth.schema";
-import type { RegisterResponse } from "../types/auth.type";
+import { registerVoterOrCandidateSchema } from "../schemas/auth.schemas";
+import type {
+  RegisterVoterOrCandidateResponseDTO,
+  RegisterVoterOrCandidateRequestDTO,
+} from "../types/auth.types";
 import type { AppError } from "../api/api";
 
 type RegisterFormProps = {
   roleTitle: "Voter" | "Candidate";
   tokenLabel: string;
-  submitFn: (payload: RegisterRequest) => Promise<RegisterResponse>;
+  submitFn: (
+    payload: RegisterVoterOrCandidateRequestDTO,
+  ) => Promise<RegisterVoterOrCandidateResponseDTO>;
 };
 
 export const RegisterForm = ({
@@ -24,8 +29,8 @@ export const RegisterForm = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterRequest>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<RegisterVoterOrCandidateRequestDTO>({
+    resolver: zodResolver(registerVoterOrCandidateSchema),
   });
 
   // Mutation handling network state
@@ -33,7 +38,11 @@ export const RegisterForm = ({
     mutateAsync,
     isPending,
     error: mutationError,
-  } = useMutation<RegisterResponse, AppError, RegisterRequest>({
+  } = useMutation<
+    RegisterVoterOrCandidateResponseDTO,
+    AppError,
+    RegisterVoterOrCandidateRequestDTO
+  >({
     mutationFn: submitFn,
     onSuccess: (data) => {
       toast.success(data.message || "Registration successful! Please sign in.");
@@ -44,7 +53,7 @@ export const RegisterForm = ({
     },
   });
 
-  const onSubmit = async (data: RegisterRequest) => {
+  const onSubmit = async (data: RegisterVoterOrCandidateRequestDTO) => {
     try {
       await mutateAsync(data);
     } catch {

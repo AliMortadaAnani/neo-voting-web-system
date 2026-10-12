@@ -14,10 +14,8 @@ export const loginSchema = z.object({
     .max(100, "Password cannot exceed 100 characters"),
 });
 
-export type LoginRequest = z.infer<typeof loginSchema>;
-
 // --- Unified Registration Schema (Voter & Candidate) ---
-export const registerSchema = z
+export const registerVoterOrCandidateSchema = z
   .object({
     userName: z
       .string()
@@ -43,5 +41,3 @@ export const registerSchema = z
     message: "NewPassword and ConfirmPassword must match",
     path: ["confirmPassword"], // Attaches error directly to the confirmPassword field
   });
-
-export type RegisterRequest = z.infer<typeof registerSchema>;

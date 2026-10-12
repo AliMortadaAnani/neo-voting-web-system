@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { ROLE_HOME } from "../utils/jwt";
-import type { Role } from "../types/auth.type";
+import type { Role } from "../types/auth.types";
 
 type RoleRouteProps = {
   allowedRole: Role;

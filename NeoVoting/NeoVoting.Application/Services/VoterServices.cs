@@ -195,5 +195,54 @@ namespace NeoVoting.Application.Services
 
             return Result<PagedResult<CandidateProfile_ResponseDTO>>.Success(pagedResult);
         }
+
+        public async Task<Result<bool>> HasVoterCastedVoteInElectionAsync(int electionId)
+        {
+            var election = await _electionRepository.GetByIdAsync(electionId);
+            if (election == null)
+            {
+                return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Election_NotFound), "Election not found."));
+            }
+
+            if(election.Status != StatusEnum.Voting)
+            {
+                return Result<bool>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.ElectionInvalidState), "Election is not in voting phase."));
+            }
+            int currentUserId = (int)_currentUserServices.AccountId!;
+
+            if (await _eventParticipationRepository.HasVoterVotedByVoterIdAndElectionIdAsync(currentUserId, electionId))
+            {
+                return Result<bool>.Success(true);
+            }
+
+
+
+            
+
+            return Result<bool>.Success(false);
+        }
+
+        public async Task<Result<bool>> HasVoterCastedVoteInPollAsync(int pollId)
+        {
+            var poll = await _pollRepository.GetByIdAsync(pollId);
+            if (poll == null)
+            {
+                return Result<bool>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Poll_NotFound), "Poll not found."));
+            }
+
+            if (poll.Status != StatusEnum.Voting)
+            {
+                return Result<bool>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.PollInvalidState), "Poll is not in voting phase."));
+            }
+
+            int currentUserId = (int)_currentUserServices.AccountId!;
+
+            if (await _eventParticipationRepository.HasVoterVotedByVoterIdAndPollIdAsync(currentUserId, pollId))
+            {
+                return Result<bool>.Success(true);
+            }
+
+            return Result<bool>.Success(false);
+        }
     }
 }

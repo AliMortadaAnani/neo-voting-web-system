@@ -1,9 +1,10 @@
-import type { Role } from "../types/auth.type";
+import type { Role } from "../types/auth.types";
+//export type Role = "Admin" | "Voter" | "Candidate";
 
 export type UserClaims = {
   role: Role;
   appUserId: number;
-  accountId?: number;
+  accountId?: number | null;
   username: string;
 };
 
@@ -60,9 +61,7 @@ export const decodeUser = (token: string): UserClaims | null => {
     return {
       role,
       appUserId: Number(rawUserId),
-      accountId: payload["accountId"]
-        ? Number(payload["accountId"])
-        : undefined,
+      accountId: payload["accountId"] ? Number(payload["accountId"]) : null,
       username,
     };
   } catch {

@@ -1,25 +1,31 @@
 import { api } from "../api/api";
-import type { AuthResponse, RegisterResponse } from "../types/auth.type";
-import type { LoginRequest, RegisterRequest } from "../schemas/auth.schema";
+import type {
+  AuthResponseDTO,
+  RegisterVoterOrCandidateResponseDTO,
+  LoginRequestDTO,
+  RegisterVoterOrCandidateRequestDTO,
+} from "../types/auth.types";
 
-export const login = async (payload: LoginRequest): Promise<AuthResponse> => {
-  return api.post("/Auth/login", payload);
+export const login = async (
+  payload: LoginRequestDTO,
+): Promise<AuthResponseDTO> => {
+  return (await api.post("/Auth/login", payload)).data;
 };
 
 export const logout = async (): Promise<void> => {
-  return api.post("/Auth/logout");
+  return (await api.post("/Auth/logout")).data;
 };
 
 export const registerVoter = async (
-  payload: RegisterRequest,
-): Promise<RegisterResponse> => {
-  return api.post("/Auth/register-voter", payload);
+  payload: RegisterVoterOrCandidateRequestDTO,
+): Promise<RegisterVoterOrCandidateResponseDTO> => {
+  return (await api.post("/Auth/register-voter", payload)).data;
 };
 
 export const registerCandidate = async (
-  payload: RegisterRequest,
-): Promise<RegisterResponse> => {
-  return api.post("/Auth/register-candidate", payload);
+  payload: RegisterVoterOrCandidateRequestDTO,
+): Promise<RegisterVoterOrCandidateResponseDTO> => {
+  return (await api.post("/Auth/register-candidate", payload)).data;
 };
 
 // --- Role Verification Endpoints ---

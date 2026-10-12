@@ -61,3 +61,5 @@ pnpm-lock.yaml
 
 # Ignore all files uploaded by users at runtime
 /wwwroot/uploads/
+
+/Epsilon_Project

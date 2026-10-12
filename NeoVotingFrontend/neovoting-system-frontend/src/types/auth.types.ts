@@ -1,8 +1,14 @@
+import { z } from "zod";
+import {
+  loginSchema,
+  registerVoterOrCandidateSchema,
+} from "../schemas/auth.schemas";
+
 export type Role = "Admin" | "Voter" | "Candidate";
 
-export type AuthResponse = {
+export type AuthResponseDTO = {
   accessToken: string;
-  refreshToken?: string;
+  refreshToken: string;
   accessTokenExpiration: string;
   refreshTokenExpiration: string;
 
@@ -18,7 +24,7 @@ export type AuthResponse = {
   role: Role;
 };
 
-export type RegisterResponse = {
+export type RegisterVoterOrCandidateResponseDTO = {
   applicationUserId: number;
   accountId: number;
   userName: string;
@@ -31,5 +37,7 @@ export type RegisterResponse = {
   message?: string;
 };
 
-//type LoginRequest is exported from src/schemas/auth.schema.ts
-//type RegisterRequest is exported from src/schemas/auth.schema.ts
+export type LoginRequestDTO = z.infer<typeof loginSchema>;
+export type RegisterVoterOrCandidateRequestDTO = z.infer<
+  typeof registerVoterOrCandidateSchema
+>;

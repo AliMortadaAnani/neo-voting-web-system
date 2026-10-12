@@ -167,6 +167,7 @@ namespace GovernmentSystem.API.StartupExtensions
                 //    // Automatically convert ALL enums to their string names in JSON responses
                 //    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 //});
+                //off to make it easy for Neovoting api to receive enums as int
 
             builder.Services.AddEndpointsApiExplorer();
 

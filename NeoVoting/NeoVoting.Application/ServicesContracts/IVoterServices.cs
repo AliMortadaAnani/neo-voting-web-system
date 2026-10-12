@@ -12,5 +12,10 @@ namespace NeoVoting.Application.ServicesContracts
         Task<Result<ElectionVoteLog_ResponseDTO>> CastVoteInElectionAsync(int electionId, Voter_Cast_In_Election_RequestDTO voter_Cast_In_Election_RequestDTO);
 
         Task<Result<PollVoteLog_ResponseDTO>> CastVoteInPollAsync(int pollId, Voter_Cast_In_Poll_RequestDTO voter_Cast_In_Poll_RequestDTO);
+
+        Task<Result<bool>> HasVoterCastedVoteInElectionAsync(int electionId);
+
+        Task<Result<bool>> HasVoterCastedVoteInPollAsync(int pollId);
+
     }
 }

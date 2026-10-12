@@ -9,6 +9,8 @@ import { VoterPage } from "./pages/VoterPage";
 import { CandidatePage } from "./pages/CandidatePage";
 import { RegisterVoterPage } from "./pages/RegisterVoterPage";
 import { RegisterCandidatePage } from "./pages/RegisterCandidatePage";
+import { StatsPage } from "./pages/StatsPage";
+import { AboutPage } from "./pages/AboutPage";
 // --- Local Placeholder Components ---
 
 import { LoginPage } from "./pages/LoginPage";
@@ -55,8 +57,8 @@ export function App() {
             </Route>
 
             {/* ZONE 2: Universal Open Routes (Auth & Non-Auth) */}
-            <Route path="/about" element={<AboutPagePlaceholder />} />
-            <Route path="/stats" element={<StatsPagePlaceholder />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/stats" element={<StatsPage />} />
 
             {/* ZONE 3: Role-Protected Routes (Authenticated) */}
             <Route element={<RoleRoute allowedRole="Admin" />}>

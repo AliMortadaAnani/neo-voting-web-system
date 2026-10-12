@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
-import { loginSchema, type LoginRequest } from "../schemas/auth.schema";
+import { loginSchema } from "../schemas/auth.schemas";
+import type { LoginRequestDTO } from "../types/auth.types";
 import { useAuth } from "../hooks/useAuth";
 import { ROLE_HOME } from "../utils/jwt";
 
@@ -13,20 +14,21 @@ export const LoginPage = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginRequest>({
+  } = useForm<LoginRequestDTO>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginRequest) => {
+  const onSubmit = async (data: LoginRequestDTO) => {
     try {
       // 1. Submit login and decode claims
       const claims = await login(data);
-
+      console.log("Decoded JWT Claims:", claims);
       // 2. Dynamically redirect based on role (Admin -> /admin, Voter -> /voter, etc.)
       navigate(ROLE_HOME[claims.role], { replace: true });
     } catch {
       // Error toast fires automatically via useAuth
       // loginError banner updates automatically below
+      console.error("Login failed. Check credentials or server status.");
     }
   };
 

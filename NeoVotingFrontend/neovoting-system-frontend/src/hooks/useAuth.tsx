@@ -17,8 +17,7 @@ import {
 
 import { decodeUser, type UserClaims } from "../utils/jwt";
 import { login, logout } from "../services/auth.services";
-import type { AuthResponse } from "../types/auth.type";
-import type { LoginRequest } from "../schemas/auth.schema";
+import type { AuthResponseDTO, LoginRequestDTO } from "../types/auth.types";
 import type { AppError } from "../api/api";
 
 // --- 1. Context: Strictly stores claims ---
@@ -72,23 +71,26 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
 
   // Login Mutation: TanStack Query handles network, loading, and error states
-  const loginMutation = useMutation<AuthResponse, AppError, LoginRequest>({
-    mutationFn: login,
-    onSuccess: (data) => {
-      setAccessToken(data.accessToken);
+  const loginMutation = useMutation<AuthResponseDTO, AppError, LoginRequestDTO>(
+    {
+      mutationFn: login,
+      onSuccess: (data) => {
+        setAccessToken(data.accessToken);
+        console.log("Access Token received:", data.accessToken);
+        const claims = decodeUser(data.accessToken);
+        console.log("Decoded JWT Claims:", claims);
+        if (!claims?.role) {
+          throw new Error("Invalid token claims received from server.");
+        }
 
-      const claims = decodeUser(data.accessToken);
-      if (!claims?.role) {
-        throw new Error("Invalid token claims received from server.");
-      }
-
-      setUser(claims);
-      toast.success(`Welcome, ${claims.username}!`);
+        setUser(claims);
+        toast.success(`Welcome, ${claims.username}!`);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
     },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  );
 
   // Logout Mutation: Clears storage, wipes memory/cache, resets claims
   const logoutMutation = useMutation<void, AppError, void>({

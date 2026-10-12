@@ -67,12 +67,16 @@ api.interceptors.response.use(
     // The ONLY two endpoints that must never trigger a refresh:
     // 1. /Auth/login (bad credentials is not an expired session)
     // 2. /Auth/refresh-token (prevents infinite refresh loops)
+    // 3. /Auth/register (new user registration)
+
+    // all these returning 401, means user credentials are invalid, so we should not attempt to refresh the token
+
     const isAuthEndpoint =
       url.includes("/auth/login") ||
       url.includes("/auth/refresh-token") ||
       url.includes("/auth/register");
 
-    // B. If 401 on any protected action and we haven't retried yet:
+    //If 401 on any protected action and we haven't retried yet:
     if (status === 401 && !isAuthEndpoint && !originalRequest._retry) {
       originalRequest._retry = true; // Stamp: "Tried once"
 
@@ -98,7 +102,7 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         // Re-execute original request seamlessly
-        return api(originalRequest);
+        return api(originalRequest); //_retry flag is still true here,same config for the recall request, so if it fails again, it will not attempt to refresh again
       } catch (refreshError) {
         // Refresh token expired or invalid -> clear storage and kick to /login
         clearAccessToken();

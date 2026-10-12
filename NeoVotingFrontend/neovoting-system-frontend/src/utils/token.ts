@@ -1,4 +1,4 @@
-const ACCESS_TOKEN_KEY = "voting_access_token";
+const ACCESS_TOKEN_KEY = "neovoting_access_token";
 
 export const getAccessToken = (): string | null => {
   return localStorage.getItem(ACCESS_TOKEN_KEY);

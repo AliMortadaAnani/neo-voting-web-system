@@ -8,7 +8,7 @@
 
         public string HashedData { get; private set; } = string.Empty;
 
-        public int CitizenId { get; private set; }
+        public int CitizenId { get; private set; } //we just assign the fk_id and ef will handle the relationship and navigation property
         public Citizen Citizen { get; private set; } = null!;
 
         private Candidate()
