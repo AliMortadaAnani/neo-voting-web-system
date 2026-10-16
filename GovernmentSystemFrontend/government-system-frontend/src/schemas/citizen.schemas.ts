@@ -1,28 +1,5 @@
 import { z } from "zod";
-
-const beAtLeast18YearsOld = (dobString: string) => {
-  if (!dobString) return false;
-  const [year, month, day] = dobString.split("-").map(Number);
-  if (!year || !month || !day) return false;
-
-  const dob = new Date(year, month - 1, day);
-  if (
-    dob.getFullYear() !== year ||
-    dob.getMonth() !== month - 1 ||
-    dob.getDate() !== day
-  ) {
-    return false;
-  }
-
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  return age >= 18;
-};
+import { isAtLeast18 } from "../utils/utilities";
 
 const citizenFormSchema = z.object({
   nationalId: z
@@ -43,7 +20,7 @@ const citizenFormSchema = z.object({
   dateOfBirth: z
     .string()
     .min(1, "Date of birth is required")
-    .refine(beAtLeast18YearsOld, {
+    .refine(isAtLeast18, {
       message: "The citizen must be at least 18 years old.",
     }),
   governorate: z

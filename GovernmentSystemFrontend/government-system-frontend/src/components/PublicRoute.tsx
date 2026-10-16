@@ -1,25 +1,33 @@
 // components/PublicRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuthCheck } from "../hooks/useAuth";
-import { AuthStatus } from "./AuthStatus";
+import { ErrorState } from "./ErrorState";
+import { LoadingSpinner } from "./LoadingSpinner";
+import { PublicLayout } from "./PublicLayout";
 
 export const PublicRoute = () => {
   const { isAuthenticated, isCheckingAuth, isAuthError, authError } =
     useAuthCheck();
 
-  if (isCheckingAuth || (isAuthError && authError?.status !== 401)) {
+  if (isCheckingAuth) {
     return (
-      <AuthStatus
-        isCheckingAuth={isCheckingAuth}
-        isAuthError={isAuthError}
-        authError={authError}
-      />
+      <LoadingSpinner label="Checking authentication..." fullScreen={true} />
     );
+  }
+
+  // if the error is not a 401 error, we will show the error state (general error page)
+  if (isAuthError && authError?.status !== 401) {
+    return <ErrorState error={authError} fullScreen={true} />;
   }
 
   if (isAuthenticated) {
     return <Navigate to="/citizens" replace />;
   }
-
-  return <Outlet />;
+  return (
+    <>
+      <PublicLayout>
+        <Outlet />
+      </PublicLayout>
+    </>
+  );
 };

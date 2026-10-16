@@ -8,7 +8,7 @@ namespace NeoVoting.Application.Validators.AuthDTOs
         public Authentication_ResponseDTOValidator()
         {
             RuleFor(x => x.AccessToken).NotEmpty();
-            RuleFor(x => x.RefreshToken).NotEmpty();
+            //RuleFor(x => x.RefreshToken).NotEmpty(); // we should not return the refresh token in the response body
             RuleFor(x => x.AccessTokenExpiration).NotNull();
             RuleFor(x => x.RefreshTokenExpiration).NotNull();
             RuleFor(x => x.ApplicationUserId).NotNull();

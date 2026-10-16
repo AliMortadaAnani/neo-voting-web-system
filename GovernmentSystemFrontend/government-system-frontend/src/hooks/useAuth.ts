@@ -14,12 +14,14 @@ export const useAuthCheck = () => {
     queryKey: ["auth", "me"],
     queryFn: getMe,
     retry: false, // Don't retry on 401
-    staleTime: 1000 * 60 * 15, // 15 minutes
+    staleTime: 1000 * 60, // 1 minute
   });
 
   return {
-    user,
-    isAuthenticated: !!user?.isSuccess,
+    user, //for checking auth state we will rely on isAuthenticated
+    // for user info we will rely on user state
+    isAuthenticated: !!user?.isSuccess, // equivalent to user?.isSuccess ?? false
+    // if user is null or undefined, isAuthenticated will be false
     isCheckingAuth,
     isAuthError,
     authError,

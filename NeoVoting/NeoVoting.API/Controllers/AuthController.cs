@@ -39,12 +39,13 @@ namespace NeoVoting.API.Controllers
             {
                 _logger.LogInformation("User login successful for: {UserName}", loginDTO.UserName);
                 SetRefreshTokenCookie(result.Value.RefreshToken!);
+                result.Value.RefreshToken = "The refresh token is in httpOnly cookie buddy!"; // Clear the refresh token from the response DTO to avoid sending it back in the response body
             }
             else
             {
                 _logger.LogWarning("User login failed for {UserName}: {Error}", loginDTO.UserName, result.Error.Description);
             }
-
+           
             return HandleResult(result);
         }
 
@@ -99,12 +100,13 @@ namespace NeoVoting.API.Controllers
             {
                 _logger.LogInformation("Refresh token generated successfully");
                 SetRefreshTokenCookie(result.Value.RefreshToken!);
+                result.Value.RefreshToken = "The refresh token is in httpOnly cookie buddy!"; // Clear the refresh token from the response DTO to avoid sending it back in the response body
             }
             else
             {
                 _logger.LogWarning("Refresh token failed: {Error}", result.Error.Description);
             }
-
+           
             return HandleResult(result);
         }
 

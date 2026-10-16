@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export type ProblemDetails = {
   type?: string; // code property in AppError
@@ -10,6 +11,7 @@ export type ProblemDetails = {
   traceId?: string; // not used
 };
 
+//an extended error from the inital JS Error object
 export type AppError = Error & {
   code?: string; // type from ProblemDetails
   status?: number;
@@ -40,6 +42,7 @@ api.interceptors.response.use(
       offlineError.status = 0;
       offlineError.errors = {};
 
+      toast.error(message); // Show a toast notification for network errors
       return Promise.reject(offlineError);
     }
 

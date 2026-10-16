@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { PagedResult } from "./citizen.types";
+import type { Governorate, PagedResult } from "./citizen.types";
 import { voterFormSchema } from "../schemas/voter.schemas";
 
 export type VoterResponseDTO = {
@@ -11,7 +11,7 @@ export type VoterResponseDTO = {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  governorate: number;
+  governorate: Governorate;
   gender: "M" | "F" | string;
 };
 
