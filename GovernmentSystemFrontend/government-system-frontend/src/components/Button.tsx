@@ -35,7 +35,9 @@ export const Button = ({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center justify-center rounded-lg font-semibold ${colorStyles[color]} ${sizeStyles[size]} ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+      /* CRITICAL: disables real click events in the browser when loading */
+      disabled={isLoading}
+      className={`inline-flex cursor-pointer items-center justify-center rounded-lg font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${colorStyles[color]} ${sizeStyles[size]} `}
     >
       {label}
     </button>

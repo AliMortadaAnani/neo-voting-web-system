@@ -27,7 +27,7 @@ export const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
       <Navbar
         items={protectedItems}
         user={user}
-        LogoutAction={() => logout()}
+        onLogout={() => logout()}
         isLoggingOut={isLoggingOut}
       />
 
