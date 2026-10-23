@@ -26,7 +26,6 @@ export const Footer = ({ items }: FooterProps) => {
             <Link
               key={item.to}
               to={item.to}
-              state={{ from: window.location.pathname }}
               className="text-xs font-medium text-gray-600 transition-colors hover:text-emerald-700"
             >
               {item.label}

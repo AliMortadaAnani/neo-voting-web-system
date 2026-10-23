@@ -6,14 +6,14 @@ export const AboutPage = () => {
   const handleBack = useGoBack();
 
   return (
-    <div className="mx-auto w-full max-w-3xl py-4">
+    <div className="mx-auto flex w-full max-w-3xl flex-col items-start gap-6 py-4 md:flex-row">
       {/* Sticky Return Button at Top Left */}
-      <div className="top-20 z-10 mb-4 flex justify-start">
+      <div className="sticky top-5 z-10 mb-4 flex shrink-0 justify-start">
         <Button label="← Return" onClick={handleBack} color="stone" size="sm" />
       </div>
 
       {/* Main Content Card */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <div className="flex-1 rounded-xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         {/* Red Title Accent */}
         <h1 className="text-2xl font-bold text-red-600">About GovPortal</h1>
 
@@ -28,6 +28,69 @@ export const AboutPage = () => {
             GovPortal is an integrated administrative platform engineered to
             modernize civil identity records and electoral operations for the
             Republic of Lebanon.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
+          </p>
+          <p>
+            The system manages foundational civil registration across all five
+            governorates, enables eligible citizens to enroll as voters, issues
+            tamper-evident cryptographic voting and nomination tokens, and
+            supervises parliamentary candidate nominations under a secure,
+            auditable digital architecture.
           </p>
           <p>
             The system manages foundational civil registration across all five

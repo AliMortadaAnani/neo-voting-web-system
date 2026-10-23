@@ -4,7 +4,8 @@ import { Navbar, type NavItem } from "../../components/general/Navbar";
 import { Footer } from "../../components/general/Footer";
 import { useAuth, useAuthCheck } from "../../hooks/useAuth";
 import { LoadingSpinner } from "../../components/general/LoadingSpinner";
-
+import { Button } from "./Button";
+import { useGoBack } from "../../hooks/useUtils";
 type ProtectedLayoutProps = {
   children: React.ReactNode;
 };
@@ -12,7 +13,7 @@ type ProtectedLayoutProps = {
 export const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
   const { logout, isLoggingOut } = useAuth();
   const { user } = useAuthCheck();
-
+  const handleBack = useGoBack();
   // Protected Admin Navigation Links
   const protectedItems: NavItem[] = [
     { label: "Citizens", to: "/citizens" },
@@ -36,6 +37,15 @@ export const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
       ) : (
         /* Main Dashboard Content Area */
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          {/* Sticky Return Button at Top  */}
+          <div className="sticky top-20 z-10 flex justify-end">
+            <Button
+              label="← Return"
+              onClick={handleBack}
+              color="green"
+              size="sm"
+            />
+          </div>
           {children}
         </main>
       )}

@@ -9,8 +9,8 @@ type FeatureCardProps = {
 export const FeatureCard = ({ label, link }: FeatureCardProps) => {
   return (
     <Link
+      key={link}
       to={link}
-      state={{ from: window.location.pathname }}
       /*
         'group' allows child elements (like the text and arrow) to react when the parent card is hovered.
         'block w-full' ensures it adapts naturally to flex columns or grid slots set by the parent.

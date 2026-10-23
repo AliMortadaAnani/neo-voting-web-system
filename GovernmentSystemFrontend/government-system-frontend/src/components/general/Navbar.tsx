@@ -53,7 +53,6 @@ export const Navbar = ({
               <NavLink
                 key={item.to}
                 to={item.to}
-                state={{ from: window.location.pathname }}
                 className={({ isActive }) =>
                   `text-xs font-medium transition-colors sm:text-sm ${
                     isActive

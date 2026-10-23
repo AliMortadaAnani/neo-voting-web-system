@@ -49,12 +49,23 @@ export const useCitizens = (page = 1, pageSize = 10) => {
 };
 
 export const useCitizen = (dto: CitizenFetchRequestDTO | null) => {
-  return useQuery<CitizenResponseDTO, AppError>({
+  const {
+    data: citizen,
+    isLoading: isFetchingCitizen,
+    isError: isFetchCitizenError,
+    error: fetchCitizenError,
+  } = useQuery<CitizenResponseDTO, AppError>({
     queryKey: citizenKeys.detail(dto?.nationalId ?? ""),
     queryFn: () => getCitizenDetails(dto!),
     enabled: Boolean(dto?.nationalId && dto?.nationalId.trim().length > 0),
     staleTime: 1000 * 60,
   });
+  return {
+    citizen,
+    isFetchingCitizen,
+    isFetchCitizenError,
+    fetchCitizenError,
+  };
 };
 
 export const useCitizensTotalCount = () => {

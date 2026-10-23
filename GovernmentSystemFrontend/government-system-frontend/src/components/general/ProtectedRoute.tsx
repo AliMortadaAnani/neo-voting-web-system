@@ -1,5 +1,5 @@
 // components/ProtectedRoute.tsx
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuthCheck } from "../../hooks/useAuth";
 import { ServerErrorState } from "./ServerErrorState";
 import { ProtectedLayout } from "./ProtectedLayout";
@@ -8,8 +8,6 @@ import { LoadingSpinner } from "./LoadingSpinner";
 export const ProtectedRoute = () => {
   const { isAuthenticated, isCheckingAuth, isAuthError, authError } =
     useAuthCheck();
-
-  const location = useLocation();
 
   if (isCheckingAuth) {
     return (
@@ -23,8 +21,8 @@ export const ProtectedRoute = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  } // from location is used to redirect the user back to the page they were trying to access after they log in
+    return <Navigate to="/login" replace />;
+  } // state={{ from: location }} is used to redirect the user back to the page they were trying to access after they log in // LATER
 
   return (
     <>
