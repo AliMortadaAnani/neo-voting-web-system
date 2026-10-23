@@ -1,7 +1,7 @@
 // components/Navbar.tsx
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "./Button";
-import type { AuthResponseDTO } from "../types/auth.types";
+import type { AuthResponseDTO } from "../../types/auth.types";
 
 export type NavItem = {
   label: string;

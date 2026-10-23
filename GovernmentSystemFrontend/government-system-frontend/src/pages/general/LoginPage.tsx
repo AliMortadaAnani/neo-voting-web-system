@@ -1,15 +1,15 @@
-// pages/LoginPage.tsx
+// pages/general/LoginPage.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "../schemas/auth.schemas";
-import type { LoginRequestDTO } from "../types/auth.types";
-import { useAuth } from "../hooks/useAuth";
-import { Button } from "../components/Button";
-import { InputField } from "../components/InputField";
-import { FormCard } from "../components/FormCard";
+import { loginSchema } from "../../schemas/auth.schemas";
+import type { LoginRequestDTO } from "../../types/auth.types";
+import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../../components/general/Button";
+import { InputField } from "../../components/general/InputField";
+import { FormCard } from "../../components/general/FormCard";
 
 export const LoginPage = () => {
-  const { login, isLoggingIn, loginResponse } = useAuth();
+  const { login, isLoggingIn } = useAuth();
 
   const {
     register,
@@ -23,7 +23,7 @@ export const LoginPage = () => {
     },
   });
 
-  const onSubmit = async (data: LoginRequestDTO) => {
+  const onSubmit = (data: LoginRequestDTO) => {
     login(data);
   };
 
@@ -64,12 +64,8 @@ export const LoginPage = () => {
             size="md"
             isLoading={isLoggingIn}
           />
+          {/* here no need for OnClick since button in a form will submit the form automatically */}
         </div>
-        {loginResponse && (
-          <p className="text-sm font-medium text-emerald-600">
-            {loginResponse.role}
-          </p>
-        )}
       </form>
     </FormCard>
   );

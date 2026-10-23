@@ -1,5 +1,3 @@
-// components/Button.tsx
-
 type ButtonColor = "green" | "red" | "stone";
 type ButtonSize = "sm" | "md" | "lg";
 
@@ -35,7 +33,6 @@ export const Button = ({
   return (
     <button
       onClick={onClick}
-      /* CRITICAL: disables real click events in the browser when loading */
       disabled={isLoading}
       className={`inline-flex cursor-pointer items-center justify-center rounded-lg font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${colorStyles[color]} ${sizeStyles[size]} `}
     >

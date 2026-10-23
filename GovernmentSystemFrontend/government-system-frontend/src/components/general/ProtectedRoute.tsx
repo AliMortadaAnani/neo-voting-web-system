@@ -1,7 +1,7 @@
 // components/ProtectedRoute.tsx
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuthCheck } from "../hooks/useAuth";
-import { ErrorState } from "./ErrorState";
+import { useAuthCheck } from "../../hooks/useAuth";
+import { ServerErrorState } from "./ServerErrorState";
 import { ProtectedLayout } from "./ProtectedLayout";
 import { LoadingSpinner } from "./LoadingSpinner";
 
@@ -19,7 +19,7 @@ export const ProtectedRoute = () => {
 
   // if the error is not a 401 error, we will show the error state (general error page)
   if (isAuthError && authError?.status !== 401) {
-    return <ErrorState error={authError} fullScreen={true} />;
+    return <ServerErrorState error={authError} fullScreen={true} />;
   }
 
   if (!isAuthenticated) {

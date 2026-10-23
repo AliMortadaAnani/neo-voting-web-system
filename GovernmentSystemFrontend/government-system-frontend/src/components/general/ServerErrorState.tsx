@@ -1,13 +1,15 @@
-// components/ErrorState.tsx
-import type { AppError } from "../api/api";
+import type { AppError } from "../../api/api";
 import { Button } from "./Button";
 
-type ErrorStateProps = {
+type ServerErrorStateProps = {
   error?: AppError | null;
   fullScreen?: boolean;
 };
 
-export const ErrorState = ({ error, fullScreen = true }: ErrorStateProps) => {
+export const ServerErrorState = ({
+  error,
+  fullScreen = true,
+}: ServerErrorStateProps) => {
   const isOffline = error?.status === 0;
   const title = isOffline ? "Server Unreachable" : "Server Error";
   const message = isOffline

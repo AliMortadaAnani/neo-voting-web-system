@@ -1,7 +1,7 @@
 // layouts/PublicLayout.tsx
 import React from "react";
-import { Navbar, type NavItem } from "../components/Navbar";
-import { Footer } from "../components/Footer";
+import { Navbar, type NavItem } from "../../components/general/Navbar";
+import { Footer } from "../../components/general/Footer";
 
 type PublicLayoutProps = {
   children: React.ReactNode;

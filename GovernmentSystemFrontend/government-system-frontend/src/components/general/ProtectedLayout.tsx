@@ -1,9 +1,9 @@
 // layouts/ProtectedLayout.tsx
 import React from "react";
-import { Navbar, type NavItem } from "../components/Navbar";
-import { Footer } from "../components/Footer";
-import { useAuth, useAuthCheck } from "../hooks/useAuth";
-import { LoadingSpinner } from "../components/LoadingSpinner";
+import { Navbar, type NavItem } from "../../components/general/Navbar";
+import { Footer } from "../../components/general/Footer";
+import { useAuth, useAuthCheck } from "../../hooks/useAuth";
+import { LoadingSpinner } from "../../components/general/LoadingSpinner";
 
 type ProtectedLayoutProps = {
   children: React.ReactNode;

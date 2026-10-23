@@ -1,19 +1,9 @@
-// pages/AboutPage.tsx
-import { useNavigate, useLocation } from "react-router-dom";
-import { Button } from "../components/Button";
+// pages/general/AboutPage.tsx
+import { Button } from "../../components/general/Button";
+import { useGoBack } from "../../hooks/useUtils";
 
 export const AboutPage = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Return to previous route from location state, or fallback to history back (-1)
-  const handleBack = () => {
-    if (location.state?.from) {
-      navigate(location.state.from);
-    } else {
-      navigate(-1);
-    }
-  };
+  const handleBack = useGoBack();
 
   return (
     <div className="mx-auto w-full max-w-3xl py-4">

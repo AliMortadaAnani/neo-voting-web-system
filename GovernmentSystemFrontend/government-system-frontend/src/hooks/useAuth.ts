@@ -35,7 +35,7 @@ export const useAuth = () => {
     {
       mutationFn: login,
       onSuccess: (data) => {
-        // queryClient.setQueryData(["auth", "me"], data);
+        queryClient.setQueryData(["auth", "me"], data);
         toast.success(data.message || "Welcome!");
       },
       onError: (error: AppError) => {
@@ -62,7 +62,7 @@ export const useAuth = () => {
     isLoggingIn: loginMutation.isPending,
     isLoginError: loginMutation.isError,
     loginError: loginMutation.error,
-    loginResponse: loginMutation.data,
+    //loginResponse: loginMutation.data,
     logout: logoutMutation.mutate,
     logoutAsync: logoutMutation.mutateAsync,
     isLoggingOut: logoutMutation.isPending,
