@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using NeoVoting.Application.ServicesContracts;
 using System.Security.Claims;
 
@@ -7,10 +8,12 @@ namespace NeoVoting.Application.Services
     public class CurrentUserServices : ICurrentUserServices
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<CurrentUserServices> _logger;
 
-        public CurrentUserServices(IHttpContextAccessor httpContextAccessor)
+        public CurrentUserServices(IHttpContextAccessor httpContextAccessor, ILogger<CurrentUserServices> logger)
         {
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         private ClaimsPrincipal? User => _httpContextAccessor.HttpContext?.User;
@@ -19,11 +22,18 @@ namespace NeoVoting.Application.Services
         {
             get
             {
-                // Check both standard NameIdentifier (sub) and custom claim name if applicable
+                _logger.LogInformation("Resolving application user ID from the current request claims.");
                 var value = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                             ?? User?.FindFirst("applicationUserId")?.Value;
 
-                return int.TryParse(value, out var result) ? result : null;
+                if (int.TryParse(value, out var parsed))
+                {
+                    _logger.LogInformation("Application user ID resolution result: {Result}", parsed);
+                    return parsed;
+                }
+
+                _logger.LogInformation("Application user ID resolution result: <none>");
+                return null;
             }
         }
 
@@ -31,8 +41,16 @@ namespace NeoVoting.Application.Services
         {
             get
             {
+                _logger.LogInformation("Resolving account ID from the current request claims.");
                 var value = User?.FindFirst("accountId")?.Value;
-                return int.TryParse(value, out var result) ? result : null;
+                if (int.TryParse(value, out var parsed))
+                {
+                    _logger.LogInformation("Account ID resolution result: {Result}", parsed);
+                    return parsed;
+                }
+
+                _logger.LogInformation("Account ID resolution result: <none>");
+                return null;
             }
         }
 
@@ -40,10 +58,12 @@ namespace NeoVoting.Application.Services
         {
             get
             {
-                // Checks standard Name claim (or 'unique_name' / 'preferred_username')
-                return User?.FindFirst(ClaimTypes.Name)?.Value
-                       ?? User?.FindFirst("name")?.Value
-                       ?? User?.Identity?.Name;
+                _logger.LogInformation("Resolving username from the current request claims.");
+                var userName = User?.FindFirst(ClaimTypes.Name)?.Value
+                        ?? User?.FindFirst("name")?.Value
+                        ?? User?.Identity?.Name;
+                _logger.LogInformation("Username resolution result: {UserName}", userName ?? "<none>");
+                return userName;
             }
         }
     }

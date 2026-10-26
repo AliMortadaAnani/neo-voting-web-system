@@ -53,6 +53,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<Authentication_ResponseDTO>> LoginAsync(Login_RequestDTO loginDTO)
         {
+            _logger.LogInformation("Login attempt initiated for user {UserName}.", loginDTO.UserName);
             var user = await _userManager.FindByNameAsync(loginDTO.UserName!);
 
             if (user == null)
@@ -160,6 +161,7 @@ namespace NeoVoting.Application.Services
         //[Authorize] (only authenticated users should call this unlike other methods Here)
         public async Task<Result<bool>> LogoutAsync()
         {
+            _logger.LogInformation("Logout initiated for authenticated user {UserId}.", _currentUserServices.ApplicationUserId);
             // 1. Get authenticated user ID (throws if not authenticated)
             // This is safe because the endpoint requires [Authorize]
             // if it throws here, something is very wrong !!!!
@@ -195,6 +197,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<Authentication_ResponseDTO>> RefreshTokenAsync(RefreshToken_RequestDTO? refreshTokenRequestDTO, string? refreshTokenFromCookie, string? accessTokenFromHeader)
         {
+            _logger.LogInformation("Refresh token flow initiated.");
             // 1. Determine which refresh token to use based on your precedence rules:
             //    - If cookie is present, use it.
             //    - Otherwise, fall back to the body token (which might be null/empty).
@@ -332,6 +335,7 @@ namespace NeoVoting.Application.Services
     RegisterVoterOrCandidate_RequestDTO dto,
     RoleTypesEnum role)
         {
+            _logger.LogInformation("Registration attempt started for {Role} user {UserName}.", role, dto.UserName);
             if (await _userManager.FindByNameAsync(dto.UserName!) != null)
                 return Result<RegisterVoterOrCandidate_ResponseDTO>.Failure(
                     Error.Conflict(nameof(ProblemDetails409ErrorTypes.User_DuplicateUsername), "This username is already taken. Please choose a different username."));

@@ -1,4 +1,5 @@
-﻿using NeoVoting.Application.RequestDTOs.CandidateDTOs;
+﻿using Microsoft.Extensions.Logging;
+using NeoVoting.Application.RequestDTOs.CandidateDTOs;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ResponseDTOs.AdminDTOs;
 using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
@@ -16,16 +17,19 @@ namespace NeoVoting.Application.Services
         private readonly ICandidateProfileRepository _candidateProfileRepository;
         private readonly IElectionRepository _electionRepository;
         private readonly ICurrentUserServices _currentUserServices;
+        private readonly ILogger<CandidateServices> _logger;
 
-        public CandidateServices(IUnitOfWork unitOfWork, ICandidateProfileRepository candidateProfileRepository, ICurrentUserServices currentUserServices, IElectionRepository electionRepository)
+        public CandidateServices(IUnitOfWork unitOfWork, ICandidateProfileRepository candidateProfileRepository, ICurrentUserServices currentUserServices, IElectionRepository electionRepository, ILogger<CandidateServices> logger)
         {
             _unitOfWork = unitOfWork;
             _candidateProfileRepository = candidateProfileRepository;
             _currentUserServices = currentUserServices;
             _electionRepository = electionRepository;
+            _logger = logger;
         }
         public async Task<Result<CandidateProfile_ResponseDTO>> CreateCandidateProfileAsync(int electionId, CandidateProfile_Create_RequestDTO candidateRequestDTO)
         {
+            _logger.LogInformation("Creating candidate profile for election {ElectionId}.", electionId);
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {
@@ -65,6 +69,8 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<CandidateProfile_ResponseDTO>> GetCandidateProfileByElectionIdAndCandidateAccountIdAsync(int electionId, int candidateId)
         {
+            _logger.LogInformation("Retrieving candidate profile for election {ElectionId}, candidate {CandidateId}.", electionId, candidateId);
+
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {

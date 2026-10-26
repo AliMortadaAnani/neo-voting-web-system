@@ -35,6 +35,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Cast vote in election {ElectionId}", electionId);
             var result = await _voterServices.CastVoteInElectionAsync(electionId, request);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Election vote created successfully for election {ElectionId}", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Election vote creation failed for election {ElectionId}: {Error}", electionId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -48,6 +56,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Cast vote in poll {PollId}", pollId);
             var result = await _voterServices.CastVoteInPollAsync(pollId, request);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Poll vote created successfully for poll {PollId}", pollId);
+            }
+            else
+            {
+                _logger.LogWarning("Poll vote creation failed for poll {PollId}: {Error}", pollId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -59,6 +75,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Check vote in election {ElectionId}", electionId);
             var result = await _voterServices.HasVoterCastedVoteInElectionAsync(electionId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Vote status check for election {ElectionId} succeeded: {HasVoted}", electionId, result.Value);
+            }
+            else
+            {
+                _logger.LogWarning("Vote status check for election {ElectionId} failed: {Error}", electionId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -70,6 +94,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Check vote in poll {PollId}", pollId);
             var result = await _voterServices.HasVoterCastedVoteInPollAsync(pollId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Vote status check for poll {PollId} succeeded: {HasVoted}", pollId, result.Value);
+            }
+            else
+            {
+                _logger.LogWarning("Vote status check for poll {PollId} failed: {Error}", pollId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 

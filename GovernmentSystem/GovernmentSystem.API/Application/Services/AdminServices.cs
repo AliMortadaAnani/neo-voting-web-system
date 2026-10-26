@@ -29,29 +29,38 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.Admin
 
         public async Task<Result<AuthResponse>> GetCurrentUserAsync()
         {
-            if(_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+            var identity = _httpContextAccessor.HttpContext?.User?.Identity;
+
+            if (identity?.IsAuthenticated == true)
             {
+                var username = identity.Name;
+                _logger.LogInformation("Admin current user resolved successfully for username: {Username}", username);
+
                 return Result<AuthResponse>.Success(new AuthResponse
                 {
                     IsSuccess = true,
                     Message = "Logged in successfully",
-                    Username = CurrentUserName!,
+                    Username = username!,
                     Role = "Admin"
                 });
             }
+
+            _logger.LogWarning("Admin current user lookup failed because no authenticated admin identity was found.");
             //usually, authorization middleware should handle this, but in case it doesn't, we return an unauthorized error
             return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Admin is not authenticated."));
         }
 
         public async Task<Result<AuthResponse>> LoginAsync(LoginDTO loginDTO)
         {
-            _logger.LogInformation("Admin login attempt initiated");
+            _logger.LogInformation("Admin login attempt initiated for username: {Username}", loginDTO.Username);
+
             var user = await _userManager.FindByNameAsync(loginDTO.Username!);
             if (user == null)
             {
-                _logger.LogWarning("Admin login failed - user not found");
+                _logger.LogWarning("Admin login failed - user not found for username: {Username}", loginDTO.Username);
                 return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Invalid admin credentials."));
             }
+
             // This method creates the Set-Cookie header
             var result = await _signInManager.PasswordSignInAsync(
                 user,
@@ -71,16 +80,21 @@ namespace GovernmentSystem.API.Application.ResponseDTOs.Admin
                 });
             }
 
-            _logger.LogWarning("Admin login failed - password sign in unsuccessful");
+            _logger.LogWarning(
+                "Admin login failed for username: {Username}. Sign-in result: {SignInResult}",
+                user.UserName,
+                result);
             return Result<AuthResponse>.Failure(Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Admin_InvalidCredentials), "Invalid admin credentials."));
         }
 
         public async Task<Result<string>> LogoutAsync()
         {
-            _logger.LogInformation("Admin logout initiated");
+            _logger.LogInformation("Admin logout initiated for current authenticated user: {Username}", CurrentUserName);
+
             // This tells the browser to delete the cookie
             await _signInManager.SignOutAsync();
-            _logger.LogInformation("Admin logout successful");
+
+            _logger.LogInformation("Admin logout successful for user: {Username}", CurrentUserName ?? "unknown");
             return Result<string>.Success("Logout Successful");
         }
     }

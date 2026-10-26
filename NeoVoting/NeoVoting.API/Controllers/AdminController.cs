@@ -36,6 +36,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Create election requested");
             var result = await _adminServices.CreateElectionAsync(request);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Election created successfully with name {ElectionName}", request.Name);
+            }
+            else
+            {
+                _logger.LogWarning("Election creation failed: {Error}", result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result, result.IsSuccess);
         }
 
@@ -48,6 +56,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Create poll requested");
             var result = await _adminServices.CreatePollAsync(request);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Poll created successfully with name {PollName}", request.Name);
+            }
+            else
+            {
+                _logger.LogWarning("Poll creation failed: {Error}", result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result, result.IsSuccess);
         }
 
@@ -58,6 +74,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Start election requested - {ElectionId}", electionId);
             var result = await _adminServices.StartElectionAsync(electionId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Election {ElectionId} started successfully", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Start election failed for {ElectionId}: {Error}", electionId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -68,6 +92,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Complete election requested - {ElectionId}", electionId);
             var result = await _adminServices.CompleteElectionAsync(electionId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Election {ElectionId} completed successfully", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Complete election failed for {ElectionId}: {Error}", electionId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -78,6 +110,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Start poll requested - {PollId}", pollId);
             var result = await _adminServices.StartPollAsync(pollId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Poll {PollId} started successfully", pollId);
+            }
+            else
+            {
+                _logger.LogWarning("Start poll failed for {PollId}: {Error}", pollId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -88,6 +128,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Complete poll requested - {PollId}", pollId);
             var result = await _adminServices.CompletePollAsync(pollId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Poll {PollId} completed successfully", pollId);
+            }
+            else
+            {
+                _logger.LogWarning("Complete poll failed for {PollId}: {Error}", pollId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -98,6 +146,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged system audit logs requested");
             var paged = await _adminServices.GetPagedSystemAuditLogsAsync(actionTypesEnum, adminId, pageNumber, pageSize);
+            if (paged.IsSuccess)
+            {
+                _logger.LogInformation("Paged system audit logs retrieved successfully");
+            }
+            else
+            {
+                _logger.LogWarning("Paged system audit logs request failed: {Error}", paged.Error?.Description ?? "Unknown error");
+            }
             return Ok(paged);
         }
     }

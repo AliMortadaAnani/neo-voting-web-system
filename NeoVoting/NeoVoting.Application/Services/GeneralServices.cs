@@ -1,4 +1,5 @@
-﻿using NeoVoting.Application.ResponseDTOs;
+﻿using Microsoft.Extensions.Logging;
+using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ResponseDTOs.AdminDTOs;
 using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
 using NeoVoting.Application.ResponseDTOs.VoterDTOs;
@@ -20,19 +21,22 @@ namespace NeoVoting.Application.Services
 
         private readonly ICandidateProfileRepository _candidateProfileRepository;
         private readonly IPollVoteRepository _pollVoteRepository;
+        private readonly ILogger<GeneralServices> _logger;
 
-        public GeneralServices(IElectionRepository electionRepository, IPollRepository pollRepository, IVoteRepository voteRepository, IPollVoteRepository pollVoteRepository, ICandidateProfileRepository candidateProfileRepository)
+        public GeneralServices(IElectionRepository electionRepository, IPollRepository pollRepository, IVoteRepository voteRepository, IPollVoteRepository pollVoteRepository, ICandidateProfileRepository candidateProfileRepository, ILogger<GeneralServices> logger)
         {
             _electionRepository = electionRepository;
             _pollRepository = pollRepository;
             _voteRepository = voteRepository;
             _pollVoteRepository = pollVoteRepository;
             _candidateProfileRepository = candidateProfileRepository;
+            _logger = logger;
         }
 
 
         public async Task<Result<Election_ResponseDTO>> GetActiveElectionAsync()
         {
+            _logger.LogInformation("Retrieving active election.");
             var activeElection = await _electionRepository.GetActiveElectionAsync();
             if (activeElection == null)
             {
@@ -44,6 +48,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<Poll_ResponseDTO>> GetActivePollAsync()
         {
+            _logger.LogInformation("Retrieving active poll.");
             var activePoll = await _pollRepository.GetActivePollAsync();
             if (activePoll == null)
             {
@@ -55,6 +60,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<PagedResult<CandidateProfile_ResponseDTO>>> GetPagedCandidateResultsForElectionAsync(int electionId, int pageNumber, int pageSize)
         {
+            _logger.LogInformation("Retrieving paged candidate results for election {ElectionId} page {PageNumber} size {PageSize}.", electionId, pageNumber, pageSize);
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {
@@ -103,6 +109,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<PagedResult<Election_ResponseDTO>>> GetPagedElectionsAsync(int pageNumber, int pageSize)
         {
+            _logger.LogInformation("Retrieving paged elections page {PageNumber} size {PageSize}.", pageNumber, pageSize);
             if (pageNumber < 1)
             {
                 return Result<PagedResult<Election_ResponseDTO>>.Failure(
@@ -140,6 +147,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<PagedResult<ElectionVoteLog_ResponseDTO>>> GetPagedElectionVoteLogsAsync(int electionId, int pageNumber, int pageSize)
         {
+            _logger.LogInformation("Retrieving paged election vote logs for election {ElectionId} page {PageNumber} size {PageSize}.", electionId, pageNumber, pageSize);
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {
@@ -195,6 +203,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<PagedResult<Poll_ResponseDTO>>> GetPagedPollsAsync(int pageNumber, int pageSize)
         {
+            _logger.LogInformation("Retrieving paged polls page {PageNumber} size {PageSize}.", pageNumber, pageSize);
             if (pageNumber < 1)
             {
                 return Result<PagedResult<Poll_ResponseDTO>>.Failure(
@@ -232,6 +241,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<PagedResult<PollVoteLog_ResponseDTO>>> GetPagedPollVoteLogsAsync(int pollId, int pageNumber, int pageSize)
         {
+            _logger.LogInformation("Retrieving paged poll vote logs for poll {PollId} page {PageNumber} size {PageSize}.", pollId, pageNumber, pageSize);
             var poll = await _pollRepository.GetByIdAsync(pollId);
             if (poll == null)
             {
@@ -288,6 +298,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<Poll_ResponseDTO>> GetPollResultsAsync(int pollId)
         {
+            _logger.LogInformation("Retrieving poll results for poll {PollId}.", pollId);
             var poll = await _pollRepository.GetByIdAsync(pollId);
             if (poll == null)
             {

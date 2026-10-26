@@ -57,7 +57,9 @@ namespace GovernmentSystem.API.API.Controllers
         [ProducesResponseType(typeof(Unauthorized401ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CurrentUser()
         {
-           // throw new NotImplementedException("This endpoint is not implemented yet.");
+            _logger.LogInformation("Checking Current User attempt initiated");
+
+            // throw new NotImplementedException("This endpoint is not implemented yet.");
             var result = await _adminServices.GetCurrentUserAsync();
             if (result.IsSuccess)
                 _logger.LogInformation("Current user retrieved successfully");

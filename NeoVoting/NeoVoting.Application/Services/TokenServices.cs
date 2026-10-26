@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NeoVoting.Application.ResponseDTOs.AuthDTOs;
 using NeoVoting.Application.ServicesContracts;
@@ -16,10 +17,12 @@ namespace NeoVoting.Application.Services
     public class TokenServices : ITokenServices
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<TokenServices> _logger;
 
-        public TokenServices(IConfiguration configuration)
+        public TokenServices(IConfiguration configuration, ILogger<TokenServices> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         // ==========================================
@@ -107,6 +110,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Authentication_ResponseDTO> CreateAdminTokensAsync(ApplicationUser user)
         {
+            _logger.LogInformation("Creating admin tokens for user {UserName}.", user.UserName);
             var claims = CreateAdminClaims(user);
 
             var accessTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
@@ -134,6 +138,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Authentication_ResponseDTO> CreateCandidateTokensAsync(ApplicationUser user, Candidate candidate)
         {
+            _logger.LogInformation("Creating candidate tokens for candidate {CandidateId}.", candidate.Id);
             var claims = CreateCandidateClaims(user, candidate);
 
             var accessTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
@@ -168,6 +173,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Authentication_ResponseDTO> CreateVoterTokensAsync(ApplicationUser user, Voter voter)
         {
+            _logger.LogInformation("Creating voter tokens for voter {VoterId}.", voter.Id);
             var claims = CreateVoterClaims(user, voter);
 
             var accessTokenExpiry = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JwtSettings:DurationInMinutes"]!));
@@ -203,6 +209,8 @@ namespace NeoVoting.Application.Services
         // 11. Method to read and verify claims from an access token even if its lifetime has lapsed
         public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
         {
+            _logger.LogInformation("Attempting to parse an expired or otherwise non-validated JWT token.");
+
             // 12. Setup strict validation rules, explicitly turning off lifetime checks
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -225,17 +233,18 @@ namespace NeoVoting.Application.Services
                 if (securityToken is not JwtSecurityToken jwtSecurityToken ||
                     !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 {
+                    _logger.LogWarning("JWT validation failed because the token signing algorithm was invalid.");
                     return Result<ClaimsPrincipal>.Failure(
                         Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
                         "Invalid token security algorithm."));
                 }
 
-                // 15. Return the successfully extracted claims principal wrapper
+                _logger.LogInformation("JWT token parsed successfully and principal was created.");
                 return Result<ClaimsPrincipal>.Success(principal);
             }
-            catch
+            catch (Exception ex)
             {
-                // 16. Intercept unexpected parsing/signature crashes and convert them to a clean domain error
+                _logger.LogWarning(ex, "JWT token validation failed while parsing the token.");
                 return Result<ClaimsPrincipal>.Failure(
                     Error.Unauthorized(nameof(ProblemDetails401ErrorTypes.Auth_InvalidToken),
                     "Token is invalid or malformed."));

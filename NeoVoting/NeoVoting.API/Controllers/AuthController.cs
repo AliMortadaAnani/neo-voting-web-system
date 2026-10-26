@@ -172,6 +172,7 @@ namespace NeoVoting.API.Controllers
         [HttpGet("test-admin")]
         public async Task<IActionResult> TestAdmin()
         {
+            _logger.LogInformation("Admin access test endpoint called");
             var result = Result<string>.Success("Admin access granted");
 
             return HandleResult(result);
@@ -180,6 +181,7 @@ namespace NeoVoting.API.Controllers
         [HttpGet("test-voter")]
         public async Task<IActionResult> TestVoter()
         {
+            _logger.LogInformation("Voter access test endpoint called");
             var result = Result<string>.Success("Voter access granted");
 
             return HandleResult(result);
@@ -188,6 +190,7 @@ namespace NeoVoting.API.Controllers
         [HttpGet("test-candidate")]
         public async Task<IActionResult> TestCandidate()
         {
+            _logger.LogInformation("Candidate access test endpoint called");
             var result = Result<string>.Success("Candidate access granted");
 
             return HandleResult(result);

@@ -1,4 +1,5 @@
-﻿using NeoVoting.Application.RequestDTOs.VoterDTOs;
+﻿using Microsoft.Extensions.Logging;
+using NeoVoting.Application.RequestDTOs.VoterDTOs;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ResponseDTOs.AdminDTOs;
 using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
@@ -26,9 +27,10 @@ namespace NeoVoting.Application.Services
         private readonly IPollVoteRepository _pollVoteRepository;
         private readonly IEventParticipationRepository _eventParticipationRepository;
         private readonly ICurrentUserServices _currentUserServices;
+        private readonly ILogger<VoterServices> _logger;
 
         public VoterServices(IUnitOfWork unitOfWork, IElectionRepository electionRepository, IPollRepository pollRepository, ICandidateProfileRepository candidateProfileRepository,
-            IVoteRepository voteRepository, IPollVoteRepository pollVoteRepository, ICurrentUserServices currentUserServices, IEventParticipationRepository eventParticipationRepository)
+            IVoteRepository voteRepository, IPollVoteRepository pollVoteRepository, ICurrentUserServices currentUserServices, IEventParticipationRepository eventParticipationRepository, ILogger<VoterServices> logger)
         {
             _unitOfWork = unitOfWork;
             _electionRepository = electionRepository;
@@ -38,10 +40,12 @@ namespace NeoVoting.Application.Services
             _pollVoteRepository = pollVoteRepository;
             _currentUserServices = currentUserServices;
             _eventParticipationRepository = eventParticipationRepository;
+            _logger = logger;
         }
 
         public async Task<Result<ElectionVoteLog_ResponseDTO>> CastVoteInElectionAsync(int electionId, Voter_Cast_In_Election_RequestDTO voter_Cast_In_Election_RequestDTO)
         {
+            _logger.LogInformation("Casting election vote for election {ElectionId}.", electionId);
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {
@@ -101,6 +105,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<PollVoteLog_ResponseDTO>> CastVoteInPollAsync(int pollId, Voter_Cast_In_Poll_RequestDTO voter_Cast_In_Poll_RequestDTO)
         {
+            _logger.LogInformation("Casting poll vote for poll {PollId}.", pollId);
             var poll = await _pollRepository.GetByIdAsync(pollId);
             if (poll == null)
             {
@@ -155,6 +160,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<PagedResult<CandidateProfile_ResponseDTO>>> GetPagedNominatedCandidatesProfilesForElectionAsync(int electionId, int pageNumber, int pageSize)
         {
+            _logger.LogInformation("Retrieving nominated candidates for election {ElectionId} page {PageNumber} size {PageSize}.", electionId, pageNumber, pageSize);
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {
@@ -198,6 +204,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<bool>> HasVoterCastedVoteInElectionAsync(int electionId)
         {
+            _logger.LogInformation("Checking whether current voter has cast a vote in election {ElectionId}.", electionId);
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {
@@ -224,6 +231,7 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<bool>> HasVoterCastedVoteInPollAsync(int pollId)
         {
+            _logger.LogInformation("Checking whether current voter has cast a vote in poll {PollId}.", pollId);
             var poll = await _pollRepository.GetByIdAsync(pollId);
             if (poll == null)
             {

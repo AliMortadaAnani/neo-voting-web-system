@@ -24,22 +24,46 @@ namespace NeoVoting.Application.Services
 
         public async Task<Result<VoterVerificationResponseDTO>> VerifyVoterAsync(GetVoterVerificationRequestDTO request)
         {
+            _logger.LogInformation("Verifying voter with national ID {NationalId} via Government System gateway.", request.NationalId);
             //we append the api key in Registration in API layer
-            return await SendRequestToGovernmentSystemAsync<GetVoterVerificationRequestDTO, VoterVerificationResponseDTO>(
+            var result = await SendRequestToGovernmentSystemAsync<GetVoterVerificationRequestDTO, VoterVerificationResponseDTO>(
                 HttpMethod.Post,
                 "api/public/voter/verify",
                 request);
+
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Voter verification succeeded for national ID {NationalId}.", request.NationalId);
+            }
+            else
+            {
+                _logger.LogWarning("Voter verification failed for national ID {NationalId}: {Error}", request.NationalId, result.Error?.Description ?? "Unknown error");
+            }
+
+            return result;
         }
 
         // --- CANDIDATE CALLS ---
 
         public async Task<Result<CandidateVerificationResponseDTO>> VerifyCandidateAsync(GetCandidateVerificationRequestDTO request)
         {
+            _logger.LogInformation("Verifying candidate with national ID {NationalId} via Government System gateway.", request.NationalId);
             //we append the api key in Registration in API layer
-            return await SendRequestToGovernmentSystemAsync<GetCandidateVerificationRequestDTO, CandidateVerificationResponseDTO>(
+            var result = await SendRequestToGovernmentSystemAsync<GetCandidateVerificationRequestDTO, CandidateVerificationResponseDTO>(
                 HttpMethod.Post,
                 "api/public/candidate/verify",
                 request);
+
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Candidate verification succeeded for national ID {NationalId}.", request.NationalId);
+            }
+            else
+            {
+                _logger.LogWarning("Candidate verification failed for national ID {NationalId}: {Error}", request.NationalId, result.Error?.Description ?? "Unknown error");
+            }
+
+            return result;
         }
 
         // =========================================================================================
@@ -57,6 +81,7 @@ namespace NeoVoting.Application.Services
             )
 
         {
+            _logger.LogInformation("Sending {Method} request to Government System endpoint {Endpoint}.", method, endpoint);
             HttpResponseMessage response;
 
             try
@@ -85,6 +110,7 @@ namespace NeoVoting.Application.Services
             // --- CASE 1: SUCCESS (200-299) ---
             if (response.IsSuccessStatusCode)
             {
+                _logger.LogInformation("Government System responded successfully for {Endpoint} with status {StatusCode}.", endpoint, response.StatusCode);
                 try
                 {
                     var data = await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);
@@ -131,6 +157,8 @@ namespace NeoVoting.Application.Services
             // 2. EXTRACT ERROR CODE
             // Prefer 'Title' (often used for codes like "Voter.NotFound"), fallback to 'Type', fallback to generic
             string errorCode = problem?.Type ?? problem?.Title ?? "GovernmentSystem.Error";
+
+            _logger.LogWarning("Government System returned error for {Endpoint}: {StatusCode} - {ErrorDescription}", endpoint, response.StatusCode, errorDesc);
 
             // 3. MAP STATUS CODE BUT KEEP ORIGINAL MESSAGE
             return (int)response.StatusCode switch

@@ -31,18 +31,22 @@ namespace NeoVoting.API.StartupExtensions
         /// </summary>
         public static WebApplicationBuilder ConfigureAllServices(this WebApplicationBuilder builder)
         {
-            builder.ConfigureDatabase()
-                   .ConfigureIdentity()
-                   .ConfigureJwtAuthenticationAndCookieForRefresh()
-                   .ConfigureApiAndControllers()
-                   .ConfigureExceptions()
-                   .ConfigureSwagger()
-                   .ConfigureHttpClients()
-                   .ConfigureCors()
-                   .ConfigureRepositoriesAndServices()
-                   .ConfigureValidation()
-                   .ConfigureRateLimiting();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
 
+            builder.ConfigureDatabase()
+                    .ConfigureIdentity()
+                    .ConfigureJwtAuthenticationAndCookieForRefresh()
+                    .ConfigureApiAndControllers()
+                    .ConfigureExceptions()
+                    .ConfigureSwagger()
+                    .ConfigureHttpClients()
+                    .ConfigureCors()
+                    .ConfigureRepositoriesAndServices()
+                    .ConfigureValidation()
+                    .ConfigureRateLimiting();
+
+            builder.Services.AddLogging();
             return builder;
         }
 

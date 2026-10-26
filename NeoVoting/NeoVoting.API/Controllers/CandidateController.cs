@@ -31,6 +31,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Create candidate profile requested for election {ElectionId}", electionId);
             var result = await _candidateServices.CreateCandidateProfileAsync(electionId, request);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Candidate profile created successfully for election {ElectionId}", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Candidate profile creation failed for election {ElectionId}: {Error}", electionId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result, result.IsSuccess);
         }
 

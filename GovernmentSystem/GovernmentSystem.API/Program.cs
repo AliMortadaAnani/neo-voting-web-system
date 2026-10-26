@@ -8,6 +8,8 @@ builder.ConfigureAllServices();
 
 var app = builder.Build();
 
+app.Logger.LogInformation("GovernmentSystem API is starting up.");
+
 // Check and execute any CLI commands. If true, exit the app immediately.
 if (await SeedingWithCLI.HandleCliCommandsAsync(app, args))
 {
@@ -37,5 +39,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.Logger.LogInformation("GovernmentSystem API has started and is listening for requests.");
+
 
 app.Run();

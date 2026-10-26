@@ -33,6 +33,10 @@ namespace GovernmentSystem.API.StartupExtensions
         /// </summary>
         public static WebApplicationBuilder ConfigureAllServices(this WebApplicationBuilder builder)
         {
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+
             builder.ConfigureDatabase()
                    .ConfigureIdentity()
                    .ConfigureCookies()

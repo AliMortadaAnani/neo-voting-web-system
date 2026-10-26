@@ -1,4 +1,5 @@
-﻿using NeoVoting.Application.RequestDTOs.AdminDTOs;
+﻿using Microsoft.Extensions.Logging;
+using NeoVoting.Application.RequestDTOs.AdminDTOs;
 using NeoVoting.Application.ResponseDTOs;
 using NeoVoting.Application.ResponseDTOs.AdminDTOs;
 using NeoVoting.Application.ResponseDTOs.GeneralDTOs;
@@ -17,19 +18,23 @@ namespace NeoVoting.Application.Services
         private readonly IPollRepository _pollRepository;
         private readonly ISystemAuditLogRepository _systemAuditLogRepository;
         private readonly ICurrentUserServices _currentUserServices;
+        private readonly ILogger<AdminServices> _logger;
 
         public AdminServices(IUnitOfWork unitOfWork, IElectionRepository electionRepository, IPollRepository pollRepository, ISystemAuditLogRepository systemAuditLogRepository,
-            ICurrentUserServices currentUserServices)
+            ICurrentUserServices currentUserServices, ILogger<AdminServices> logger)
         {
             _unitOfWork = unitOfWork;
             _electionRepository = electionRepository;
             _pollRepository = pollRepository;
             _systemAuditLogRepository = systemAuditLogRepository;
             _currentUserServices = currentUserServices;
+            _logger = logger;
         }
 
         public async Task<Result<Election_ResponseDTO>> CompleteElectionAsync(int electionId)
         {
+            _logger.LogInformation("Completing election {ElectionId}.", electionId);
+
             var election = await _electionRepository.GetByIdAsync(electionId);
             if (election == null)
             {
@@ -56,11 +61,14 @@ namespace NeoVoting.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("Election {ElectionId} completed successfully.", electionId);
             return Result<Election_ResponseDTO>.Success(responseDTO);
         }
 
         public async Task<Result<Poll_ResponseDTO>> CompletePollAsync(int pollId)
         {
+            _logger.LogInformation("Completing poll {PollId}.", pollId);
+
             var poll = await _pollRepository.GetByIdAsync(pollId);
             if (poll == null)
             {
@@ -87,11 +95,14 @@ namespace NeoVoting.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("Poll {PollId} completed successfully.", pollId);
             return Result<Poll_ResponseDTO>.Success(responseDTO);
         }
 
         public async Task<Result<Election_ResponseDTO>> CreateElectionAsync(ElectionCreate_RequestDTO dto)
         {
+            _logger.LogInformation("Creating election with name {ElectionName}.", dto.Name);
+
             if(await _electionRepository.IsActiveElectionExistsAsync())
             {
                 return Result<Election_ResponseDTO>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.ElectionAlreadyActive),"An active election already exists. Cannot create a new election."));
@@ -129,11 +140,13 @@ namespace NeoVoting.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("Election {ElectionId} created successfully.", election.Id);
             return Result<Election_ResponseDTO>.Success(responseDTO);
         }
 
         public async Task<Result<Poll_ResponseDTO>> CreatePollAsync(PollCreate_RequestDTO dto)
         {
+            _logger.LogInformation("Creating poll with name {PollName}.", dto.Name);
 
             // 1. Check count (min 2, max 5)
             if (dto.Answers == null || dto.Answers.Count < 2 || dto.Answers.Count > 5)
@@ -190,20 +203,23 @@ namespace NeoVoting.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("Poll {PollId} created successfully.", poll.Id);
             return Result<Poll_ResponseDTO>.Success(responseDTO);
         }
 
         public async Task<Result<PagedResult<SystemAuditLog_ResponseDTO>>> GetPagedSystemAuditLogsAsync(SystemActionTypesEnum? actionTypesEnum, int? adminId, int pageNumber, int pageSize)
         {
+            _logger.LogInformation("Retrieving paged system audit logs with action filter {ActionType}, admin filter {AdminId}, page {PageNumber}, size {PageSize}.", actionTypesEnum, adminId, pageNumber, pageSize);
 
             if (pageNumber < 1)
             {
+                _logger.LogWarning("Paged system audit log request rejected because page number {PageNumber} is invalid.", pageNumber);
                 return Result<PagedResult<SystemAuditLog_ResponseDTO>>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.PagingInvalidParameters), "PageNumber must be greater than 0."));
             }
             if (pageSize < 1)
             {
-             
+                _logger.LogWarning("Paged system audit log request rejected because page size {PageSize} is invalid.", pageSize);
                 return Result<PagedResult<SystemAuditLog_ResponseDTO>>.Failure(
                     Error.Validation(nameof(ProblemDetails400ErrorTypes.PagingInvalidParameters), "PageSize must be greater than 0."));
             }
@@ -228,19 +244,25 @@ namespace NeoVoting.Application.Services
                 TotalCount = totalCount
             };
 
+            _logger.LogInformation("Paged system audit logs retrieved successfully for action filter {ActionType}, admin filter {AdminId}.", actionTypesEnum, adminId);
             return Result<PagedResult<SystemAuditLog_ResponseDTO>>.Success(pagedResult);
 
         }
 
         public async Task<Result<Election_ResponseDTO>> StartElectionAsync(int electionId)
         {
+            _logger.LogInformation("Starting election {ElectionId}.", electionId);
+
             var election = await _electionRepository.GetByIdAsync(electionId);
-            if (election == null) { 
-            return Result<Election_ResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Election_NotFound), "Election not found."));
+            if (election == null)
+            {
+                _logger.LogWarning("Attempted to start election {ElectionId}, but it was not found.", electionId);
+                return Result<Election_ResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Election_NotFound), "Election not found."));
             }
 
             if(election.Status != StatusEnum.Upcoming)
             {
+                _logger.LogWarning("Election {ElectionId} cannot be started because its status is {CurrentStatus}.", electionId, election.Status);
                 return Result<Election_ResponseDTO>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.ElectionInvalidState), "Election is not in the upcoming phase and cannot be started."));
             }
 
@@ -259,20 +281,25 @@ namespace NeoVoting.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("Election {ElectionId} started successfully.", electionId);
             return Result<Election_ResponseDTO>.Success(responseDTO);
 
         }
 
         public async Task<Result<Poll_ResponseDTO>> StartPollAsync(int pollId)
         {
+            _logger.LogInformation("Starting poll {PollId}.", pollId);
+
             var poll = await _pollRepository.GetByIdAsync(pollId);
             if (poll == null)
             {
+                _logger.LogWarning("Attempted to start poll {PollId}, but it was not found.", pollId);
                 return Result<Poll_ResponseDTO>.Failure(Error.NotFound(nameof(ProblemDetails404ErrorTypes.Poll_NotFound), "Poll not found."));
             }
 
             if (poll.Status != StatusEnum.Upcoming)
             {
+                _logger.LogWarning("Poll {PollId} cannot be started because its status is {CurrentStatus}.", pollId, poll.Status);
                 return Result<Poll_ResponseDTO>.Failure(Error.Validation(nameof(ProblemDetails400ErrorTypes.PollInvalidState), "Poll is not in the upcoming phase and cannot be started."));
             }
 
@@ -291,6 +318,7 @@ namespace NeoVoting.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("Poll {PollId} started successfully.", pollId);
             return Result<Poll_ResponseDTO>.Success(responseDTO);
         }
     }

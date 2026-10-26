@@ -33,6 +33,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get candidate profile requested for election {ElectionId} and candidate {CandidateId}", electionId, candidateId);
             var result = await _candidateServices.GetCandidateProfileByElectionIdAndCandidateAccountIdAsync(electionId, candidateId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Candidate profile retrieved successfully for election {ElectionId} and candidate {CandidateId}", electionId, candidateId);
+            }
+            else
+            {
+                _logger.LogWarning("Candidate profile retrieval failed for election {ElectionId} and candidate {CandidateId}: {Error}", electionId, candidateId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -43,6 +51,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get active election requested");
             var result = await _generalServices.GetActiveElectionAsync();
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Active election retrieved successfully");
+            }
+            else
+            {
+                _logger.LogWarning("Active election retrieval failed: {Error}", result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -53,6 +69,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get active poll requested");
             var result = await _generalServices.GetActivePollAsync();
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Active poll retrieved successfully");
+            }
+            else
+            {
+                _logger.LogWarning("Active poll retrieval failed: {Error}", result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -63,6 +87,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged elections requested - Page: {Page}, Size: {Size}", page, pageSize);
             var paged = await _generalServices.GetPagedElectionsAsync(page, pageSize);
+            if (paged.IsSuccess)
+            {
+                _logger.LogInformation("Paged elections retrieved successfully - Page: {Page}, Size: {Size}", page, pageSize);
+            }
+            else
+            {
+                _logger.LogWarning("Paged elections request failed - Page: {Page}, Size: {Size}: {Error}", page, pageSize, paged.Error?.Description ?? "Unknown error");
+            }
             return Ok(paged);
         }
 
@@ -73,6 +105,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged polls requested - Page: {Page}, Size: {Size}", page, pageSize);
             var paged = await _generalServices.GetPagedPollsAsync(page, pageSize);
+            if (paged.IsSuccess)
+            {
+                _logger.LogInformation("Paged polls retrieved successfully - Page: {Page}, Size: {Size}", page, pageSize);
+            }
+            else
+            {
+                _logger.LogWarning("Paged polls request failed - Page: {Page}, Size: {Size}: {Error}", page, pageSize, paged.Error?.Description ?? "Unknown error");
+            }
             return Ok(paged);
         }
 
@@ -84,6 +124,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged nominated candidates for election {ElectionId}", electionId);
             var paged = await _voterServices.GetPagedNominatedCandidatesProfilesForElectionAsync(electionId, pageNumber, pageSize);
+            if (paged.IsSuccess)
+            {
+                _logger.LogInformation("Paged nominated candidates retrieved successfully for election {ElectionId}", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Paged nominated candidates request failed for election {ElectionId}: {Error}", electionId, paged.Error?.Description ?? "Unknown error");
+            }
             return Ok(paged);
         }
 
@@ -95,6 +143,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged election vote logs requested for election {ElectionId}", electionId);
             var paged = await _generalServices.GetPagedElectionVoteLogsAsync(electionId, pageNumber, pageSize);
+            if (paged.IsSuccess)
+            {
+                _logger.LogInformation("Paged election vote logs retrieved successfully for election {ElectionId}", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Paged election vote logs request failed for election {ElectionId}: {Error}", electionId, paged.Error?.Description ?? "Unknown error");
+            }
             return Ok(paged);
         }
 
@@ -106,6 +162,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged poll vote logs requested for poll {PollId}", pollId);
             var paged = await _generalServices.GetPagedPollVoteLogsAsync(pollId, pageNumber, pageSize);
+            if (paged.IsSuccess)
+            {
+                _logger.LogInformation("Paged poll vote logs retrieved successfully for poll {PollId}", pollId);
+            }
+            else
+            {
+                _logger.LogWarning("Paged poll vote logs request failed for poll {PollId}: {Error}", pollId, paged.Error?.Description ?? "Unknown error");
+            }
             return Ok(paged);
         }
 
@@ -117,6 +181,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get poll results requested for poll {PollId}", pollId);
             var result = await _generalServices.GetPollResultsAsync(pollId);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Poll results retrieved successfully for poll {PollId}", pollId);
+            }
+            else
+            {
+                _logger.LogWarning("Poll results retrieval failed for poll {PollId}: {Error}", pollId, result.Error?.Description ?? "Unknown error");
+            }
             return HandleResult(result);
         }
 
@@ -128,6 +200,14 @@ namespace NeoVoting.API.Controllers
         {
             _logger.LogInformation("Get paged candidate results for election {ElectionId}", electionId);
             var paged = await _generalServices.GetPagedCandidateResultsForElectionAsync(electionId, pageNumber, pageSize);
+            if (paged.IsSuccess)
+            {
+                _logger.LogInformation("Paged candidate results retrieved successfully for election {ElectionId}", electionId);
+            }
+            else
+            {
+                _logger.LogWarning("Paged candidate results request failed for election {ElectionId}: {Error}", electionId, paged.Error?.Description ?? "Unknown error");
+            }
             return Ok(paged);
         }
     }
