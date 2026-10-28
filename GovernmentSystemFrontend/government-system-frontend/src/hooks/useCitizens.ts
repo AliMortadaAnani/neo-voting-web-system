@@ -40,6 +40,7 @@ export const citizenKeys = {
 };
 
 export const useCitizens = (page = 1, pageSize = 10) => {
+  console.log("[useCitizens] Fetching citizens for page:", page, pageSize);
   return useQuery<PagedResult<CitizenResponseDTO>, AppError>({
     queryKey: citizenKeys.list(page, pageSize),
     queryFn: () => getCitizensPaged(page, pageSize),
@@ -49,6 +50,10 @@ export const useCitizens = (page = 1, pageSize = 10) => {
 };
 
 export const useCitizen = (dto: CitizenFetchRequestDTO | null) => {
+  console.log(
+    "[useCitizen] Fetching citizen details for nationalId:",
+    dto?.nationalId,
+  );
   const {
     data: citizen,
     isLoading: isFetchingCitizen,
@@ -69,6 +74,7 @@ export const useCitizen = (dto: CitizenFetchRequestDTO | null) => {
 };
 
 export const useCitizensTotalCount = () => {
+  console.log("[useCitizensTotalCount] Fetching total citizen count");
   return useQuery<number, AppError>({
     queryKey: citizenKeys.totalCount(),
     queryFn: getCitizensTotalCount,
@@ -97,13 +103,15 @@ export const useCitizenMutations = () => {
     CitizenCreateRequestDTO
   >({
     mutationFn: createCitizen,
-    onSuccess: () => {
+    onSuccess: (data) => {
       invalidateLists();
       invalidateTotalCount();
       toast.success("Citizen created successfully");
+      console.log("[useCitizens] Citizen created successfully:", data);
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to create citizen");
+      console.error("[useCitizens] Failed to create citizen, error:", error);
     },
   });
 
@@ -119,9 +127,11 @@ export const useCitizenMutations = () => {
       invalidateVoters();
       invalidateCandidates();
       toast.success("Citizen updated successfully");
+      console.log("[useCitizens] Citizen updated successfully:", data);
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to update citizen");
+      console.error("[useCitizens] Failed to update citizen, error:", error);
     },
   });
 
@@ -138,9 +148,14 @@ export const useCitizenMutations = () => {
         invalidateCandidates();
 
         toast.success("Citizen deleted successfully");
+        console.log(
+          "[useCitizens] Citizen deleted successfully for nationalId:",
+          variables.nationalId,
+        );
       },
       onError: (error: AppError) => {
         toast.error(error.message || "Failed to delete citizen");
+        console.error("[useCitizens] Failed to delete citizen, error:", error);
       },
     },
   );
@@ -151,13 +166,13 @@ export const useCitizenMutations = () => {
     isCreatingCitizen: createMutation.isPending,
     isCreateCitizenError: createMutation.isError,
     createCitizenError: createMutation.error,
-
+    createCitizenResponse: createMutation.data,
     updateCitizen: updateMutation.mutate,
     updateCitizenAsync: updateMutation.mutateAsync,
     isUpdatingCitizen: updateMutation.isPending,
     isUpdateCitizenError: updateMutation.isError,
     updateCitizenError: updateMutation.error,
-
+    updateCitizenResponse: updateMutation.data,
     deleteCitizen: deleteMutation.mutate,
     deleteCitizenAsync: deleteMutation.mutateAsync,
     isDeletingCitizen: deleteMutation.isPending,

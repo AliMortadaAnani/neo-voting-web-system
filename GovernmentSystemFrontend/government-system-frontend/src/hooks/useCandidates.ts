@@ -32,6 +32,12 @@ export const candidateKeys = {
 };
 
 export const useCandidates = (page = 1, pageSize = 10) => {
+  console.log(
+    "[useCandidates] Fetching candidates for page:",
+    page,
+    "pageSize:",
+    pageSize,
+  );
   return useQuery<PagedResult<CandidateResponseDTO>, AppError>({
     queryKey: candidateKeys.list(page, pageSize),
     queryFn: () => getCandidatesPaged(page, pageSize),
@@ -41,6 +47,10 @@ export const useCandidates = (page = 1, pageSize = 10) => {
 };
 
 export const useCandidate = (dto: CandidateRequestDTO | null) => {
+  console.log(
+    "[useCandidate] Fetching candidate details for nationalId:",
+    dto?.nationalId,
+  );
   return useQuery<CandidateResponseDTO, AppError>({
     queryKey: candidateKeys.detail(dto?.nationalId ?? ""),
     queryFn: () => getCandidateDetails(dto!),
@@ -50,6 +60,7 @@ export const useCandidate = (dto: CandidateRequestDTO | null) => {
 };
 
 export const useCandidatesTotalCount = () => {
+  console.log("[useCandidatesTotalCount] Fetching total candidate count");
   return useQuery<number, AppError>({
     queryKey: candidateKeys.totalCount(),
     queryFn: getCandidatesTotalCount,
@@ -72,13 +83,15 @@ export const useCandidateMutations = () => {
     CandidateRequestDTO
   >({
     mutationFn: addCandidate,
-    onSuccess: () => {
+    onSuccess: (data) => {
       invalidateLists();
       invalidateTotalCount();
       toast.success("Citizen nominated as a candidate successfully");
+      console.log("[useCandidates] Candidate added successfully:", data);
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to nominate candidate");
+      console.error("[useCandidates] Failed to add candidate, error:", error);
     },
   });
 
@@ -95,9 +108,17 @@ export const useCandidateMutations = () => {
         data,
       );
       toast.success("New nomination token generated successfully");
+      console.log(
+        "[useCandidates] Nomination token regenerated successfully:",
+        data,
+      );
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to generate new nomination token");
+      console.error(
+        "[useCandidates] Failed to regenerate nomination token, error:",
+        error,
+      );
     },
   });
 
@@ -110,9 +131,17 @@ export const useCandidateMutations = () => {
         queryKey: candidateKeys.detail(variables.nationalId),
       });
       toast.success("Candidate record removed successfully");
+      console.log(
+        "[useCandidates] Candidate record removed successfully for nationalId:",
+        variables.nationalId,
+      );
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to remove candidate");
+      console.error(
+        "[useCandidates] Failed to remove candidate, error:",
+        error,
+      );
     },
   });
 
@@ -122,13 +151,13 @@ export const useCandidateMutations = () => {
     isAdding: addMutation.isPending,
     isAddError: addMutation.isError,
     addError: addMutation.error,
-
+    addCandidateResponse: addMutation.data,
     regenerateToken: tokenMutation.mutate,
     regenerateTokenAsync: tokenMutation.mutateAsync,
     isRegeneratingToken: tokenMutation.isPending,
     isRegenerateTokenError: tokenMutation.isError,
     regenerateTokenError: tokenMutation.error,
-
+    regenerateTokenResponse: tokenMutation.data,
     deleteCandidate: deleteMutation.mutate,
     deleteCandidateAsync: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isPending,

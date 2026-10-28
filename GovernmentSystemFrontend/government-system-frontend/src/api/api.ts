@@ -29,9 +29,14 @@ export const api = axios.create({
 
 api.interceptors.response.use(
   // Standard approach: passes through the full AxiosResponse
-  (response) => response,
+
+  (response) => {
+    console.log("[api] Response received:", response);
+    return response;
+  },
 
   (error) => {
+    console.log("[api] Error response received:", error);
     // no response from the server => a network error or server is offline
     //caused by the server being offline, CORS, ip whitelisting ...
     if (!error.response) {

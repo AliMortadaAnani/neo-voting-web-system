@@ -5,6 +5,7 @@ import type { AppError } from "../api/api";
 import type { AuthResponseDTO, LoginRequestDTO } from "../types/auth.types.ts";
 
 export const useAuthCheck = () => {
+  console.log("[useAuthCheck] invoked");
   const {
     data: user,
     isLoading: isCheckingAuth,
@@ -37,9 +38,11 @@ export const useAuth = () => {
       onSuccess: (data) => {
         queryClient.setQueryData(["auth", "me"], data);
         toast.success(data.message || "Welcome!");
+        console.log("[useAuth] Login successful, user data:", data);
       },
-      onError: (error: AppError) => {
+      onError: (error) => {
         toast.error(error.message || "Invalid credentials");
+        console.error("[useAuth] Login failed, error:", error);
       },
     },
   );
@@ -50,9 +53,11 @@ export const useAuth = () => {
       queryClient.setQueryData(["auth", "me"], null); // since protected routes are subscribed to this query, they will automatically redirect to login page when the user logs out
       queryClient.clear(); // Clears all sensitive cached data safely
       toast.success(data || "Logged out successfully");
+      console.log("[useAuth] Logout successful, message:", data);
     },
-    onError: (error: AppError) => {
+    onError: (error) => {
       toast.error(error.message || "Failed to log out");
+      console.error("[useAuth] Logout failed, error:", error);
     },
   });
 
@@ -62,7 +67,7 @@ export const useAuth = () => {
     isLoggingIn: loginMutation.isPending,
     isLoginError: loginMutation.isError,
     loginError: loginMutation.error,
-    //loginResponse: loginMutation.data,
+    loginResponse: loginMutation.data,
     logout: logoutMutation.mutate,
     logoutAsync: logoutMutation.mutateAsync,
     isLoggingOut: logoutMutation.isPending,

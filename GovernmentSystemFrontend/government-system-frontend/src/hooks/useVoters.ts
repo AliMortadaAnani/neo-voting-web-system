@@ -31,6 +31,12 @@ export const voterKeys = {
 };
 
 export const useVoters = (page = 1, pageSize = 10) => {
+  console.log(
+    "[useVoters] Fetching voters for page:",
+    page,
+    "pageSize:",
+    pageSize,
+  );
   return useQuery<PagedResult<VoterResponseDTO>, AppError>({
     queryKey: voterKeys.list(page, pageSize),
     queryFn: () => getVotersPaged(page, pageSize),
@@ -40,6 +46,10 @@ export const useVoters = (page = 1, pageSize = 10) => {
 };
 
 export const useVoter = (dto: VoterRequestDTO | null) => {
+  console.log(
+    "[useVoter] Fetching voter details for nationalId:",
+    dto?.nationalId,
+  );
   return useQuery<VoterResponseDTO, AppError>({
     queryKey: voterKeys.detail(dto?.nationalId ?? ""),
     queryFn: () => getVoterDetails(dto!),
@@ -49,6 +59,7 @@ export const useVoter = (dto: VoterRequestDTO | null) => {
 };
 
 export const useVotersTotalCount = () => {
+  console.log("[useVotersTotalCount] Fetching total voter count");
   return useQuery<number, AppError>({
     queryKey: voterKeys.totalCount(),
     queryFn: getVotersTotalCount,
@@ -67,13 +78,18 @@ export const useVoterMutations = () => {
 
   const addMutation = useMutation<VoterResponseDTO, AppError, VoterRequestDTO>({
     mutationFn: addVoter,
-    onSuccess: () => {
+    onSuccess: (data) => {
       invalidateLists();
       invalidateTotalCount();
       toast.success("Citizen enrolled as a voter successfully");
+      console.log(
+        "[useVoters] Citizen enrolled as a voter successfully:",
+        data,
+      );
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to enroll voter");
+      console.error("[useVoters] Failed to enroll voter, error:", error);
     },
   });
 
@@ -87,9 +103,19 @@ export const useVoterMutations = () => {
       invalidateLists();
       queryClient.setQueryData(voterKeys.detail(variables.nationalId), data);
       toast.success("New voting token generated successfully");
+      console.log(
+        "[useVoters] New voting token generated successfully for nationalId:",
+        variables.nationalId,
+        "response:",
+        data,
+      );
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to generate new voting token");
+      console.error(
+        "[useVoters] Failed to generate new voting token, error:",
+        error,
+      );
     },
   });
 
@@ -102,9 +128,14 @@ export const useVoterMutations = () => {
         queryKey: voterKeys.detail(variables.nationalId),
       });
       toast.success("Voter record removed successfully");
+      console.log(
+        "[useVoters] Voter record removed successfully for nationalId:",
+        variables.nationalId,
+      );
     },
     onError: (error: AppError) => {
       toast.error(error.message || "Failed to remove voter");
+      console.error("[useVoters] Failed to remove voter, error:", error);
     },
   });
 
@@ -114,13 +145,13 @@ export const useVoterMutations = () => {
     isAddingVoter: addMutation.isPending,
     isAddVoterError: addMutation.isError,
     addVoterError: addMutation.error,
-
+    addVoterResponse: addMutation.data,
     regenerateVotingToken: tokenMutation.mutate,
     regenerateVotingTokenAsync: tokenMutation.mutateAsync,
     isRegeneratingVotingToken: tokenMutation.isPending,
     isRegenerateVotingTokenError: tokenMutation.isError,
     regenerateVotingTokenError: tokenMutation.error,
-
+    regenerateVotingTokenResponse: tokenMutation.data,
     deleteVoter: deleteMutation.mutate,
     deleteVoterAsync: deleteMutation.mutateAsync,
     isDeletingVoter: deleteMutation.isPending,

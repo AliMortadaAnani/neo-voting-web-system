@@ -6,7 +6,7 @@ import { ProtectedLayout } from "./ProtectedLayout";
 import { LoadingSpinner } from "./LoadingSpinner";
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isCheckingAuth, isAuthError, authError } =
+  const { isAuthenticated, isCheckingAuth, isAuthError, authError, user } =
     useAuthCheck();
 
   if (isCheckingAuth) {
@@ -26,7 +26,7 @@ export const ProtectedRoute = () => {
 
   return (
     <>
-      <ProtectedLayout>
+      <ProtectedLayout user={user}>
         <Outlet />
       </ProtectedLayout>
     </>

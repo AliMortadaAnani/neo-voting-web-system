@@ -2,17 +2,19 @@
 import React from "react";
 import { Navbar, type NavItem } from "../../components/general/Navbar";
 import { Footer } from "../../components/general/Footer";
-import { useAuth, useAuthCheck } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { LoadingSpinner } from "../../components/general/LoadingSpinner";
 import { Button } from "./Button";
 import { useGoBack } from "../../hooks/useUtils";
+import type { AuthResponseDTO } from "../../types/auth.types";
 type ProtectedLayoutProps = {
   children: React.ReactNode;
+  user: AuthResponseDTO | undefined; // user can be null if not authenticated
 };
 
-export const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
+export const ProtectedLayout = ({ children, user }: ProtectedLayoutProps) => {
   const { logout, isLoggingOut } = useAuth();
-  const { user } = useAuthCheck();
+
   const handleBack = useGoBack();
   // Protected Admin Navigation Links
   const protectedItems: NavItem[] = [
