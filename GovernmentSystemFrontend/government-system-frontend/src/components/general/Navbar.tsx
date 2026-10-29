@@ -10,7 +10,7 @@ export type NavItem = {
 
 type NavbarProps = {
   items: NavItem[];
-  user?: AuthResponseDTO | null;
+  user?: AuthResponseDTO | undefined;
   onLogout?: () => void;
   isLoggingOut?: boolean;
 };

@@ -63,13 +63,11 @@ export const useAuth = () => {
 
   return {
     login: loginMutation.mutate,
-    loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
     isLoginError: loginMutation.isError,
     loginError: loginMutation.error,
     loginResponse: loginMutation.data,
     logout: logoutMutation.mutate,
-    logoutAsync: logoutMutation.mutateAsync,
     isLoggingOut: logoutMutation.isPending,
     isLogoutError: logoutMutation.isError,
     logoutError: logoutMutation.error,

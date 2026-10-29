@@ -38,12 +38,25 @@ export const useCandidates = (page = 1, pageSize = 10) => {
     "pageSize:",
     pageSize,
   );
-  return useQuery<PagedResult<CandidateResponseDTO>, AppError>({
+
+  const {
+    data: candidates,
+    isLoading: isFetchingCandidates,
+    isError: isFetchCandidatesError,
+    error: fetchCandidatesError,
+  } = useQuery<PagedResult<CandidateResponseDTO>, AppError>({
     queryKey: candidateKeys.list(page, pageSize),
     queryFn: () => getCandidatesPaged(page, pageSize),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 30,
   });
+
+  return {
+    candidates,
+    isFetchingCandidates,
+    isFetchCandidatesError,
+    fetchCandidatesError,
+  };
 };
 
 export const useCandidate = (dto: CandidateRequestDTO | null) => {
@@ -51,21 +64,47 @@ export const useCandidate = (dto: CandidateRequestDTO | null) => {
     "[useCandidate] Fetching candidate details for nationalId:",
     dto?.nationalId,
   );
-  return useQuery<CandidateResponseDTO, AppError>({
+
+  const {
+    data: candidate,
+    isLoading: isFetchingCandidate,
+    isError: isFetchCandidateError,
+    error: fetchCandidateError,
+  } = useQuery<CandidateResponseDTO, AppError>({
     queryKey: candidateKeys.detail(dto?.nationalId ?? ""),
     queryFn: () => getCandidateDetails(dto!),
-    enabled: Boolean(dto?.nationalId && dto?.nationalId.trim().length > 0),
+    enabled: Boolean(dto?.nationalId && dto.nationalId.trim().length > 0),
     staleTime: 1000 * 60,
   });
+
+  return {
+    candidate,
+    isFetchingCandidate,
+    isFetchCandidateError,
+    fetchCandidateError,
+  };
 };
 
 export const useCandidatesTotalCount = () => {
   console.log("[useCandidatesTotalCount] Fetching total candidate count");
-  return useQuery<number, AppError>({
+
+  const {
+    data: candidatesTotalCount,
+    isLoading: isFetchingCandidatesTotalCount,
+    isError: isFetchCandidatesTotalCountError,
+    error: fetchCandidatesTotalCountError,
+  } = useQuery<number, AppError>({
     queryKey: candidateKeys.totalCount(),
     queryFn: getCandidatesTotalCount,
     staleTime: 1000 * 60 * 5,
   });
+
+  return {
+    candidatesTotalCount,
+    isFetchingCandidatesTotalCount,
+    isFetchCandidatesTotalCountError,
+    fetchCandidatesTotalCountError,
+  };
 };
 
 export const useCandidateMutations = () => {
@@ -147,19 +186,16 @@ export const useCandidateMutations = () => {
 
   return {
     addCandidate: addMutation.mutate,
-    addCandidateAsync: addMutation.mutateAsync,
     isAdding: addMutation.isPending,
     isAddError: addMutation.isError,
     addError: addMutation.error,
     addCandidateResponse: addMutation.data,
     regenerateToken: tokenMutation.mutate,
-    regenerateTokenAsync: tokenMutation.mutateAsync,
     isRegeneratingToken: tokenMutation.isPending,
     isRegenerateTokenError: tokenMutation.isError,
     regenerateTokenError: tokenMutation.error,
     regenerateTokenResponse: tokenMutation.data,
     deleteCandidate: deleteMutation.mutate,
-    deleteCandidateAsync: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isPending,
     isDeleteError: deleteMutation.isError,
     deleteError: deleteMutation.error,

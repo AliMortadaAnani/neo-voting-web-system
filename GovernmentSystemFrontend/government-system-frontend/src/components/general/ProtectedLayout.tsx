@@ -9,7 +9,7 @@ import { useGoBack } from "../../hooks/useUtils";
 import type { AuthResponseDTO } from "../../types/auth.types";
 type ProtectedLayoutProps = {
   children: React.ReactNode;
-  user: AuthResponseDTO | undefined; // user can be null if not authenticated
+  user: AuthResponseDTO | undefined;
 };
 
 export const ProtectedLayout = ({ children, user }: ProtectedLayoutProps) => {

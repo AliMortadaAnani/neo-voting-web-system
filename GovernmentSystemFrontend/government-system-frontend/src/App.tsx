@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { ProtectedRoute } from "./components/general/ProtectedRoute";
 import { PublicRoute } from "./components/general/PublicRoute";
 
-// Minimal page imports
+// page imports
 import { LoginPage } from "./pages/general/LoginPage";
 import { CitizenPage } from "./pages/citizens/CitizenPage";
 import { CitizenListPage } from "./pages/citizens/CitizenListPage";

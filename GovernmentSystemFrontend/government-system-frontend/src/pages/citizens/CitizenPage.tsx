@@ -1,26 +1,16 @@
 // Inside pages/CitizenPage.tsx
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/general/Button";
 import { FeatureCard } from "../../components/general/FeatureCard";
 import { MainPageHeader } from "../../components/general/MainPageHeader";
-import { CitizenSearchPage } from "./CitizenSearchPage";
 export const CitizenPage = () => {
   const navigate = useNavigate();
-
-  // State for Demo 2 (In-Page Toggle)
-  const [inlineDemoId, setInlineDemoId] = useState<string | null>(null);
 
   // Demo 1 Handler: Navigates to /citizens/details passing ID secretly in router state
   const handleRouteDemo = () => {
     navigate("/citizens/details", {
-      state: { initialNationalId: "NI-AA2M1403-8X7M" },
+      state: { initialNationalId: "NI-AA2M1403-8X7Ms" },
     });
-  };
-
-  // Demo 2 Handler: Toggles the component mounted inline on this exact page
-  const handleInlineDemo = () => {
-    setInlineDemoId((prev) => (prev ? null : "1029384756"));
   };
 
   return (
@@ -39,26 +29,9 @@ export const CitizenPage = () => {
           color="stone"
           size="sm"
         />
-
-        {/* Demo 2: Mount Component Inline with Prop */}
-        <Button
-          label={
-            inlineDemoId
-              ? "Close Inline Demo"
-              : "Demo 2: Mount Inline (Direct Prop)"
-          }
-          onClick={handleInlineDemo}
-          color="green"
-          size="sm"
-        />
       </div>
 
       {/* If Demo 2 is active, render the page component inline right here with the prop */}
-      {inlineDemoId && (
-        <div className="mb-8">
-          <CitizenSearchPage initialNationalId={inlineDemoId} />
-        </div>
-      )}
 
       {/* Standard Feature Navigation Cards */}
       <div className="mx-auto flex max-w-xl flex-col gap-3">

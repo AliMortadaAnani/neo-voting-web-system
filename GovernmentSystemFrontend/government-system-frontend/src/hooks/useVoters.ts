@@ -37,12 +37,25 @@ export const useVoters = (page = 1, pageSize = 10) => {
     "pageSize:",
     pageSize,
   );
-  return useQuery<PagedResult<VoterResponseDTO>, AppError>({
+
+  const {
+    data: voters,
+    isLoading: isFetchingVoters,
+    isError: isFetchVotersError,
+    error: fetchVotersError,
+  } = useQuery<PagedResult<VoterResponseDTO>, AppError>({
     queryKey: voterKeys.list(page, pageSize),
     queryFn: () => getVotersPaged(page, pageSize),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 30,
   });
+
+  return {
+    voters,
+    isFetchingVoters,
+    isFetchVotersError,
+    fetchVotersError,
+  };
 };
 
 export const useVoter = (dto: VoterRequestDTO | null) => {
@@ -50,21 +63,47 @@ export const useVoter = (dto: VoterRequestDTO | null) => {
     "[useVoter] Fetching voter details for nationalId:",
     dto?.nationalId,
   );
-  return useQuery<VoterResponseDTO, AppError>({
+
+  const {
+    data: voter,
+    isLoading: isFetchingVoter,
+    isError: isFetchVoterError,
+    error: fetchVoterError,
+  } = useQuery<VoterResponseDTO, AppError>({
     queryKey: voterKeys.detail(dto?.nationalId ?? ""),
     queryFn: () => getVoterDetails(dto!),
-    enabled: Boolean(dto?.nationalId && dto?.nationalId.trim().length > 0),
+    enabled: Boolean(dto?.nationalId && dto.nationalId.trim().length > 0),
     staleTime: 1000 * 60,
   });
+
+  return {
+    voter,
+    isFetchingVoter,
+    isFetchVoterError,
+    fetchVoterError,
+  };
 };
 
 export const useVotersTotalCount = () => {
   console.log("[useVotersTotalCount] Fetching total voter count");
-  return useQuery<number, AppError>({
+
+  const {
+    data: votersTotalCount,
+    isLoading: isFetchingVotersTotalCount,
+    isError: isFetchVotersTotalCountError,
+    error: fetchVotersTotalCountError,
+  } = useQuery<number, AppError>({
     queryKey: voterKeys.totalCount(),
     queryFn: getVotersTotalCount,
     staleTime: 1000 * 60 * 5,
   });
+
+  return {
+    votersTotalCount,
+    isFetchingVotersTotalCount,
+    isFetchVotersTotalCountError,
+    fetchVotersTotalCountError,
+  };
 };
 
 export const useVoterMutations = () => {
@@ -141,19 +180,16 @@ export const useVoterMutations = () => {
 
   return {
     addVoter: addMutation.mutate,
-    addVoterAsync: addMutation.mutateAsync,
     isAddingVoter: addMutation.isPending,
     isAddVoterError: addMutation.isError,
     addVoterError: addMutation.error,
     addVoterResponse: addMutation.data,
     regenerateVotingToken: tokenMutation.mutate,
-    regenerateVotingTokenAsync: tokenMutation.mutateAsync,
     isRegeneratingVotingToken: tokenMutation.isPending,
     isRegenerateVotingTokenError: tokenMutation.isError,
     regenerateVotingTokenError: tokenMutation.error,
     regenerateVotingTokenResponse: tokenMutation.data,
     deleteVoter: deleteMutation.mutate,
-    deleteVoterAsync: deleteMutation.mutateAsync,
     isDeletingVoter: deleteMutation.isPending,
     isDeleteVoterError: deleteMutation.isError,
     deleteVoterError: deleteMutation.error,

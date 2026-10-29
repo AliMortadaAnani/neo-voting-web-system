@@ -13,19 +13,12 @@ import { Button } from "../../components/general/Button";
 import { InputField } from "../../components/general/InputField";
 import { LoadingSpinner } from "../../components/general/LoadingSpinner";
 
-type CitizenSearchPageProps = {
-  initialNationalId?: string;
-};
-
-export const CitizenSearchPage = ({
-  initialNationalId,
-}: CitizenSearchPageProps) => {
+export const CitizenSearchPage = () => {
   const location = useLocation();
 
   // Pick up the ID from the direct React prop FIRST; if none, check router navigation state
-  const effectiveNationalId =
-    initialNationalId ||
-    (location.state as { initialNationalId?: string })?.initialNationalId;
+  const effectiveNationalId = (location.state as { initialNationalId?: string })
+    ?.initialNationalId;
 
   // Initialize search immediately if an ID was passed via either method
   const [searchDto, setSearchDto] = useState<CitizenFetchRequestDTO | null>(

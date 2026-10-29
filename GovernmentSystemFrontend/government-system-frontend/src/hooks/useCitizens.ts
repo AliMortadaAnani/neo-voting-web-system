@@ -41,12 +41,25 @@ export const citizenKeys = {
 
 export const useCitizens = (page = 1, pageSize = 10) => {
   console.log("[useCitizens] Fetching citizens for page:", page, pageSize);
-  return useQuery<PagedResult<CitizenResponseDTO>, AppError>({
+
+  const {
+    data: citizens,
+    isLoading: isFetchingCitizens,
+    isError: isFetchCitizensError,
+    error: fetchCitizensError,
+  } = useQuery<PagedResult<CitizenResponseDTO>, AppError>({
     queryKey: citizenKeys.list(page, pageSize),
     queryFn: () => getCitizensPaged(page, pageSize),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 30,
   });
+
+  return {
+    citizens,
+    isFetchingCitizens,
+    isFetchCitizensError,
+    fetchCitizensError,
+  };
 };
 
 export const useCitizen = (dto: CitizenFetchRequestDTO | null) => {
@@ -54,6 +67,7 @@ export const useCitizen = (dto: CitizenFetchRequestDTO | null) => {
     "[useCitizen] Fetching citizen details for nationalId:",
     dto?.nationalId,
   );
+
   const {
     data: citizen,
     isLoading: isFetchingCitizen,
@@ -62,9 +76,10 @@ export const useCitizen = (dto: CitizenFetchRequestDTO | null) => {
   } = useQuery<CitizenResponseDTO, AppError>({
     queryKey: citizenKeys.detail(dto?.nationalId ?? ""),
     queryFn: () => getCitizenDetails(dto!),
-    enabled: Boolean(dto?.nationalId && dto?.nationalId.trim().length > 0),
+    enabled: Boolean(dto?.nationalId && dto.nationalId.trim().length > 0),
     staleTime: 1000 * 60,
   });
+
   return {
     citizen,
     isFetchingCitizen,
@@ -75,11 +90,24 @@ export const useCitizen = (dto: CitizenFetchRequestDTO | null) => {
 
 export const useCitizensTotalCount = () => {
   console.log("[useCitizensTotalCount] Fetching total citizen count");
-  return useQuery<number, AppError>({
+
+  const {
+    data: citizensTotalCount,
+    isLoading: isFetchingCitizensTotalCount,
+    isError: isFetchCitizensTotalCountError,
+    error: fetchCitizensTotalCountError,
+  } = useQuery<number, AppError>({
     queryKey: citizenKeys.totalCount(),
     queryFn: getCitizensTotalCount,
     staleTime: 1000 * 60 * 5,
   });
+
+  return {
+    citizensTotalCount,
+    isFetchingCitizensTotalCount,
+    isFetchCitizensTotalCountError,
+    fetchCitizensTotalCountError,
+  };
 };
 
 export const useCitizenMutations = () => {
@@ -162,19 +190,16 @@ export const useCitizenMutations = () => {
 
   return {
     createCitizen: createMutation.mutate,
-    createCitizenAsync: createMutation.mutateAsync,
     isCreatingCitizen: createMutation.isPending,
     isCreateCitizenError: createMutation.isError,
     createCitizenError: createMutation.error,
     createCitizenResponse: createMutation.data,
     updateCitizen: updateMutation.mutate,
-    updateCitizenAsync: updateMutation.mutateAsync,
     isUpdatingCitizen: updateMutation.isPending,
     isUpdateCitizenError: updateMutation.isError,
     updateCitizenError: updateMutation.error,
     updateCitizenResponse: updateMutation.data,
     deleteCitizen: deleteMutation.mutate,
-    deleteCitizenAsync: deleteMutation.mutateAsync,
     isDeletingCitizen: deleteMutation.isPending,
     isDeleteCitizenError: deleteMutation.isError,
     deleteCitizenError: deleteMutation.error,
