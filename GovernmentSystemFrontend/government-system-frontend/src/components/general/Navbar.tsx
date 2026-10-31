@@ -72,10 +72,10 @@ export const Navbar = ({
           {user != null && (
             <>
               {/* 
-                HIDING THE PROFILE:
-                'hidden md:block' hides BOTH the username and the role badge on phones and small tablets.
-                It only appears when the screen reaches medium (768px+) width.
-              */}
+                  HIDING THE PROFILE:
+                  'hidden md:block' hides BOTH the username and the role badge on phones and small tablets.
+                  It only appears when the screen reaches medium (768px+) width.
+                */}
               <div className="hidden text-right md:block">
                 <p className="text-xs font-semibold text-stone-800 sm:text-sm">
                   {user.username}

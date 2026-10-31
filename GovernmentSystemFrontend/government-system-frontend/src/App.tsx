@@ -26,9 +26,8 @@ import { CandidateSearchPage } from "./pages/candidates/CandidateSearchPage";
 import { CandidateRegisterPage } from "./pages/candidates/CandidateRegisterPage";
 import { CandidateTokenPage } from "./pages/candidates/CandidateTokenPage";
 import { CandidateDeletePage } from "./pages/candidates/CandidateDeletePage";
-
 import { AboutPage } from "./pages/general/AboutPage";
-
+import { Test } from "./pages/citizens/test";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -54,7 +53,7 @@ export function App() {
 
             {/* Citizens */}
             <Route path="/citizens" element={<CitizenPage />} />
-            <Route path="/citizens/list" element={<CitizenListPage />} />
+            <Route path="/citizens/list" element={<Test />} />
             <Route path="/citizens/details" element={<CitizenSearchPage />} />
             <Route
               path="/citizens/register"

@@ -12,6 +12,7 @@ import { useCitizen } from "../../hooks/useCitizens";
 import { Button } from "../../components/general/Button";
 import { InputField } from "../../components/general/InputField";
 import { LoadingSpinner } from "../../components/general/LoadingSpinner";
+import { MainPageHeader } from "../../components/general/MainPageHeader";
 
 export const CitizenSearchPage = () => {
   const location = useLocation();
@@ -45,6 +46,10 @@ export const CitizenSearchPage = () => {
 
   return (
     <div className="mx-auto w-full max-w-2xl py-4">
+      <MainPageHeader
+        title="Civil Registry"
+        subtitle="Republic of Lebanon — Citizen Records"
+      />
       {/* ── Search Form Card ── */}
       <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="mb-4">
